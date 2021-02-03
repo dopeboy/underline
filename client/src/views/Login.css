@@ -1,0 +1,10 @@
+.ball {
+    max-width: 120px;
+    margin: 0px auto;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.main-grid {
+    margin-top: 20px;
+}
