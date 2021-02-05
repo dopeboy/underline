@@ -1,0 +1,10 @@
+[
+{
+    "model": "core.league",
+    "pk": 1,
+    "fields": {
+        "acronym": "NFL",
+        "long_name": "National Football Association"
+    }
+}
+]

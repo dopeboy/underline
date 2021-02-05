@@ -1,0 +1,365 @@
+[
+    {
+        "model": "core.team",
+        "pk": 97,
+        "fields": {
+            "name": "Cardinals",
+            "abbreviation": "ARI",
+            "location": "Arizona",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/af859073d0b115143b55b62e364d4760/56c1997b",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 98,
+        "fields": {
+            "name": "Falcons",
+            "abbreviation": "ATL",
+            "location": "Atlanta",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/fa7b1cd7c104bdb4802d63daba69e549/adc1f2c7",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 99,
+        "fields": {
+            "name": "Ravens",
+            "abbreviation": "BAL",
+            "location": "Baltimore",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/22a3b54de2c13ab2e29a343ce1da3340/2bca5ba2",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 100,
+        "fields": {
+            "name": "Bills",
+            "abbreviation": "BUF",
+            "location": "Buffalo",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/a3823f4fe7357231a31eb6f077247406/f0c63425",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 101,
+        "fields": {
+            "name": "Panthers",
+            "abbreviation": "CAR",
+            "location": "Carolina",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/3dce6d29b6ef6a3458bef7d9b29bf659/6809b914",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 102,
+        "fields": {
+            "name": "Bears",
+            "abbreviation": "CHI",
+            "location": "Chicago",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/e1834c38d79465a2a9d39cff80c7fd18/429df100",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 103,
+        "fields": {
+            "name": "Bengals",
+            "abbreviation": "CIN",
+            "location": "Cincinatti",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/14dc0906f5e7f8e989d8954db13629ee/55c5c7c2",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 104,
+        "fields": {
+            "name": "Browns",
+            "abbreviation": "CLE",
+            "location": "Cleveland",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/475cb33c71d04fa3fbc68de643756582/38ee2ca0",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 105,
+        "fields": {
+            "name": "Cowboys",
+            "abbreviation": "DAL",
+            "location": "Dallas",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/1c6bd4109b3ded57badf6f462a08048b/1893e63a",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 106,
+        "fields": {
+            "name": "Broncos",
+            "abbreviation": "DEN",
+            "location": "Denver",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/8715f0cdf79b56a3228b78f3494ccbfa/fcf3f91c",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 107,
+        "fields": {
+            "name": "Lions",
+            "abbreviation": "DET",
+            "location": "Detroit",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/519edb577552657d82a1ebcb4bd2549b/43fef5f7",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 108,
+        "fields": {
+            "name": "Packers",
+            "abbreviation": "GB",
+            "location": "Green Bay",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/a38e8d5f4de681b7ddb32341c76a39a1/1bc8cd7b",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 109,
+        "fields": {
+            "name": "Texans",
+            "abbreviation": "HOU",
+            "location": "Houston",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/e5705bfcc6814fcacb437466ef124a5a/4f899be1",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 110,
+        "fields": {
+            "name": "Colts",
+            "abbreviation": "IND",
+            "location": "Indianapolis",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/32c9e1d40b590f57afb51bed691e2f5b/3720ce5b",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 111,
+        "fields": {
+            "name": "Jaguars",
+            "abbreviation": "JAX",
+            "location": "Jacksonville",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/0c50b4f7d7d149d4ccc19899798995ef/f24e5e56",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 112,
+        "fields": {
+            "name": "Chiefs",
+            "abbreviation": "KC",
+            "location": "Kansas City",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/12ac3b22fccad8c30a4bfbde52506520/ac9e11b5",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 113,
+        "fields": {
+            "name": "Chargers",
+            "abbreviation": "LAC",
+            "location": "Los Angeles",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/97c6efee213690cf163b062ac73af9f5/d383d6d1",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 114,
+        "fields": {
+            "name": "Rams",
+            "abbreviation": "LAR",
+            "location": "Los Angeles",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/26de4dc42185d0f606def33eeef712de/9e581056",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 115,
+        "fields": {
+            "name": "Raiders",
+            "abbreviation": "LV",
+            "location": "Las Vegas",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/975e11775cfef514c70f429b71e671be/0a3e718f",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 116,
+        "fields": {
+            "name": "Dolphins",
+            "abbreviation": "MIA",
+            "location": "Miami ",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/81f71d0ef5bdcd8bfc6c189b24124d7e/4ac6fff4",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 117,
+        "fields": {
+            "name": "Vikings",
+            "abbreviation": "MIN",
+            "location": "Minnesota",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/d8d6fe44f06e156e6a269ba1d2cbd798/b03daa6c",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 118,
+        "fields": {
+            "name": "Jets",
+            "abbreviation": "NE",
+            "location": "New York",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/8aecfd7fb92fd3b34320a7de57a3f9af/10d92a5d",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 119,
+        "fields": {
+            "name": "Saints",
+            "abbreviation": "NO",
+            "location": "New Orleans",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/fdc1b04f282e0c51323bf908cdf5dcea/28440560",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 120,
+        "fields": {
+            "name": "Giants",
+            "abbreviation": "NYG",
+            "location": "New York",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/aed51ce87b2cb062a19291c38e0a36e3/fe13ab6c",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 121,
+        "fields": {
+            "name": "Jets",
+            "abbreviation": "NYJ",
+            "location": "New York",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/e856e38f7dcb484c8c4ffb372ab85248/3d4d3277",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 122,
+        "fields": {
+            "name": "Eagles",
+            "abbreviation": "PHI",
+            "location": "Philadelphia",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/b245399c82d8ac7571b97249e0e53d60/ede9ecbf",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 123,
+        "fields": {
+            "name": "Steelers",
+            "abbreviation": "PIT",
+            "location": "Pittsburgh",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/1a04792d97c3ea03f3f7ab2879e4eeb7/19d22845",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 124,
+        "fields": {
+            "name": "Seahawks",
+            "abbreviation": "SEA",
+            "location": "Seattle",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/1538364f71a268862fce0d20a7d06228/33fd4866",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 125,
+        "fields": {
+            "name": "49ers",
+            "abbreviation": "SF",
+            "location": "San Francisco",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/6cc6b6f3016c08a58217d7951f8a56f4/95b4b4fa",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 126,
+        "fields": {
+            "name": "Buccaneers",
+            "abbreviation": "TB",
+            "location": "Tampa",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/051632f0bbc4d5f7caae5348c31f47f1/8456fa5a",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 127,
+        "fields": {
+            "name": "Titans",
+            "abbreviation": "TEN",
+            "location": "Tennesse",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/ba4ac5c45ee5b0a289145aec19b306a4/5fa47913",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 128,
+        "fields": {
+            "name": "Redskins",
+            "abbreviation": "WAS",
+            "location": "Washington",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/45c5b4696ec2314ad34650f37ea2c113/54abe16e",
+            "league": 1
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 129,
+        "fields": {
+            "name": "FREE AGENT - NO TEAM",
+            "abbreviation": "FA",
+            "location": "NA",
+            "logo_url": "empty",
+            "league": 1
+        }
+    }
+]

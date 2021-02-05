@@ -1,0 +1,47 @@
+[
+{
+    "model": "core.position",
+    "pk": 1,
+    "fields": {
+        "league": 1,
+        "name": "Quarterback",
+        "acronym": "QB"
+    }
+},
+{
+    "model": "core.position",
+    "pk": 2,
+    "fields": {
+        "league": 1,
+        "name": "Running Back",
+        "acronym": "RB"
+    }
+},
+{
+    "model": "core.position",
+    "pk": 3,
+    "fields": {
+        "league": 1,
+        "name": "Wide Receiver",
+        "acronym": "WR"
+    }
+},
+{
+    "model": "core.position",
+    "pk": 4,
+    "fields": {
+        "league": 1,
+        "name": "Tight end",
+        "acronym": "TE"
+    }
+},
+{
+    "model": "core.position",
+    "pk": 5,
+    "fields": {
+        "league": 1,
+        "name": "Kicker",
+        "acronym": "K"
+    }
+}
+]
