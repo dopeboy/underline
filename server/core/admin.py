@@ -41,11 +41,6 @@ class PlayerAdmin(admin.ModelAdmin):
         return False
 
 
-class CurrentDateAdmin(admin.ModelAdmin):
-    def has_add_permission(self, request, obj=None):
-        return False
-
-
 class LineAdmin(admin.ModelAdmin):
     def has_add_permission(self, request, obj=None):
         return False
@@ -74,6 +69,6 @@ admin.site.register(Team, TeamAdmin)
 admin.site.register(League)
 admin.site.register(Position)
 admin.site.register(Line, LineAdmin)
-admin.site.register(CurrentDate, CurrentDateAdmin)
+admin.site.register(CurrentDate)
 admin.site.register(Player, PlayerAdmin)
 admin.site.register(Game, GameAdmin)
