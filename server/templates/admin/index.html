@@ -13,13 +13,14 @@
 
 {% block content %}
 <div id="content-main">
-   <!--
-  <form action="{% url 'sync_airtable' %}">
-    <input type="submit" value="Sync airtable" />
+  <form action="{% url 'sync_games' %}">
+    <input type="submit" value="Sync games" />
+  </form>
+  <form action="{% url 'sync_lines' %}">
+    <input type="submit" value="Sync lines" />
   </form>
   <br/>
   <br/>
-  -->
   {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
 </div>
 {% endblock %}

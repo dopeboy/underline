@@ -19,41 +19,59 @@ import logo from '../images/logo.png'
 import mahones from '../images/mahones.png'
 import clyde from '../images/clyde.png'
 import { gql, useQuery } from '@apollo/client'
+import moment from 'moment-timezone'
 import './Dashboard.css'
 
-const GET_PLAYERS_QUERY = gql`
+const GET_TODAYS_LINES_QUERY = gql`
     query {
-        allPlayers {
+        todaysLines {
             id
-            name
-            headshotUrl
+            pointsLine
+            player {
+                id
+                name
+                headshotUrl
+            }
+            game {
+                datetime
+                homeTeam {
+                    abbreviation
+                }
+                awayTeam {
+                    abbreviation
+                }
+            }
         }
     }
 `
 
 const PlayerList = () => {
-    const { data } = useQuery(GET_PLAYERS_QUERY)
+    const { data } = useQuery(GET_TODAYS_LINES_QUERY)
     return (
         <Card.Group>
             {data && (
                 <>
-                    {data.allPlayers.map((player) => (
+                    {data.todaysLines.map((line) => (
                         <Card>
                             <Image
                                 size="small"
-                                src={player.headshotUrl}
+                                src={line.player.headshotUrl}
                                 wrapped
                                 ui={false}
                             />
                             <Card.Content>
-                                <Card.Header>{player.name}</Card.Header>
+                                <Card.Header>{line.player.name}</Card.Header>
                                 <Card.Meta>
                                     <span className="date">
-                                        25.85 Fantasy Points
+                                        Points: {line.pointsLine}
                                     </span>
                                 </Card.Meta>
                                 <Card.Description>
-                                    KC @ TB - 3:30 PM
+                                    {line.game.awayTeam.abbreviation} @{' '}
+                                    {line.game.homeTeam.abbreviation} -{' '}
+                                    {moment(line.game.datetime)
+                                        .tz('America/Los_Angeles')
+                                        .format('h:mma z')}
                                 </Card.Description>
                             </Card.Content>
                             <Card.Content extra>

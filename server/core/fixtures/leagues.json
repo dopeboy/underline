@@ -1,10 +1,18 @@
 [
-{
-    "model": "core.league",
-    "pk": 1,
-    "fields": {
-        "acronym": "NFL",
-        "long_name": "National Football Association"
+    {
+        "model": "core.league",
+        "pk": 1,
+        "fields": {
+            "acronym": "NFL",
+            "long_name": "National Football Association"
+        }
+    },
+    {
+        "model": "core.league",
+        "pk": 2,
+        "fields": {
+            "acronym": "NBA",
+            "long_name": "National Basketball Association"
+        }
     }
-}
 ]
