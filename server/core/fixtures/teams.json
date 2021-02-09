@@ -361,5 +361,335 @@
             "logo_url": "empty",
             "league": 1
         }
+    },
+    {
+        "model": "core.team",
+        "pk": 130,
+        "fields": {
+            "name": "Hawks",
+            "abbreviation": "ATL",
+            "location": "Atlanta",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/12541f034c4cb222a6fcd0fb2949c115/7938e25d",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 131,
+        "fields": {
+            "name": "Celtics",
+            "abbreviation": "BOS",
+            "location": "Boston",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/e10addd96c43ac9065fcda1390c37ba4/f2baff30",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 132,
+        "fields": {
+            "name": "Nets",
+            "abbreviation": "BKN",
+            "location": "Brooklyn",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/73e1a4ccdd61ef71e712d06f5cfd5bf6/65cfc48e",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 133,
+        "fields": {
+            "name": "Hornets",
+            "abbreviation": "CHA",
+            "location": "Charlotte",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/3e42bc3ed6a92ecbc85d050035b2bdc6/5f26461d",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 134,
+        "fields": {
+            "name": "Bulls",
+            "abbreviation": "CHI",
+            "location": "Chicago",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/766b3915beae65f062a95811999beaa3/60052e51",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 135,
+        "fields": {
+            "name": "Cavaliers",
+            "abbreviation": "CLE",
+            "location": "Cleveland",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/03065ca362cccbc407e0af964d1d7a51/efa4deac",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 136,
+        "fields": {
+            "name": "Mavericks",
+            "abbreviation": "DAL",
+            "location": "Dallas",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/d03151c7a3ec9e2202f0b78189a1b20c/3c75b916",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 137,
+        "fields": {
+            "name": "Nuggets",
+            "abbreviation": "DEN",
+            "location": "Denver",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/6181d2badca879dd49145819607f6b07/63c444bf",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 138,
+        "fields": {
+            "name": "Pistons",
+            "abbreviation": "DET",
+            "location": "Detroit",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/3e7b085b80f901e393f9705ff584cfa9/4d875b22",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 139,
+        "fields": {
+            "name": "Warriors",
+            "abbreviation": "GSW",
+            "location": "Golden State",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/0826def0b85239276ebea856e5fee57f/029e42b7",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 140,
+        "fields": {
+            "name": "Rockets",
+            "abbreviation": "HOU",
+            "location": "Houston",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/cf3fc785f4e537cc24b9ee91b06de849/109d5a00",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 141,
+        "fields": {
+            "name": "Pacers",
+            "abbreviation": "IND",
+            "location": "Indiana",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/aafdf809d26abd6103c1c2232e7ccccf/e4962d6f",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 142,
+        "fields": {
+            "name": "Clippers",
+            "abbreviation": "LAC",
+            "location": "Los Angeles",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/a60574b5c08e1071b5458301c78bb6ab/6f6257a1",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 143,
+        "fields": {
+            "name": "Lakers",
+            "abbreviation": "LAL",
+            "location": "Los Angeles",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/239a6c3b04df1bdd046cd1fabde07176/384210d7",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 144,
+        "fields": {
+            "name": "Grizzlies",
+            "abbreviation": "MEM",
+            "location": "Memphis",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/0ef5c985525c6587840f9c76fccf53a9/ff446c41",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 145,
+        "fields": {
+            "name": "Heat",
+            "abbreviation": "MIA",
+            "location": "Miami",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/601d63f5f213f292860d68a5b6a42c51/7d74ff47",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 146,
+        "fields": {
+            "name": "Bucks",
+            "abbreviation": "MIL",
+            "location": "Milwaukee",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/b7a98d1acad46b64b8e54320a566af72/48f54ee2",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 147,
+        "fields": {
+            "name": "Timberwolves",
+            "abbreviation": "MIN",
+            "location": "Minnesota",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/ad71fc43fff01711ed2b126ab92adebb/a312f66f",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 148,
+        "fields": {
+            "name": "Pelicans",
+            "abbreviation": "NOP",
+            "location": "New Orleans",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/bc5b60fe900efde9531edf395272530d/d175d621",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 149,
+        "fields": {
+            "name": "Knicks",
+            "abbreviation": "NYK",
+            "location": "New York",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/5fb641fd218573e3a052cb973c9a20fa/6192e803",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 150,
+        "fields": {
+            "name": "Thunder",
+            "abbreviation": "OKC",
+            "location": "Oklahoma",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/6481ec91b884779d9d9841c737ed9c9a/57b479b4",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 151,
+        "fields": {
+            "name": "Magic",
+            "abbreviation": "ORL",
+            "location": "Orlando",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/2bcae8fdca9d00d08258120bdce101d2/84ec936d",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 152,
+        "fields": {
+            "name": "76ers",
+            "abbreviation": "PHI",
+            "location": "Philadelphia",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/f113c4e9cc74089d87b002cad4de9114/774ce76d",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 153,
+        "fields": {
+            "name": "Suns",
+            "abbreviation": "PHX",
+            "location": "Phoenix",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/e469a810be39fcd98eef94bfc112ff97/e6863219",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 154,
+        "fields": {
+            "name": "Trail Blazers",
+            "abbreviation": "POR",
+            "location": "Portland",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/6338049a5f2695927f8012de43d2b045/9d85b13f",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 155,
+        "fields": {
+            "name": "Kings",
+            "abbreviation": "SAC",
+            "location": "Sacramento",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/a07e3c692e6316d3a1155b357d3a6d70/d2d86c9f",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 156,
+        "fields": {
+            "name": "Spurs",
+            "abbreviation": "SAS",
+            "location": "San Antonio",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/5c97c1d7dd2a0ff83242581707a3d735/739a31f2",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 157,
+        "fields": {
+            "name": "Raptors",
+            "abbreviation": "TOR",
+            "location": "Toronto",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/edfee4a551505698e012e79de7dc22b2/6e79051d",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 158,
+        "fields": {
+            "name": "Jazz",
+            "abbreviation": "UTA",
+            "location": "Utah",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/f729fb86e1ef22c9a5e2d67b8bd14fad/e68df3f6",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 159,
+        "fields": {
+            "name": "Wizards",
+            "abbreviation": "WAS",
+            "location": "Washington Wizards",
+            "logo_url": "https://dl.airtable.com/.attachmentThumbnails/e35f7c381173c4488600c7ed3c2871b5/5737d4a4",
+            "league": 2
+        }
     }
 ]
