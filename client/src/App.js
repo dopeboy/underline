@@ -1,42 +1,69 @@
-import logo from './logo.svg'
-import './App.css'
 import { gql, useQuery } from '@apollo/client'
-import { ApolloProvider, ApolloClient, InMemoryCache } from '@apollo/client'
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
-import Login from './views/Login.jsx'
-import Dashboard from './views/Dashboard.jsx'
+import { getJWT } from './utils'
+import {
+    createHttpLink,
+    ApolloProvider,
+    ApolloClient,
+    InMemoryCache,
+} from '@apollo/client'
+import { setContext } from '@apollo/client/link/context'
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+    Link,
+    Redirect,
+} from 'react-router-dom'
+import Login from 'views/Login.jsx'
+import Dashboard from 'views/Dashboard.jsx'
+import Main from 'components/Main'
 
-const GET_QUERY = gql`
-    {
-        yay
+const authLink = setContext((_, { headers }) => {
+    const token = getJWT()
+    return {
+        headers: {
+            ...headers,
+            authorization: token ? `JWT ${token}` : '',
+        },
     }
-`
+})
 
-const client = new ApolloClient({
+const httpLink = createHttpLink({
     uri:
         process.env.NODE_ENV === 'production'
             ? '/gql'
             : 'http://localhost:5000/graphql/',
+})
+
+const client = new ApolloClient({
+    link: authLink.concat(httpLink),
     cache: new InMemoryCache(),
 })
 
-function Sample() {
-    const { loading, error, data } = useQuery(GET_QUERY)
-
-    if (loading) return 'Loading...'
-    if (error) return `Error! ${error.message}`
-
-    return <div>{data.yay}</div>
-}
+const PrivateRoute = ({ component: Component, ...rest }) => (
+    <Route
+        {...rest}
+        render={(props) =>
+            getJWT() ? (
+                <Main>
+                    <Component {...props} />
+                </Main>
+            ) : (
+                <Redirect to="/login" />
+            )
+        }
+    />
+)
 
 function App() {
     return (
         <ApolloProvider client={client}>
             <Router>
                 <Switch>
-                    <Route path="/dashboard">
-                        <Dashboard />
-                    </Route>
+                    <PrivateRoute
+                        path="/dashboard"
+                        component={Dashboard}
+                    ></PrivateRoute>
                     <Route path="/">
                         <Login />
                     </Route>

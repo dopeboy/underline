@@ -12,6 +12,7 @@ services:
     image: underline
     env_file: .env
     container_name: underline
+    user: ${CURRENT_UID}
     volumes:
       - .:/code
     ports:

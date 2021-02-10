@@ -29,3 +29,5 @@ server/static
 __pycache__
 .pytest_cache
 *.swp
+
+server/staticfiles

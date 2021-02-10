@@ -11,5 +11,6 @@ class Command(BaseCommand):
         call_command('loaddata', 'core/fixtures/leagues.json', verbosity=0)
         call_command('loaddata', 'core/fixtures/teams.json', verbosity=0)
         call_command('loaddata', 'core/fixtures/positions.json', verbosity=0)
+        call_command('loaddata', 'core/fixtures/players.json', verbosity=0)
         result = {'message': "Successfully loaded base data"}
         return json.dumps(result)

@@ -16,11 +16,10 @@ import {
     Menu,
 } from 'semantic-ui-react'
 import logo from '../images/logo.png'
-import mahones from '../images/mahones.png'
-import clyde from '../images/clyde.png'
 import { gql, useQuery } from '@apollo/client'
 import moment from 'moment-timezone'
 import './Dashboard.css'
+import { Helmet } from 'react-helmet'
 
 const GET_TODAYS_LINES_QUERY = gql`
     query {
@@ -111,118 +110,97 @@ export default class Dashboard extends Component {
         const { activeItem } = this.state
 
         return (
-            <div>
-                <Menu size="huge" className="ule navbar">
-                    <Menu.Item onClick={this.handleItemClick}>
-                        <img src={logo} className="ball" />
-                        <span className="comp-name">Underline</span>
-                    </Menu.Item>
-
-                    <Menu.Item onClick={this.handleItemClick} active>
-                        Pick'Em
-                    </Menu.Item>
-
-                    <Menu.Menu position="right">
-                        <Dropdown item text="Zach M.">
-                            <Dropdown.Menu>
-                                <Dropdown.Item>Logout</Dropdown.Item>
-                            </Dropdown.Menu>
-                        </Dropdown>
-                    </Menu.Menu>
+            <>
+                <Helmet>
+                    <title>Dashboard</title>
+                </Helmet>
+                <Menu secondary>
+                    <Menu.Item
+                        name="Lobby"
+                        active={activeItem === 'lobby'}
+                        onClick={this.handleItemClick}
+                    />
+                    <Menu.Item
+                        name="active"
+                        active={activeItem === 'active'}
+                        onClick={this.handleItemClick}
+                    />
+                    <Menu.Item
+                        name="completed"
+                        active={activeItem === 'completed'}
+                        onClick={this.handleItemClick}
+                    />
                 </Menu>
-                <div id="ule-container">
-                    <Menu secondary>
-                        <Menu.Item
-                            name="Lobby"
-                            active={activeItem === 'lobby'}
-                            onClick={this.handleItemClick}
-                        />
-                        <Menu.Item
-                            name="active"
-                            active={activeItem === 'active'}
-                            onClick={this.handleItemClick}
-                        />
-                        <Menu.Item
-                            name="completed"
-                            active={activeItem === 'completed'}
-                            onClick={this.handleItemClick}
-                        />
-                    </Menu>
 
-                    <Grid>
-                        <Grid.Row>
-                            <Grid.Column width={12}>
-                                <Header as="h2">Featured players</Header>
-                                <PlayerList />
-                            </Grid.Column>
-                            <Grid.Column width={4}>
-                                <Header as="h2">Review picks</Header>
-                                <Progress
-                                    percent={this.state.percent}
-                                    color="green"
-                                >
-                                    {this.state.percent === 0
-                                        ? '1x'
-                                        : this.state.percent < 40
-                                        ? '3x'
-                                        : '6x'}
-                                </Progress>
-                                <Form>
-                                    <Form.Group widths="equal">
-                                        <Form.Input
+                <Grid>
+                    <Grid.Row>
+                        <Grid.Column width={12}>
+                            <Header as="h2">Featured players</Header>
+                            <PlayerList />
+                        </Grid.Column>
+                        <Grid.Column width={4}>
+                            <Header as="h2">Review picks</Header>
+                            <Progress
+                                percent={this.state.percent}
+                                color="green"
+                            >
+                                {this.state.percent === 0
+                                    ? '1x'
+                                    : this.state.percent < 40
+                                    ? '3x'
+                                    : '6x'}
+                            </Progress>
+                            <Form>
+                                <Form.Group widths="equal">
+                                    <Form.Input
+                                        fluid
+                                        icon="dollar"
+                                        iconPosition="left"
+                                        label="Entry amount"
+                                        placeholder="Entry amount"
+                                    />
+                                    <Form.Input
+                                        fluid
+                                        icon="dollar"
+                                        iconPosition="left"
+                                        label="Payout"
+                                        placeholder="Payout"
+                                    />
+                                </Form.Group>
+                                <Form.Button fluid color="green">
+                                    Submit
+                                </Form.Button>
+                            </Form>
+                            {this.state.picks.length > 0 && <Divider />}
+                            {this.state.picks.map((item) => (
+                                <Card fluid>
+                                    <Card.Content>
+                                        <Image floated="left" size="mini" />
+                                        <Card.Header>
+                                            Patrick Mahones
+                                        </Card.Header>
+                                        <Card.Meta>
+                                            25.85 Fantasy Points
+                                        </Card.Meta>
+                                        <Card.Description>
+                                            KC @ TB - 3:30 PM
+                                        </Card.Description>
+                                    </Card.Content>
+                                    <Card.Content extra>
+                                        <Button
+                                            basic
+                                            color={item ? 'red' : 'green'}
                                             fluid
-                                            icon="dollar"
-                                            iconPosition="left"
-                                            label="Entry amount"
-                                            placeholder="Entry amount"
-                                        />
-                                        <Form.Input
-                                            fluid
-                                            icon="dollar"
-                                            iconPosition="left"
-                                            label="Payout"
-                                            placeholder="Payout"
-                                        />
-                                    </Form.Group>
-                                    <Form.Button fluid color="green">
-                                        Submit
-                                    </Form.Button>
-                                </Form>
-                                {this.state.picks.length > 0 && <Divider />}
-                                {this.state.picks.map((item) => (
-                                    <Card fluid>
-                                        <Card.Content>
-                                            <Image
-                                                floated="left"
-                                                size="mini"
-                                                src={mahones}
-                                            />
-                                            <Card.Header>
-                                                Patrick Mahones
-                                            </Card.Header>
-                                            <Card.Meta>
-                                                25.85 Fantasy Points
-                                            </Card.Meta>
-                                            <Card.Description>
-                                                KC @ TB - 3:30 PM
-                                            </Card.Description>
-                                        </Card.Content>
-                                        <Card.Content extra>
-                                            <Button
-                                                basic
-                                                color={item ? 'red' : 'green'}
-                                                fluid
-                                            >
-                                                {item ? 'Under' : 'Over'}
-                                            </Button>
-                                        </Card.Content>
-                                    </Card>
-                                ))}
-                            </Grid.Column>
-                        </Grid.Row>
-                    </Grid>
-                </div>
-            </div>
+                                        >
+                                            {item ? 'Under' : 'Over'}
+                                        </Button>
+                                    </Card.Content>
+                                </Card>
+                            ))}
+                        </Grid.Column>
+                    </Grid.Row>
+                </Grid>
+            </>
         )
     }
 }

@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [requires]
-python_version = "3.7.0"
+python_version = "3.9.1"
 
 [packages]
 django = "==3.1.6"
@@ -16,6 +16,8 @@ gunicorn = "*"
 django-environ = "*"
 django-heroku = "*"
 requests = "==2.25.1"
+pyjwt = "==1.7.0"
+django-graphql-jwt = "*"
 
 [dev-packages]
 pytest-django = "==3.3.2"

@@ -19,7 +19,7 @@ case $task in
     start)
         # Start docker containers.
         # See ./d up --help for additional info
-        docker-compose up $args
+        CURRENT_UID=$(id -u):$(id -g) docker-compose up $args
         ;;
     stop)
         # Stop docker containers.
@@ -46,7 +46,7 @@ case $task in
     bash)
         # SSH (bash) into server container.
         # Useful for running Django shell commands.
-        docker exec -it underline bash
+        CURRENT_UID=$(id -u):$(id -g) docker exec -it underline bash
         ;;
     bashdb)
         # SSH (bash) into database container.
