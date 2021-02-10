@@ -6,3 +6,4 @@ ls /var/log/nginx/error.log
 ls -l /var/log/nginx/error.log 
 chown -R app:app /var/log/nginx
 ./createsuperuser.sh 
+pipenv lock

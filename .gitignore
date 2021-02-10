@@ -31,3 +31,6 @@ __pycache__
 *.swp
 
 server/staticfiles
+.cache
+.local
+.bash_history
