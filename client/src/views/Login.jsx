@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { Grid, Form, Button, Container } from 'semantic-ui-react'
+import { Message, Grid, Form, Button, Container } from 'semantic-ui-react'
 import logo from 'images/logo.png'
-import './Login.css'
 import { Helmet } from 'react-helmet'
 import { gql, useMutation } from '@apollo/client'
 import { saveJWT } from 'utils'
 import { useHistory } from 'react-router-dom'
+import './Login.scss'
 
 const LOGIN_MUTATION = gql`
     mutation TokenAuth($emailAddress: String!, $password: String!) {
@@ -21,25 +21,33 @@ const Login = () => {
     const history = useHistory()
     const [emailAddress, setEmailAddress] = useState('')
     const [password, setPassword] = useState('')
+    const [error, setError] = useState(false)
+    const [processing, setProcessing] = useState(false)
+
     const [loginUser] = useMutation(LOGIN_MUTATION, {
         onCompleted: (data) => {
+            setProcessing(false)
+            setError(false)
             saveJWT(data.tokenAuth.token)
             history.push('/dashboard')
         },
         onError: (data) => {
-            console.error(data)
+            setProcessing(false)
+            setError(true)
         },
     })
 
     const handleSubmit = (evt) => {
         evt.preventDefault()
+        setProcessing(true)
+        setError(false)
         loginUser({
             variables: { emailAddress: emailAddress, password: password },
         })
     }
 
     return (
-        <Container>
+        <Container id="ul-login">
             <Helmet>
                 <title>Login</title>
             </Helmet>
@@ -47,6 +55,11 @@ const Login = () => {
                 <Grid centered columns={1}>
                     <Grid.Column width={6}>
                         <img alt="" src={logo} className="logo" />
+                        {error && <Message negative>
+                            <Message.Header>Login invalid</Message.Header>
+                            <p>Your email address or password is incorrect.</p>
+                        </Message>
+                        }
                         <Form onSubmit={handleSubmit}>
                             <Form.Field required>
                                 <label>Email address</label>
@@ -77,6 +90,8 @@ const Login = () => {
                                 size="large"
                                 fluid
                                 color="green"
+                                disabled={processing}
+                                loading={processing}
                             >
                                 Login
                             </Button>

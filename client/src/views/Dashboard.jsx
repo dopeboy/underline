@@ -1,11 +1,14 @@
-import React, { Component } from 'react'
+import React, { useState, Component } from 'react'
 import {
     Divider,
     Form,
     Progress,
     Segment,
     Grid,
+    Label,
     Icon,
+    List,
+    Modal,
     Card,
     Image,
     Header,
@@ -18,8 +21,8 @@ import {
 import logo from '../images/logo.png'
 import { gql, useQuery } from '@apollo/client'
 import moment from 'moment-timezone'
-import './Dashboard.css'
 import { Helmet } from 'react-helmet'
+import './Dashboard.scss'
 
 const GET_TODAYS_LINES_QUERY = gql`
     query {
@@ -44,163 +47,357 @@ const GET_TODAYS_LINES_QUERY = gql`
     }
 `
 
-const PlayerList = () => {
+const PlayerList = ({ picks, addOrRemovePick }) => {
     const { data } = useQuery(GET_TODAYS_LINES_QUERY)
     return (
-        <Card.Group>
-            {data && (
-                <>
-                    {data.todaysLines.map((line) => (
-                        <Card>
-                            <Image
-                                size="small"
-                                src={line.player.headshotUrl}
-                                wrapped
-                                ui={false}
-                            />
-                            <Card.Content>
-                                <Card.Header>{line.player.name}</Card.Header>
-                                <Card.Meta>
-                                    <span className="date">
-                                        Points: {line.pointsLine}
-                                    </span>
-                                </Card.Meta>
-                                <Card.Description>
-                                    {line.game.awayTeam.abbreviation} @{' '}
-                                    {line.game.homeTeam.abbreviation} -{' '}
-                                    {moment(line.game.datetime)
-                                        .tz('America/Los_Angeles')
-                                        .format('h:mma z')}
-                                </Card.Description>
-                            </Card.Content>
-                            <Card.Content extra>
-                                <Button.Group size="large" fluid>
-                                    <Button>Under</Button>
-                                    <Button.Or />
-                                    <Button>Over</Button>
-                                </Button.Group>
-                            </Card.Content>
-                        </Card>
-                    ))}
-                </>
-            )}
-        </Card.Group>
+        <Form loading={!data}>
+            <Card.Group>
+                {data &&
+                    data.todaysLines.map((line) => {
+                        const pick = picks.filter((e) => {
+                            return e.id === line.id
+                        })[0]
+
+                        return (
+                            <Card key={line.id}>
+                                <Image
+                                    size="small"
+                                    src={line.player.headshotUrl}
+                                    wrapped
+                                    ui={false}
+                                />
+                                <Card.Content>
+                                    <Card.Header>
+                                        {line.player.name}
+                                    </Card.Header>
+                                    <Card.Meta>
+                                        <span className="date">
+                                            Points: {line.pointsLine}
+                                        </span>
+                                    </Card.Meta>
+                                    <Card.Description>
+                                        {line.game.awayTeam.abbreviation} @{' '}
+                                        {line.game.homeTeam.abbreviation} -{' '}
+                                        {moment(line.game.datetime)
+                                            .tz('America/Los_Angeles')
+                                            .format('h:mma z')}
+                                    </Card.Description>
+                                </Card.Content>
+                                <Card.Content extra>
+                                    <Button.Group size="large" fluid>
+                                        <Button
+                                            content="Under"
+                                            active={pick && pick.under}
+                                            icon={
+                                                pick && pick.under
+                                                    ? 'check'
+                                                    : null
+                                            }
+                                            color="blue"
+                                            onClick={() =>
+                                                addOrRemovePick(line, true)
+                                            }
+                                        />
+                                        <Button.Or />
+                                        <Button
+                                            color="purple"
+                                            content="Over"
+                                            icon={
+                                                pick && !pick.under
+                                                    ? 'check'
+                                                    : null
+                                            }
+                                            onClick={() =>
+                                                addOrRemovePick(line, false)
+                                            }
+                                        />
+                                    </Button.Group>
+                                </Card.Content>
+                            </Card>
+                        )
+                    })}
+            </Card.Group>
+        </Form>
     )
 }
 
-export default class Dashboard extends Component {
-    state = { activeItem: 'lobby', picks: [], percent: 0 }
-    under = () => {
-        this.setState({
-            picks: [...this.state.picks, true],
-            percent: this.state.percent + 20,
-        })
+const Dashboard = () => {
+    const [tab, setTab] = useState('lobby')
+    const [picks, setPicks] = useState([])
+    const [percent, setPercent] = useState(0)
+    const [multiplier, setMultiplier] = useState('1x')
+    const [payout, setPayout] = useState('')
+    const [entryAmount, setEntryAmount] = useState('')
+    const [tooManyLinesModalVisible, setTooManyLinesModalVisible] = useState(
+        false
+    )
+
+    const addOrRemovePick = (line, under) => {
+        const pickIndex = picks.findIndex((e) => e.id === line.id)
+        let newPicks = []
+
+        // If the pick already exists, remove it
+        if (pickIndex != -1) {
+            var array = [...picks] // deep copy
+
+            // Check if user is changing the over/under. If so, just update that.
+            if (array[pickIndex].under != under) {
+                array[pickIndex].under = under
+            }
+
+            // Else, remove it
+            else {
+                array.splice(pickIndex, 1)
+            }
+
+            newPicks = array
+            setPicks(newPicks)
+        }
+
+        // New pick. Set the attribute
+        else {
+            // If we're at 5 picks, tell the user and don't proceed
+            if (picks.length === 5) {
+                setTooManyLinesModalVisible(true)
+                newPicks = picks
+            } else {
+                newPicks = [...picks, Object.assign({}, line, { under })]
+                setPicks(newPicks)
+            }
+        }
+
+        // Update multiplier
+        if (newPicks.length == 0) {
+            setPercent(0)
+            setMultiplier(`${getMultiplier(newPicks.length)}x`)
+            setPayout(entryAmount ? entryAmount : '')
+        } else if (newPicks.length === 1) {
+            setPercent(10)
+            setMultiplier(`${getMultiplier(newPicks.length)}x`)
+            setPayout(entryAmount ? entryAmount : '')
+        } else if (newPicks.length === 2) {
+            setPercent(25)
+            setMultiplier(`${getMultiplier(newPicks.length)}x`)
+            setPayout(
+                entryAmount ? entryAmount * getMultiplier(newPicks.length) : ''
+            )
+        } else if (newPicks.length === 3) {
+            setPercent(50)
+            setMultiplier(`${getMultiplier(newPicks.length)}x`)
+            setPayout(
+                entryAmount ? entryAmount * getMultiplier(newPicks.length) : ''
+            )
+        } else if (newPicks.length === 4) {
+            setPercent(75)
+            setMultiplier(`${getMultiplier(newPicks.length)}x`)
+            setPayout(
+                entryAmount ? entryAmount * getMultiplier(newPicks.length) : ''
+            )
+        } else if (newPicks.length === 5) {
+            setPercent(100)
+            setMultiplier(`${getMultiplier(newPicks.length)}x`)
+            setPayout(
+                entryAmount ? entryAmount * getMultiplier(newPicks.length) : ''
+            )
+        }
     }
 
-    over = () => {
-        this.setState({
-            picks: [...this.state.picks, false],
-            percent: this.state.percent + 20,
-        })
+    const getMultiplier = (numPicks) => {
+        if (numPicks == 0) {
+            return 1
+        } else if (numPicks === 1) {
+            return 1
+        } else if (numPicks === 2) {
+            return 3
+        } else if (numPicks === 3) {
+            return 6
+        } else if (numPicks === 4) {
+            return 10
+        } else if (numPicks === 5) {
+            return 20
+        }
     }
 
-    handleItemClick = (e, { name }) => this.setState({ activeItem: name })
+    return (
+        <div id="ul-dashboard">
+            <Helmet>
+                <title>Dashboard</title>
+            </Helmet>
+            <Modal
+                onClose={() => setTooManyLinesModalVisible(false)}
+                onOpen={() => setTooManyLinesModalVisible(true)}
+                open={tooManyLinesModalVisible}
+                size="small"
+            >
+                <Header>
+                    <Icon name="exclamation circle" />
+                    Too many lines
+                </Header>
+                <Modal.Content>
+                    <p>You can only pick five lines.</p>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button onClick={() => setTooManyLinesModalVisible(false)}>
+                        OK
+                    </Button>
+                </Modal.Actions>
+            </Modal>
+            <Menu secondary>
+                <Menu.Item
+                    name="Lobby"
+                    active={tab === 'lobby'}
+                    onClick={setTab}
+                />
+                <Menu.Item
+                    name="active"
+                    active={tab === 'active'}
+                    onClick={setTab}
+                />
+                <Menu.Item
+                    name="completed"
+                    active={tab === 'completed'}
+                    onClick={setTab}
+                />
+            </Menu>
 
-    render() {
-        const { activeItem } = this.state
-
-        return (
-            <>
-                <Helmet>
-                    <title>Dashboard</title>
-                </Helmet>
-                <Menu secondary>
-                    <Menu.Item
-                        name="Lobby"
-                        active={activeItem === 'lobby'}
-                        onClick={this.handleItemClick}
-                    />
-                    <Menu.Item
-                        name="active"
-                        active={activeItem === 'active'}
-                        onClick={this.handleItemClick}
-                    />
-                    <Menu.Item
-                        name="completed"
-                        active={activeItem === 'completed'}
-                        onClick={this.handleItemClick}
-                    />
-                </Menu>
-
-                <Grid>
-                    <Grid.Row>
-                        <Grid.Column width={12}>
-                            <Header as="h2">Featured players</Header>
-                            <PlayerList />
-                        </Grid.Column>
-                        <Grid.Column width={4}>
-                            <Header as="h2">Review picks</Header>
-                            <Progress
-                                percent={this.state.percent}
+            <Grid>
+                <Grid.Row>
+                    <Grid.Column width={12}>
+                        <Header as="h1">Featured players</Header>
+                        <PlayerList
+                            picks={picks}
+                            addOrRemovePick={addOrRemovePick}
+                        />
+                    </Grid.Column>
+                    <Grid.Column width={4}>
+                        <Header as="h1">Review picks</Header>
+                        <Progress percent={percent} color="green">
+                            {multiplier}
+                        </Progress>
+                        <Form>
+                            <Form.Group widths="equal">
+                                <Form.Input
+                                    fluid
+                                    icon="dollar"
+                                    iconPosition="left"
+                                    label="Entry amount"
+                                    placeholder="Entry amount"
+                                    size="huge"
+                                    onChange={(e) => {
+                                        setEntryAmount(e.target.value)
+                                        setPayout(
+                                            (e.target.value *
+                                                getMultiplier(picks.length): '')
+                                        )
+                                    }}
+                                />
+                                <Form.Input
+                                    fluid
+                                    icon="dollar"
+                                    iconPosition="left"
+                                    className="payout-box"
+                                    label="Payout"
+                                    placeholder="Payout"
+                                    value={payout}
+                                    size="huge"
+                                />
+                            </Form.Group>
+                            <Form.Button
+                                disabled={picks.length < 2}
+                                fluid
                                 color="green"
+                                size="huge"
                             >
-                                {this.state.percent === 0
-                                    ? '1x'
-                                    : this.state.percent < 40
-                                    ? '3x'
-                                    : '6x'}
-                            </Progress>
-                            <Form>
-                                <Form.Group widths="equal">
-                                    <Form.Input
+                                Submit
+                            </Form.Button>
+                        </Form>
+                        <Header as="h2">Slip</Header>
+                        {picks.length === 0 && (
+                            <p>Add a player from the left.</p>
+                        )}
+                        {picks.map((pick) => (
+                            <Card fluid className="slip-card">
+                                <Card.Content>
+                                    <Grid columns="two" divided>
+                                        <Grid.Row>
+                                            <Grid.Column>
+                                                <Image
+                                                    src={
+                                                        pick.player.headshotUrl
+                                                    }
+                                                />
+                                            </Grid.Column>
+                                            <Grid.Column>
+                                                <Header as="h4">
+                                                    {pick.player.name}
+                                                </Header>
+                                                <List>
+                                                    <List.Item className="lol">
+                                                        <List.Icon name="hashtag" />
+                                                        <List.Content>
+                                                            Points:{' '}
+                                                            {pick.pointsLine}
+                                                        </List.Content>
+                                                    </List.Item>
+                                                    <List.Item>
+                                                        <List.Icon name="calendar outline" />
+                                                        <List.Content>
+                                                            {
+                                                                pick.game
+                                                                    .awayTeam
+                                                                    .abbreviation
+                                                            }{' '}
+                                                            @{' '}
+                                                            {
+                                                                pick.game
+                                                                    .homeTeam
+                                                                    .abbreviation
+                                                            }{' '}
+                                                            -{' '}
+                                                            {moment(
+                                                                pick.game
+                                                                    .datetime
+                                                            )
+                                                                .tz(
+                                                                    'America/Los_Angeles'
+                                                                )
+                                                                .format(
+                                                                    'h:mma z'
+                                                                )}
+                                                        </List.Content>
+                                                    </List.Item>
+                                                    <List.Item>
+                                                        <List.Icon name="basketball ball" />
+                                                        <List.Content>
+                                                            {pick.under
+                                                                ? 'Under'
+                                                                : 'Over'}
+                                                        </List.Content>
+                                                    </List.Item>
+                                                </List>
+                                            </Grid.Column>
+                                        </Grid.Row>
+                                    </Grid>
+                                </Card.Content>
+                                <Card.Content extra>
+                                    <Button
                                         fluid
-                                        icon="dollar"
-                                        iconPosition="left"
-                                        label="Entry amount"
-                                        placeholder="Entry amount"
-                                    />
-                                    <Form.Input
-                                        fluid
-                                        icon="dollar"
-                                        iconPosition="left"
-                                        label="Payout"
-                                        placeholder="Payout"
-                                    />
-                                </Form.Group>
-                                <Form.Button fluid color="green">
-                                    Submit
-                                </Form.Button>
-                            </Form>
-                            {this.state.picks.length > 0 && <Divider />}
-                            {this.state.picks.map((item) => (
-                                <Card fluid>
-                                    <Card.Content>
-                                        <Image floated="left" size="mini" />
-                                        <Card.Header>
-                                            Patrick Mahones
-                                        </Card.Header>
-                                        <Card.Meta>
-                                            25.85 Fantasy Points
-                                        </Card.Meta>
-                                        <Card.Description>
-                                            KC @ TB - 3:30 PM
-                                        </Card.Description>
-                                    </Card.Content>
-                                    <Card.Content extra>
-                                        <Button
-                                            basic
-                                            color={item ? 'red' : 'green'}
-                                            fluid
-                                        >
-                                            {item ? 'Under' : 'Over'}
-                                        </Button>
-                                    </Card.Content>
-                                </Card>
-                            ))}
-                        </Grid.Column>
-                    </Grid.Row>
-                </Grid>
-            </>
-        )
-    }
+                                        color="red"
+                                        basic
+                                        onClick={() =>
+                                            addOrRemovePick(pick, pick.under)
+                                        }
+                                    >
+                                        Remove
+                                    </Button>
+                                </Card.Content>
+                            </Card>
+                        ))}
+                    </Grid.Column>
+                </Grid.Row>
+            </Grid>
+        </div>
+    )
 }
+
+export default Dashboard

@@ -7,3 +7,4 @@ ls -l /var/log/nginx/error.log
 chown -R app:app /var/log/nginx
 ./createsuperuser.sh 
 pipenv lock
+python manage.py loadbasedata

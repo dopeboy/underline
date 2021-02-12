@@ -18,7 +18,7 @@ import {
 import logo from 'images/logo.png'
 import { clearJWT } from 'utils'
 import { useHistory } from 'react-router-dom'
-import styles from './Main.module.css' // Import css modules stylesheet as styles
+import styles from './Main.module.css'
 
 const GET_ME_QUERY = gql`
     query {
@@ -39,7 +39,7 @@ const Main = (props) => {
 
     return (
         <>
-            <Menu size="massive" className="ule navbar">
+            <Menu size="massive" className={styles['ule-navbar']}>
                 <Menu.Item>
                     <img src={logo} id={styles.logo} />
                 </Menu.Item>
@@ -62,7 +62,7 @@ const Main = (props) => {
                     </Dropdown>
                 </Menu.Menu>
             </Menu>
-            <div id="ule-container">{props.children}</div>
+            <div className={styles['ule-container']}>{props.children}</div>
         </>
     )
 }
