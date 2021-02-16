@@ -3,7 +3,6 @@
 }
 
 .ule-navbar {
-    padding: 0px 100px;
 }
 
 @media only screen and (min-width: 1920px) {
@@ -11,13 +10,12 @@
         width: 1900px;
         margin-left: auto !important;
         margin-right: auto !important;
-        padding: 0px 120px;
     }
 }
 
 @media only screen and (max-width: 1920px) {
     .ule-container {
-        padding: 0px 120px;
+        padding: 0px 30px;
         width: 100%;
         margin-left: auto !important;
         margin-right: auto !important;

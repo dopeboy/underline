@@ -19,7 +19,7 @@ import {
     Menu,
 } from 'semantic-ui-react'
 import logo from '../images/logo.png'
-import { gql, useQuery } from '@apollo/client'
+import { gql, useApolloClient, useQuery } from '@apollo/client'
 import moment from 'moment-timezone'
 import { Helmet } from 'react-helmet'
 import './Dashboard.scss'
@@ -33,6 +33,9 @@ const GET_TODAYS_LINES_QUERY = gql`
                 id
                 name
                 headshotUrl
+                team {
+                    id
+                }
             }
             game {
                 datetime
@@ -44,6 +47,12 @@ const GET_TODAYS_LINES_QUERY = gql`
                 }
             }
         }
+    }
+`
+
+const CHECK_APPROVED_LOCATION_QUERY = gql`
+    query ApprovedLocation($lat: Float!, $lng: Float!) {
+        approvedLocation(lat: $lat, lng: $lng)
     }
 `
 
@@ -86,29 +95,28 @@ const PlayerList = ({ picks, addOrRemovePick }) => {
                                 <Card.Content extra>
                                     <Button.Group size="large" fluid>
                                         <Button
-                                            content="Under"
-                                            active={pick && pick.under}
-                                            icon={
-                                                pick && pick.under
-                                                    ? 'check'
-                                                    : null
+                                            className="over-under-btn"
+                                            color={
+                                                pick && !pick.under
+                                                    ? 'black'
+                                                    : ''
                                             }
-                                            color="blue"
+                                            content="Over"
                                             onClick={() =>
-                                                addOrRemovePick(line, true)
+                                                addOrRemovePick(line, false)
                                             }
                                         />
                                         <Button.Or />
                                         <Button
-                                            color="purple"
-                                            content="Over"
-                                            icon={
-                                                pick && !pick.under
-                                                    ? 'check'
+                                            className="over-under-btn"
+                                            content="Under"
+                                            color={
+                                                pick && pick.under
+                                                    ? 'black'
                                                     : null
                                             }
                                             onClick={() =>
-                                                addOrRemovePick(line, false)
+                                                addOrRemovePick(line, true)
                                             }
                                         />
                                     </Button.Group>
@@ -128,9 +136,14 @@ const Dashboard = () => {
     const [multiplier, setMultiplier] = useState('1x')
     const [payout, setPayout] = useState('')
     const [entryAmount, setEntryAmount] = useState('')
-    const [tooManyLinesModalVisible, setTooManyLinesModalVisible] = useState(
-        false
-    )
+    const [processing, setProcessing] = useState(false)
+    const [errorModalVisible, setErrorModalVisible] = useState({
+        open: false,
+        header: '',
+        message: '',
+    })
+    const [payoutErrorVisible, setPayoutErrorVisible] = useState(false)
+    const client = useApolloClient()
 
     const addOrRemovePick = (line, under) => {
         const pickIndex = picks.findIndex((e) => e.id === line.id)
@@ -158,7 +171,11 @@ const Dashboard = () => {
         else {
             // If we're at 5 picks, tell the user and don't proceed
             if (picks.length === 5) {
-                setTooManyLinesModalVisible(true)
+                setErrorModalVisible({
+                    open: true,
+                    header: 'Too many picks',
+                    message: 'You can only choose five picks.',
+                })
                 newPicks = picks
             } else {
                 newPicks = [...picks, Object.assign({}, line, { under })]
@@ -218,26 +235,105 @@ const Dashboard = () => {
         }
     }
 
+    // (1) Check if they entered a payout amount
+    // (2) Check that there aren't two players from the same team
+    // (3) Check the location of the user
+    // (4) Check if user has linked a payment method
+    // (5) Check if user has sufficients funds in their wallet
+    const submitPicks = async () => {
+        setProcessing(true)
+        let lat,
+            lng = null
+
+        // (1)
+        if (!payout) {
+            setPayoutErrorVisible(true)
+            return
+        }
+
+        // (2)
+        let teamIds = []
+        for (let i = 0; i < picks.length; i++) {
+            const teamId = picks[i].player.team.id
+
+            if (teamIds.includes(teamId)) {
+                // Error
+                setErrorModalVisible({
+                    open: true,
+                    header: 'Two players from the same team',
+                    message:
+                        'You are not allowed to select two players from the same team.',
+                })
+                setProcessing(false)
+                return
+            } else {
+                teamIds.push(teamId)
+            }
+        }
+
+        // (3)
+        if (!'geolocation' in navigator) {
+            setErrorModalVisible({
+                open: true,
+                header: 'Please enable location access',
+                message:
+                    'We need to verify your location. Please enable location access.',
+            })
+            setProcessing(false)
+            return
+        } else {
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const { data } = await client.query({
+                    query: CHECK_APPROVED_LOCATION_QUERY,
+                    variables: {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                    },
+                })
+
+                if (!data.approvedLocation) {
+                    setErrorModalVisible({
+                        open: true,
+                        header: 'Invalid location',
+                        message:
+                            'Sorry, you are playing from an invalid location.',
+                    })
+                    setProcessing(false)
+                    return
+                }
+
+                lat = position.coords.latitude
+                lng = position.coords.longitude
+
+                // We made it! User is all good to go
+                alert(
+                    'Great! Still need to check if you have a payment method + sufficient funds in your wallet...'
+                )
+            })
+        }
+    }
+
     return (
         <div id="ul-dashboard">
             <Helmet>
                 <title>Dashboard</title>
             </Helmet>
             <Modal
-                onClose={() => setTooManyLinesModalVisible(false)}
-                onOpen={() => setTooManyLinesModalVisible(true)}
-                open={tooManyLinesModalVisible}
+                onClose={() => setErrorModalVisible({ open: false })}
+                open={errorModalVisible.open}
                 size="small"
             >
                 <Header>
                     <Icon name="exclamation circle" />
-                    Too many lines
+                    {errorModalVisible.header}
                 </Header>
                 <Modal.Content>
-                    <p>You can only pick five lines.</p>
+                    <p>{errorModalVisible.message}</p>
                 </Modal.Content>
                 <Modal.Actions>
-                    <Button onClick={() => setTooManyLinesModalVisible(false)}>
+                    <Button
+                        onClick={() => setErrorModalVisible({ open: false })}
+                    >
                         OK
                     </Button>
                 </Modal.Actions>
@@ -274,7 +370,7 @@ const Dashboard = () => {
                         <Progress percent={percent} color="green">
                             {multiplier}
                         </Progress>
-                        <Form>
+                        <Form loading={processing}>
                             <Form.Group widths="equal">
                                 <Form.Input
                                     fluid
@@ -282,8 +378,10 @@ const Dashboard = () => {
                                     iconPosition="left"
                                     label="Entry amount"
                                     placeholder="Entry amount"
+                                    error={payoutErrorVisible}
                                     size="huge"
                                     onChange={(e) => {
+                                        setPayoutErrorVisible(false)
                                         setEntryAmount(e.target.value)
                                         setPayout(
                                             (e.target.value *
@@ -304,6 +402,7 @@ const Dashboard = () => {
                             </Form.Group>
                             <Form.Button
                                 disabled={picks.length < 2}
+                                onClick={submitPicks}
                                 fluid
                                 color="green"
                                 size="huge"
@@ -384,6 +483,7 @@ const Dashboard = () => {
                                         fluid
                                         color="red"
                                         basic
+                                        size="tiny"
                                         onClick={() =>
                                             addOrRemovePick(pick, pick.under)
                                         }

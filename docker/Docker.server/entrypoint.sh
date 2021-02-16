@@ -12,11 +12,15 @@ function migrate {
 }
 
 function mockdata {
-    :
+    python manage.py loadbasedata
 }
 
 function assets {
     python manage.py collectstatic --noinput
+}
+
+function djangoadminuser {
+    ./createsuperuser
 }
 
 function prepare {
@@ -32,6 +36,7 @@ function development {
     mockdata
     assets
     supervisor
+    djangoadminuser
 }
 
 function production {

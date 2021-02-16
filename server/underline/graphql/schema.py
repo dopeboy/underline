@@ -1,4 +1,5 @@
 import graphene
+import json
 
 from django.db.models import Q
 from graphene_django import DjangoObjectType
@@ -6,6 +7,9 @@ from pytz import timezone, utc
 from core.models import Team, Player, Line, CurrentDate, Game
 from accounts.models import User
 from graphql_jwt.decorators import login_required
+
+from turfpy.measurement import boolean_point_in_polygon
+from geojson import Point, Polygon, Feature
 
 
 class TeamType(DjangoObjectType):
@@ -28,6 +32,8 @@ class GameType(DjangoObjectType):
 
 
 class PlayerType(DjangoObjectType):
+    team = graphene.Field(TeamType)
+
     class Meta:
         model = Player
 
@@ -43,6 +49,9 @@ class LineType(DjangoObjectType):
 class Query(graphene.ObjectType):
     todays_lines = graphene.List(LineType)
     me = graphene.Field(UserType)
+    approved_location = graphene.Field(
+        graphene.Boolean, lat=graphene.Float(), lng=graphene.Float()
+    )
 
     # Get today's date. Find all the games that lie on today's
     # date. Get all the lines that roll up to these dates
@@ -80,3 +89,47 @@ class Query(graphene.ObjectType):
     @login_required
     def resolve_me(self, info, **kawargs):
         return info.context.user
+
+    @login_required
+    def resolve_approved_location(self, info, lat, lng):
+        point = Feature(geometry=Point((lng, lat)))
+
+        approved_states = [
+            "Arkansas",
+            "California",
+            "District of Columbia",
+            "Florida",
+            "Georgia",
+            "Kansas",
+            "New Mexico",
+            "North Dakota",
+            "Oklahoma",
+            "Oregon",
+            "Rhode Island",
+            "South Carolina",
+            "South Dakota",
+            "Texas",
+            "Utah",
+            "West Virginia",
+            "Wyoming",
+            "Colorado",
+        ]
+
+        with open("gz_2010_us_040_00_20m.json") as f:
+            js = json.load(f)
+
+        for feature in js["features"]:
+            features = feature["geometry"]
+
+            if feature["properties"]["NAME"] in approved_states:
+                if features["type"] == "Polygon":
+                    p = Polygon(features["coordinates"])
+                    if boolean_point_in_polygon(point, p):
+                        return True
+                else:
+                    for polygon in features["coordinates"]:
+                        p = Polygon(polygon)
+                        if boolean_point_in_polygon(point, p):
+                            return True
+
+        return False
