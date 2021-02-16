@@ -10,6 +10,7 @@ from graphql_jwt.decorators import login_required
 
 from turfpy.measurement import boolean_point_in_polygon
 from geojson import Point, Polygon, Feature
+from django.conf import settings
 
 
 class TeamType(DjangoObjectType):
@@ -115,7 +116,7 @@ class Query(graphene.ObjectType):
             "Colorado",
         ]
 
-        with open("gz_2010_us_040_00_20m.json") as f:
+        with open(f"{settings.BASE_DIR}/gz_2010_us_040_00_20m.json") as f:
             js = json.load(f)
 
         for feature in js["features"]:

@@ -236,7 +236,7 @@ const Dashboard = () => {
     }
 
     // (1) Check if they entered a payout amount
-    // (2) Check that there aren't two players from the same team
+    // (2) Check that there are atleast two teams involved
     // (3) Check the location of the user
     // (4) Check if user has linked a payment method
     // (5) Check if user has sufficients funds in their wallet
@@ -248,6 +248,7 @@ const Dashboard = () => {
         // (1)
         if (!payout) {
             setPayoutErrorVisible(true)
+            setProcessing(false)
             return
         }
 
@@ -256,19 +257,20 @@ const Dashboard = () => {
         for (let i = 0; i < picks.length; i++) {
             const teamId = picks[i].player.team.id
 
-            if (teamIds.includes(teamId)) {
-                // Error
-                setErrorModalVisible({
-                    open: true,
-                    header: 'Two players from the same team',
-                    message:
-                        'You are not allowed to select two players from the same team.',
-                })
-                setProcessing(false)
-                return
-            } else {
+            if (!teamIds.includes(teamId)) {
                 teamIds.push(teamId)
             }
+        }
+
+        if (teamIds.length < 2) {
+            // Error
+            setErrorModalVisible({
+                open: true,
+                header: 'Two teams must be involved',
+                message: 'You must select picks that span atleast two teams.',
+            })
+            setProcessing(false)
+            return
         }
 
         // (3)
