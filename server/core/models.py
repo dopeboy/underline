@@ -1,5 +1,7 @@
 from django.db import models
 from pytz import timezone, utc
+from django.utils import timezone as tz
+
 
 from accounts.models import User
 
@@ -101,10 +103,13 @@ class Subline(models.Model):
             return self.line.nba_points_actual > self.nba_points_line
         return None
 
+    def __str__(self):
+        return f'{self.line}'
+
 
 class Slip(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
-    datetime_created = models.DateTimeField()
+    datetime_created = models.DateTimeField(auto_now_add=True)
 
     # For every line, find if points_actual is filled.
     @property
@@ -118,6 +123,6 @@ class Pick(models.Model):
     slip = models.ForeignKey(Slip, on_delete=models.CASCADE)
 
     # NBA specific
-    over_nba_points = models.BooleanField(null=True)
+    under_nba_points = models.BooleanField(null=True)
 
-    datetime_created = models.DateTimeField()
+    datetime_created = models.DateTimeField(auto_now_add=True)

@@ -60,6 +60,14 @@ const CHECK_APPROVED_LOCATION_QUERY = gql`
     }
 `
 
+const CREATE_SLIP_MUTATION = gql`
+    mutation CreateSlip($picks: [PickType]!) {
+        createSlip(picks: $picks) {
+            status
+        }
+    }
+`
+
 const PlayerList = ({ picks, addOrRemovePick }) => {
     const { data } = useQuery(GET_TODAYS_SUBLINES_QUERY)
     return (
@@ -327,7 +335,25 @@ const Lobby = () => {
                 'Great! Still need to check if you have a payment method + sufficient funds in your wallet...'
             )
 
-            console.log(picks)
+            console.log(
+                picks.map((e) => {
+                    return {
+                        id: e.id,
+                        under: e.under,
+                    }
+                })
+            )
+            const response = await client.mutate({
+                mutation: CREATE_SLIP_MUTATION,
+                variables: {
+                    picks: picks.map((e) => {
+                        return {
+                            id: e.id,
+                            under: e.under,
+                        }
+                    }),
+                },
+            })
         }
     }
 

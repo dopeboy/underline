@@ -56,3 +56,18 @@ history | grep dump
 history | grep dumpdata
 python manage.py dumpdata core.CurrentDate
 python manage.py dumpdata core.CurrentDate > core/fixtures/currentdate.json
+python manage.py loadbasedata
+python manage.py loadbasedata
+python manage.py loadbasedata
+python manage.py loadbasedata
+python manage.py loadbasedata
+python manage.py loadbasedata
+python manage.py loadbasedata
+python manage.py loadbasedata
+python manage.py loadbasedata
+python manage.py makemigrations
+python manage.py migrate
+python manage.py makemigrations
+python manage.py migrate
+python manage.py makemigrations
+python manage.py migrate

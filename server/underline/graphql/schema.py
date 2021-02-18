@@ -4,7 +4,7 @@ import json
 from django.db.models import Q
 from graphene_django import DjangoObjectType
 from pytz import timezone, utc
-from core.models import Team, Player, Line, CurrentDate, Game, Subline
+from core.models import Team, Player, Line, CurrentDate, Game, Subline, Slip, Pick
 from accounts.models import User
 from graphql_jwt.decorators import login_required
 
@@ -80,13 +80,6 @@ class Query(graphene.ObjectType):
             .filter(player__premier=True)
             .order_by("game__datetime")
         ).filter(visible=True)
-        """
-        q1 = (
-            Line.objects.filter(game__in=todays_games)
-            .filter(player__premier=True)
-            .order_by("game__datetime")
-        )
-        """
 
         # Needed to fill reset_cache below
         len(q1)
@@ -149,3 +142,32 @@ class Query(graphene.ObjectType):
                             return True
 
         return False
+
+
+class PickType(graphene.InputObjectType):
+    # This is the subline_id
+    id = graphene.ID(required=True)
+    under = graphene.Boolean(required=True)
+
+
+class SlipMutation(graphene.Mutation):
+    class Arguments:
+        picks = graphene.List(PickType)
+
+    # The class attributes define the response of the mutation
+    status = graphene.Boolean()
+
+    @classmethod
+    def mutate(cls, root, info, picks):
+        # Create the slip
+        slip = Slip.objects.create(owner=info.context.user)
+
+        for p in picks:
+            subline = Subline.objects.get(id=int(p["id"]))
+            Pick.objects.create(subline=subline, slip=slip, under_nba_points=p["under"])
+
+        return SlipMutation(status=True)
+
+
+class Mutation(graphene.ObjectType):
+    create_slip = SlipMutation.Field()
