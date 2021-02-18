@@ -79,7 +79,7 @@ class Query(graphene.ObjectType):
             line__in=Line.objects.filter(game__in=todays_games)
             .filter(player__premier=True)
             .order_by("game__datetime")
-        )
+        ).filter(visible=True)
         """
         q1 = (
             Line.objects.filter(game__in=todays_games)
@@ -95,7 +95,7 @@ class Query(graphene.ObjectType):
             line__in=Line.objects.filter(game__in=todays_games)
             .filter(player__premier=False)
             .order_by("game__datetime")
-        )
+        ).filter(visible=True)
 
         for line in q2:
             q1._result_cache.append(line)
