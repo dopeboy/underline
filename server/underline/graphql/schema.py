@@ -4,7 +4,7 @@ import json
 from django.db.models import Q
 from graphene_django import DjangoObjectType
 from pytz import timezone, utc
-from core.models import Team, Player, Line, CurrentDate, Game
+from core.models import Team, Player, Line, CurrentDate, Game, Subline
 from accounts.models import User
 from graphql_jwt.decorators import login_required
 
@@ -47,16 +47,24 @@ class LineType(DjangoObjectType):
         model = Line
 
 
+class SublineType(DjangoObjectType):
+    line = graphene.Field(LineType)
+
+    class Meta:
+        model = Subline
+
+
 class Query(graphene.ObjectType):
-    todays_lines = graphene.List(LineType)
+    todays_sublines = graphene.List(SublineType)
     me = graphene.Field(UserType)
     approved_location = graphene.Field(
         graphene.Boolean, lat=graphene.Float(), lng=graphene.Float()
     )
 
     # Get today's date. Find all the games that lie on today's
-    # date. Get all the lines that roll up to these dates
-    def resolve_todays_lines(self, info, **kwargs):
+    # date. Get all the lines that roll up to these dates. Get all the sublines
+    # that these lines roll up to.
+    def resolve_todays_sublines(self, info, **kwargs):
         cd = CurrentDate.objects.first()
         todays_games = []
 
@@ -67,17 +75,24 @@ class Query(graphene.ObjectType):
         # Hacky way to append two pre-sorted querysets
         # Might be better way
         # https://stackoverflow.com/questions/18235419/how-to-chain-django-querysets-preserving-individual-order
+        q1 = Subline.objects.filter(
+            line__in=Line.objects.filter(game__in=todays_games)
+            .filter(player__premier=True)
+            .order_by("game__datetime")
+        )
+        """
         q1 = (
             Line.objects.filter(game__in=todays_games)
             .filter(player__premier=True)
             .order_by("game__datetime")
         )
+        """
 
         # Needed to fill reset_cache below
         len(q1)
 
-        q2 = (
-            Line.objects.filter(game__in=todays_games)
+        q2 = Subline.objects.filter(
+            line__in=Line.objects.filter(game__in=todays_games)
             .filter(player__premier=False)
             .order_by("game__datetime")
         )

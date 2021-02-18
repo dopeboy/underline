@@ -38,3 +38,21 @@ python3
 pipenv install --server
 pipenv install --system
 python3
+ls
+cd core/
+ls
+cd migrations/
+ls
+rm -rf *
+ls
+cd ..
+cd ..
+python manage.py makemigrations
+python manage.py makemigrations
+python manage.py makemigrations
+python manage.py makemigrations core
+./createsuperuser.sh 
+history | grep dump
+history | grep dumpdata
+python manage.py dumpdata core.CurrentDate
+python manage.py dumpdata core.CurrentDate > core/fixtures/currentdate.json

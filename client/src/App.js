@@ -15,7 +15,7 @@ import {
     Redirect,
 } from 'react-router-dom'
 import Login from 'views/Login.jsx'
-import Dashboard from 'views/Dashboard.jsx'
+import Lobby from 'views/Lobby.jsx'
 import Main from 'components/Main'
 
 const authLink = setContext((_, { headers }) => {
@@ -61,8 +61,8 @@ function App() {
             <Router>
                 <Switch>
                     <PrivateRoute
-                        path="/dashboard"
-                        component={Dashboard}
+                        path="/lobby"
+                        component={Lobby}
                     ></PrivateRoute>
                     <Route path="/">
                         <Login />

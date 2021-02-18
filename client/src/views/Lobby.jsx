@@ -3,6 +3,7 @@ import {
     Divider,
     Form,
     Progress,
+    Message,
     Segment,
     Grid,
     Label,
@@ -22,28 +23,31 @@ import logo from '../images/logo.png'
 import { gql, useApolloClient, useQuery } from '@apollo/client'
 import moment from 'moment-timezone'
 import { Helmet } from 'react-helmet'
-import './Dashboard.scss'
+import './Lobby.scss'
 
-const GET_TODAYS_LINES_QUERY = gql`
+const GET_TODAYS_SUBLINES_QUERY = gql`
     query {
-        todaysLines {
+        todaysSublines {
             id
-            pointsLine
-            player {
+            nbaPointsLine
+            line {
                 id
-                name
-                headshotUrl
-                team {
+                player {
                     id
+                    name
+                    headshotUrl
+                    team {
+                        id
+                    }
                 }
-            }
-            game {
-                datetime
-                homeTeam {
-                    abbreviation
-                }
-                awayTeam {
-                    abbreviation
+                game {
+                    datetime
+                    homeTeam {
+                        abbreviation
+                    }
+                    awayTeam {
+                        abbreviation
+                    }
                 }
             }
         }
@@ -57,37 +61,45 @@ const CHECK_APPROVED_LOCATION_QUERY = gql`
 `
 
 const PlayerList = ({ picks, addOrRemovePick }) => {
-    const { data } = useQuery(GET_TODAYS_LINES_QUERY)
+    const { data } = useQuery(GET_TODAYS_SUBLINES_QUERY)
     return (
         <Form loading={!data}>
             <Card.Group>
                 {data &&
-                    data.todaysLines.map((line) => {
+                    data.todaysSublines.map((subline) => {
                         const pick = picks.filter((e) => {
-                            return e.id === line.id
+                            return e.id === subline.id
                         })[0]
 
                         return (
-                            <Card key={line.id}>
+                            <Card key={subline.id}>
                                 <Image
                                     size="small"
-                                    src={line.player.headshotUrl}
+                                    src={subline.line.player.headshotUrl}
                                     wrapped
                                     ui={false}
                                 />
                                 <Card.Content>
                                     <Card.Header>
-                                        {line.player.name}
+                                        {subline.line.player.name}
                                     </Card.Header>
                                     <Card.Meta>
                                         <span className="date">
-                                            Points: {line.pointsLine}
+                                            Points: {subline.nbaPointsLine}
                                         </span>
                                     </Card.Meta>
                                     <Card.Description>
-                                        {line.game.awayTeam.abbreviation} @{' '}
-                                        {line.game.homeTeam.abbreviation} -{' '}
-                                        {moment(line.game.datetime)
+                                        {
+                                            subline.line.game.awayTeam
+                                                .abbreviation
+                                        }{' '}
+                                        @{' '}
+                                        {
+                                            subline.line.game.homeTeam
+                                                .abbreviation
+                                        }{' '}
+                                        -{' '}
+                                        {moment(subline.line.game.datetime)
                                             .tz('America/Los_Angeles')
                                             .format('h:mma z')}
                                     </Card.Description>
@@ -103,7 +115,7 @@ const PlayerList = ({ picks, addOrRemovePick }) => {
                                             }
                                             content="Over"
                                             onClick={() =>
-                                                addOrRemovePick(line, false)
+                                                addOrRemovePick(subline, false)
                                             }
                                         />
                                         <Button.Or />
@@ -116,7 +128,7 @@ const PlayerList = ({ picks, addOrRemovePick }) => {
                                                     : null
                                             }
                                             onClick={() =>
-                                                addOrRemovePick(line, true)
+                                                addOrRemovePick(subline, true)
                                             }
                                         />
                                     </Button.Group>
@@ -129,7 +141,7 @@ const PlayerList = ({ picks, addOrRemovePick }) => {
     )
 }
 
-const Dashboard = () => {
+const Lobby = () => {
     const [tab, setTab] = useState('lobby')
     const [picks, setPicks] = useState([])
     const [percent, setPercent] = useState(0)
@@ -145,8 +157,8 @@ const Dashboard = () => {
     const [payoutErrorVisible, setPayoutErrorVisible] = useState(false)
     const client = useApolloClient()
 
-    const addOrRemovePick = (line, under) => {
-        const pickIndex = picks.findIndex((e) => e.id === line.id)
+    const addOrRemovePick = (subline, under) => {
+        const pickIndex = picks.findIndex((e) => e.id === subline.id)
         let newPicks = []
 
         // If the pick already exists, remove it
@@ -178,7 +190,7 @@ const Dashboard = () => {
                 })
                 newPicks = picks
             } else {
-                newPicks = [...picks, Object.assign({}, line, { under })]
+                newPicks = [...picks, Object.assign({}, subline, { under })]
                 setPicks(newPicks)
             }
         }
@@ -255,7 +267,7 @@ const Dashboard = () => {
         // (2)
         let teamIds = []
         for (let i = 0; i < picks.length; i++) {
-            const teamId = picks[i].player.team.id
+            const teamId = picks[i].line.player.team.id
 
             if (!teamIds.includes(teamId)) {
                 teamIds.push(teamId)
@@ -284,6 +296,7 @@ const Dashboard = () => {
             setProcessing(false)
             return
         } else {
+            /*
             navigator.geolocation.getCurrentPosition(async (position) => {
                 const { data } = await client.query({
                     query: CHECK_APPROVED_LOCATION_QUERY,
@@ -306,19 +319,22 @@ const Dashboard = () => {
 
                 lat = position.coords.latitude
                 lng = position.coords.longitude
-
-                // We made it! User is all good to go
-                alert(
-                    'Great! Still need to check if you have a payment method + sufficient funds in your wallet...'
-                )
             })
+            */
+
+            // We made it! User is all good to go
+            alert(
+                'Great! Still need to check if you have a payment method + sufficient funds in your wallet...'
+            )
+
+            console.log(picks)
         }
     }
 
     return (
         <div id="ul-dashboard">
             <Helmet>
-                <title>Dashboard</title>
+                <title>Lobby</title>
             </Helmet>
             <Modal
                 onClose={() => setErrorModalVisible({ open: false })}
@@ -340,24 +356,12 @@ const Dashboard = () => {
                     </Button>
                 </Modal.Actions>
             </Modal>
-            <Menu secondary>
-                <Menu.Item
-                    name="Lobby"
-                    active={tab === 'lobby'}
-                    onClick={setTab}
-                />
-                <Menu.Item
-                    name="active"
-                    active={tab === 'active'}
-                    onClick={setTab}
-                />
-                <Menu.Item
-                    name="completed"
-                    active={tab === 'completed'}
-                    onClick={setTab}
-                />
-            </Menu>
-
+            <Header as="h2" textAlign="center">
+                Over/Under
+                <Header.Subheader>
+                    Select 1 player from atleast two teams
+                </Header.Subheader>
+            </Header>
             <Grid>
                 <Grid.Row>
                     <Grid.Column width={12}>
@@ -379,7 +383,7 @@ const Dashboard = () => {
                                     icon="dollar"
                                     iconPosition="left"
                                     label="Entry amount"
-                                    placeholder="Entry amount"
+                                    placeholder="$0"
                                     error={payoutErrorVisible}
                                     size="huge"
                                     onChange={(e) => {
@@ -397,7 +401,7 @@ const Dashboard = () => {
                                     iconPosition="left"
                                     className="payout-box"
                                     label="Payout"
-                                    placeholder="Payout"
+                                    placeholder="$0"
                                     value={payout}
                                     size="huge"
                                 />
@@ -424,39 +428,40 @@ const Dashboard = () => {
                                             <Grid.Column>
                                                 <Image
                                                     src={
-                                                        pick.player.headshotUrl
+                                                        pick.line.player
+                                                            .headshotUrl
                                                     }
                                                 />
                                             </Grid.Column>
                                             <Grid.Column>
                                                 <Header as="h4">
-                                                    {pick.player.name}
+                                                    {pick.line.player.name}
                                                 </Header>
                                                 <List>
                                                     <List.Item className="lol">
                                                         <List.Icon name="hashtag" />
                                                         <List.Content>
                                                             Points:{' '}
-                                                            {pick.pointsLine}
+                                                            {pick.nbaPointsLine}
                                                         </List.Content>
                                                     </List.Item>
                                                     <List.Item>
                                                         <List.Icon name="calendar outline" />
                                                         <List.Content>
                                                             {
-                                                                pick.game
+                                                                pick.line.game
                                                                     .awayTeam
                                                                     .abbreviation
                                                             }{' '}
                                                             @{' '}
                                                             {
-                                                                pick.game
+                                                                pick.line.game
                                                                     .homeTeam
                                                                     .abbreviation
                                                             }{' '}
                                                             -{' '}
                                                             {moment(
-                                                                pick.game
+                                                                pick.line.game
                                                                     .datetime
                                                             )
                                                                 .tz(
@@ -502,4 +507,4 @@ const Dashboard = () => {
     )
 }
 
-export default Dashboard
+export default Lobby

@@ -1,6 +1,8 @@
 from django.db import models
 from pytz import timezone, utc
 
+from accounts.models import User
+
 
 class CurrentDate(models.Model):
     date = models.DateField()
@@ -72,14 +74,50 @@ class Player(models.Model):
 
 class Line(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
-    points_line = models.IntegerField(blank=True, null=True)
-    points_actual = models.IntegerField(blank=True, null=True)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
 
-    def __str__(self):
-        return f"{self.player.name} line"
+    # NBA specific
+    nba_points_actual = models.DecimalField(
+        max_digits=5, decimal_places=2, blank=True, null=True
+    )
 
-    def points_over(self):
-        if points_line is not None and points_actual is not None:
-            return points_actual > points_line
+    def __str__(self):
+        return f"{self.player.name} - {self.game}"
+
+
+class Subline(models.Model):
+    line = models.ForeignKey(Line, on_delete=models.CASCADE)
+
+    # NBA specific
+    nba_points_line = models.DecimalField(
+        max_digits=5, decimal_places=2, blank=True, null=True
+    )
+
+    # Visible in lobby
+    visible = models.BooleanField(default=True)
+
+    def is_nba_points_over(self):
+        if self.nba_points_line is not None and self.line.nba_points_actual is not None:
+            return self.line.nba_points_actual > self.nba_points_line
         return None
+
+
+class Slip(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    datetime_created = models.DateTimeField()
+
+    # For every line, find if points_actual is filled.
+    @property
+    def complete(self):
+        # (lambda line: False if (line.points_actual) else False)(Pick)
+        return True
+
+
+class Pick(models.Model):
+    subline = models.ForeignKey(Subline, on_delete=models.CASCADE)
+    slip = models.ForeignKey(Slip, on_delete=models.CASCADE)
+
+    # NBA specific
+    over_nba_points = models.BooleanField(null=True)
+
+    datetime_created = models.DateTimeField()

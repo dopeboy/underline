@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import League, Team, Position, Player, CurrentDate, Line, Game
+from .models import League, Team, Position, Player, CurrentDate, Line, Game, Subline
 
 
 class TeamAdmin(admin.ModelAdmin):
@@ -41,15 +41,16 @@ class PlayerAdmin(admin.ModelAdmin):
         return False
 
 
+class SublineAdmin(admin.TabularInline):
+    model = Subline
+    extra = 1
+    can_delete = False
+
+
 class LineAdmin(admin.ModelAdmin):
-    def has_add_permission(self, request, obj=None):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
+    inlines = [
+        SublineAdmin,
+    ]
 
 
 class GameAdmin(admin.ModelAdmin):
@@ -63,12 +64,20 @@ class GameAdmin(admin.ModelAdmin):
         return False
 
 
+class CurrentDateAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 admin.site.register(Team, TeamAdmin)
 
 # Register your models here.
 admin.site.register(League)
 admin.site.register(Position)
 admin.site.register(Line, LineAdmin)
-admin.site.register(CurrentDate)
+admin.site.register(CurrentDate, CurrentDateAdmin)
 admin.site.register(Player, PlayerAdmin)
 admin.site.register(Game, GameAdmin)

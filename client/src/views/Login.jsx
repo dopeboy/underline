@@ -29,7 +29,7 @@ const Login = () => {
             setProcessing(false)
             setError(false)
             saveJWT(data.tokenAuth.token)
-            history.push('/dashboard')
+            history.push('/lobby')
         },
         onError: (data) => {
             setProcessing(false)
@@ -55,11 +55,14 @@ const Login = () => {
                 <Grid centered columns={1}>
                     <Grid.Column width={6}>
                         <img alt="" src={logo} className="logo" />
-                        {error && <Message negative>
-                            <Message.Header>Login invalid</Message.Header>
-                            <p>Your email address or password is incorrect.</p>
-                        </Message>
-                        }
+                        {error && (
+                            <Message negative>
+                                <Message.Header>Login invalid</Message.Header>
+                                <p>
+                                    Your email address or password is incorrect.
+                                </p>
+                            </Message>
+                        )}
                         <Form onSubmit={handleSubmit}>
                             <Form.Field required>
                                 <label>Email address</label>
