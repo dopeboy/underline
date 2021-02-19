@@ -17,7 +17,7 @@ import {
 } from 'semantic-ui-react'
 import logo from 'images/logo.png'
 import { clearJWT } from 'utils'
-import { useHistory } from 'react-router-dom'
+import { Link, useLocation, useHistory } from 'react-router-dom'
 import './Main.scss'
 
 const GET_ME_QUERY = gql`
@@ -36,6 +36,7 @@ const Main = (props) => {
         history.push('/')
     }
     const history = useHistory()
+    const location = useLocation()
 
     return (
         <>
@@ -44,9 +45,27 @@ const Main = (props) => {
                     <img src={logo} className="logo" />
                 </Menu.Item>
 
-                <Menu.Item active>Lobby</Menu.Item>
-                <Menu.Item>Active</Menu.Item>
-                <Menu.Item>Completed</Menu.Item>
+                <Menu.Item
+                    active={location.pathname === '/lobby'}
+                    as={Link}
+                    to="/lobby"
+                >
+                    Lobby
+                </Menu.Item>
+                <Menu.Item
+                    active={location.pathname === '/active'}
+                    as={Link}
+                    to="/active"
+                >
+                    Active
+                </Menu.Item>
+                <Menu.Item
+                    active={location.pathname === '/completed'}
+                    as={Link}
+                    to="/completed"
+                >
+                    Completed
+                </Menu.Item>
 
                 <Menu.Menu position="right">
                     <Dropdown

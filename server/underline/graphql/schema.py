@@ -54,12 +54,31 @@ class SublineType(DjangoObjectType):
         model = Subline
 
 
+class MyPickType(DjangoObjectType):
+    subline = graphene.Field(SublineType)
+
+    class Meta:
+        model = Pick
+
+
+class MySlipType(DjangoObjectType):
+    picks = graphene.List(MyPickType)
+
+    def resolve_picks(parent, info):
+        return Pick.objects.filter(slip=parent)
+
+    class Meta:
+        model = Slip
+
+
 class Query(graphene.ObjectType):
     todays_sublines = graphene.List(SublineType)
     me = graphene.Field(UserType)
     approved_location = graphene.Field(
         graphene.Boolean, lat=graphene.Float(), lng=graphene.Float()
     )
+    active_slips = graphene.List(MySlipType)
+    inactive_slips = graphene.List(MySlipType)
 
     # Get today's date. Find all the games that lie on today's
     # date. Get all the lines that roll up to these dates. Get all the sublines
@@ -98,6 +117,20 @@ class Query(graphene.ObjectType):
     @login_required
     def resolve_me(self, info, **kawargs):
         return info.context.user
+
+    def resolve_active_slips(self, info, **kawargs):
+        return [
+            slip
+            for slip in Slip.objects.filter(owner=info.context.user)
+            if slip.complete == False
+        ]
+
+    def resolve_inactive_slips(self, info, **kawargs):
+        return [
+            slip
+            for slip in Slip.objects.filter(owner=info.context.user)
+            if slip.complete == True
+        ]
 
     @login_required
     def resolve_approved_location(self, info, lat, lng):
@@ -155,7 +188,7 @@ class SlipMutation(graphene.Mutation):
         picks = graphene.List(PickType)
 
     # The class attributes define the response of the mutation
-    status = graphene.Boolean()
+    success = graphene.Boolean()
 
     @classmethod
     def mutate(cls, root, info, picks):
@@ -166,7 +199,7 @@ class SlipMutation(graphene.Mutation):
             subline = Subline.objects.get(id=int(p["id"]))
             Pick.objects.create(subline=subline, slip=slip, under_nba_points=p["under"])
 
-        return SlipMutation(status=True)
+        return SlipMutation(success=True)
 
 
 class Mutation(graphene.ObjectType):

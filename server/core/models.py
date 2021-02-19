@@ -104,17 +104,20 @@ class Subline(models.Model):
         return None
 
     def __str__(self):
-        return f'{self.line}'
+        return f"{self.line}"
 
 
 class Slip(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     datetime_created = models.DateTimeField(auto_now_add=True)
 
-    # For every line, find if points_actual is filled.
+    # For every attached pick, find every attached subline.
+    # For every attached line, see if actual points filled out.
     @property
     def complete(self):
-        # (lambda line: False if (line.points_actual) else False)(Pick)
+        for p in Pick.objects.filter(slip=self):
+            if p.subline.line.nba_points_actual == None:
+                return False
         return True
 
 

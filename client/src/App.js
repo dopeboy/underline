@@ -16,6 +16,8 @@ import {
 } from 'react-router-dom'
 import Login from 'views/Login.jsx'
 import Lobby from 'views/Lobby.jsx'
+import Active from 'views/Active.jsx'
+import Completed from 'views/Completed.jsx'
 import Main from 'components/Main'
 
 const authLink = setContext((_, { headers }) => {
@@ -63,6 +65,14 @@ function App() {
                     <PrivateRoute
                         path="/lobby"
                         component={Lobby}
+                    ></PrivateRoute>
+                    <PrivateRoute
+                        path="/active"
+                        component={Active}
+                    ></PrivateRoute>
+                    <PrivateRoute
+                        path="/completed"
+                        component={Completed}
                     ></PrivateRoute>
                     <Route path="/">
                         <Login />

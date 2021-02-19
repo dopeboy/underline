@@ -24,6 +24,7 @@ import { gql, useApolloClient, useQuery } from '@apollo/client'
 import moment from 'moment-timezone'
 import { Helmet } from 'react-helmet'
 import './Lobby.scss'
+import { useHistory } from 'react-router-dom'
 
 const GET_TODAYS_SUBLINES_QUERY = gql`
     query {
@@ -63,7 +64,7 @@ const CHECK_APPROVED_LOCATION_QUERY = gql`
 const CREATE_SLIP_MUTATION = gql`
     mutation CreateSlip($picks: [PickType]!) {
         createSlip(picks: $picks) {
-            status
+            success
         }
     }
 `
@@ -93,7 +94,10 @@ const PlayerList = ({ picks, addOrRemovePick }) => {
                                     </Card.Header>
                                     <Card.Meta>
                                         <span className="date">
-                                            Points: {subline.nbaPointsLine}
+                                            Points:{' '}
+                                            {parseFloat(
+                                                subline.nbaPointsLine
+                                            ).toFixed(1)}
                                         </span>
                                     </Card.Meta>
                                     <Card.Description>
@@ -164,6 +168,7 @@ const Lobby = () => {
     })
     const [payoutErrorVisible, setPayoutErrorVisible] = useState(false)
     const client = useApolloClient()
+    const history = useHistory()
 
     const addOrRemovePick = (subline, under) => {
         const pickIndex = picks.findIndex((e) => e.id === subline.id)
@@ -331,18 +336,6 @@ const Lobby = () => {
             */
 
             // We made it! User is all good to go
-            alert(
-                'Great! Still need to check if you have a payment method + sufficient funds in your wallet...'
-            )
-
-            console.log(
-                picks.map((e) => {
-                    return {
-                        id: e.id,
-                        under: e.under,
-                    }
-                })
-            )
             const response = await client.mutate({
                 mutation: CREATE_SLIP_MUTATION,
                 variables: {
@@ -354,6 +347,12 @@ const Lobby = () => {
                     }),
                 },
             })
+
+            console.log(response.data)
+            // Redirect
+            if (response.data.createSlip.success) {
+                history.push('/active')
+            }
         }
     }
 
@@ -409,7 +408,7 @@ const Lobby = () => {
                                     icon="dollar"
                                     iconPosition="left"
                                     label="Entry amount"
-                                    placeholder="$0"
+                                    placeholder="0"
                                     error={payoutErrorVisible}
                                     size="huge"
                                     onChange={(e) => {
@@ -427,7 +426,7 @@ const Lobby = () => {
                                     iconPosition="left"
                                     className="payout-box"
                                     label="Payout"
-                                    placeholder="$0"
+                                    placeholder="0"
                                     value={payout}
                                     size="huge"
                                 />
@@ -468,7 +467,9 @@ const Lobby = () => {
                                                         <List.Icon name="hashtag" />
                                                         <List.Content>
                                                             Points:{' '}
-                                                            {pick.nbaPointsLine}
+                                                            {parseFloat(
+                                                                pick.nbaPointsLine
+                                                            ).toFixed(1)}
                                                         </List.Content>
                                                     </List.Item>
                                                     <List.Item>
