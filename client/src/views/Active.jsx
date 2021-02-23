@@ -5,16 +5,20 @@ import {
     Header,
     Grid,
     Image,
+    Modal,
+    Icon,
+    Label,
     List,
     Form,
     Button,
     Container,
+    Segment,
 } from 'semantic-ui-react'
 import logo from 'images/logo.png'
 import { Helmet } from 'react-helmet'
 import { gql, useQuery } from '@apollo/client'
-import { saveJWT } from 'utils'
-import { useHistory } from 'react-router-dom'
+import { parseQuery, saveJWT } from 'utils'
+import { Link, useLocation, useHistory } from 'react-router-dom'
 import moment from 'moment-timezone'
 import './Active.scss'
 
@@ -23,12 +27,16 @@ const GET_ACTIVE_SLIPS_QUERY = gql`
         activeSlips {
             id
             datetimeCreated
+            entryAmount
+            payoutAmount
             picks {
                 id
                 underNbaPoints
+                won
                 subline {
                     nbaPointsLine
                     line {
+                        nbaPointsActual
                         id
                         player {
                             name
@@ -55,116 +63,131 @@ const GET_ACTIVE_SLIPS_QUERY = gql`
 const Active = () => {
     const history = useHistory()
     const { data } = useQuery(GET_ACTIVE_SLIPS_QUERY)
+    const [successModalVisible, setSuccessModalVisible] = useState(
+        parseQuery(useLocation().search).get('success') !== null
+    )
 
     return (
         <Form loading={!data} id="ul-active">
             <Helmet>
                 <title>Active slips</title>
             </Helmet>
+            <Modal
+                onClose={() => setSuccessModalVisible(false)}
+                open={successModalVisible}
+                size="small"
+            >
+                <Header>
+                    <Icon name="exclamation circle" />
+                    Success
+                </Header>
+                <Modal.Content>
+                    <p>Your slip has been submitted.</p>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button onClick={() => setSuccessModalVisible(false)}>
+                        OK
+                    </Button>
+                </Modal.Actions>
+            </Modal>
+            <Header as="h2">Active slips</Header>
+            {data && data.activeSlips.length === 0 && (
+                <div>
+                    No slips yet. Go to the <Link to="/lobby">Lobby</Link> to
+                    make some picks.
+                </div>
+            )}
+
             {data &&
                 data.activeSlips.map((slip) => {
                     return (
-                        <div className="slip">
-                            <Header as="h3">
-                                Slip&nbsp;
-                                {moment(slip.datetimeCreated)
-                                    .tz('America/Los_Angeles')
-                                    .format('M/D/YY')}
+                        <Segment className="slip" raised>
+                            <Header as="h3" className="title">
+                                {' '}
+                                {`${slip.picks.length} Picks for $${slip.payoutAmount}`}
                             </Header>
-                            <Card.Group>
-                                {slip.picks.map((pick) => {
-                                    return (
-                                        <Card className="slip-card">
-                                            <Card.Content>
-                                                <Grid columns="two" divided>
-                                                    <Grid.Row>
-                                                        <Grid.Column>
-                                                            <Image
-                                                                src={
-                                                                    pick.subline
-                                                                        .line
-                                                                        .player
-                                                                        .headshotUrl
-                                                                }
-                                                            />
-                                                        </Grid.Column>
-                                                        <Grid.Column>
-                                                            <Header as="h4">
-                                                                {
-                                                                    pick.subline
-                                                                        .line
-                                                                        .player
-                                                                        .name
-                                                                }
-                                                            </Header>
-                                                            <List>
-                                                                <List.Item className="lol">
-                                                                    <List.Icon name="hashtag" />
-                                                                    <List.Content>
-                                                                        Points:{' '}
-                                                                        {parseFloat(
-                                                                            pick
-                                                                                .subline
-                                                                                .nbaPointsLine
-                                                                        ).toFixed(
-                                                                            1
-                                                                        )}
-                                                                    </List.Content>
-                                                                </List.Item>
-                                                                <List.Item>
-                                                                    <List.Icon name="calendar outline" />
-                                                                    <List.Content>
-                                                                        {
-                                                                            pick
-                                                                                .subline
-                                                                                .line
-                                                                                .game
-                                                                                .awayTeam
-                                                                                .abbreviation
-                                                                        }{' '}
-                                                                        @{' '}
-                                                                        {
-                                                                            pick
-                                                                                .subline
-                                                                                .line
-                                                                                .game
-                                                                                .homeTeam
-                                                                                .abbreviation
-                                                                        }{' '}
-                                                                        -{' '}
-                                                                        {moment(
-                                                                            pick
-                                                                                .subline
-                                                                                .line
-                                                                                .game
-                                                                                .datetime
-                                                                        )
-                                                                            .tz(
-                                                                                'America/Los_Angeles'
-                                                                            )
-                                                                            .format(
-                                                                                'h:mma z'
-                                                                            )}
-                                                                    </List.Content>
-                                                                </List.Item>
-                                                                <List.Item>
-                                                                    <List.Icon name="basketball ball" />
-                                                                    <List.Content>
-                                                                        {pick.underNbaPoints
-                                                                            ? 'Under'
-                                                                            : 'Over'}
-                                                                    </List.Content>
-                                                                </List.Item>
-                                                            </List>
-                                                        </Grid.Column>
-                                                    </Grid.Row>
-                                                </Grid>
-                                            </Card.Content>
-                                        </Card>
-                                    )
-                                })}
-                            </Card.Group>
-                        </div>
+                            {slip.picks.map((pick, i) => (
+                                <Grid className="pick-table">
+                                    <Grid.Row>
+                                        <Grid.Column width={3}>
+                                            <Image
+                                                size="tiny"
+                                                src={
+                                                    pick.subline.line.player
+                                                        .headshotUrl
+                                                }
+                                            />
+                                        </Grid.Column>
+                                        <Grid.Column width={5}>
+                                            <Header
+                                                as="h4"
+                                                className="player-name"
+                                            >
+                                                {pick.subline.line.player.name}
+                                            </Header>
+                                            <span className="over-under">
+                                                {`${
+                                                    pick.underNbaPoints
+                                                        ? 'Under'
+                                                        : 'Over'
+                                                }`}
+                                            </span>{' '}
+                                            {`${parseFloat(
+                                                pick.subline.nbaPointsLine
+                                            ).toFixed(1)} points`}
+                                        </Grid.Column>
+                                        <Grid.Column width={5}>
+                                            {
+                                                pick.subline.line.game.awayTeam
+                                                    .abbreviation
+                                            }{' '}
+                                            @{' '}
+                                            {
+                                                pick.subline.line.game.homeTeam
+                                                    .abbreviation
+                                            }{' '}
+                                            -{' '}
+                                            {moment(
+                                                pick.subline.line.game.datetime
+                                            )
+                                                .tz('America/Los_Angeles')
+                                                .format('h:mma z')}
+                                            {pick.subline.line
+                                                .nbaPointsActual && (
+                                                <div>
+                                                    {`${parseInt(
+                                                        pick.subline.line
+                                                            .nbaPointsActual
+                                                    )} points scored`}
+                                                </div>
+                                            )}
+                                        </Grid.Column>
+                                        <Grid.Column width={3}>
+                                            {pick.won === null && (
+                                                <Label color="gray">
+                                                    In progress
+                                                </Label>
+                                            )}
+                                            {pick.won === true && (
+                                                <Label color="green">Won</Label>
+                                            )}
+                                            {pick.won === false && (
+                                                <Label color="red">Lost</Label>
+                                            )}
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                </Grid>
+                            ))}
+                            <div className="details">
+                                <div className="created">
+                                    created{' '}
+                                    {moment(slip.datetimeCreated).fromNow()}
+                                </div>
+                                <div className="entry-amount">
+                                    ${`${slip.entryAmount} Entry`}
+                                </div>
+                            </div>
+                        </Segment>
                     )
                 })}
         </Form>

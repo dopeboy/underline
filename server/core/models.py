@@ -109,6 +109,7 @@ class Subline(models.Model):
 
 class Slip(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    entry_amount = models.PositiveIntegerField()
     datetime_created = models.DateTimeField(auto_now_add=True)
 
     # For every attached pick, find every attached subline.
@@ -120,6 +121,26 @@ class Slip(models.Model):
                 return False
         return True
 
+    @property
+    def payout_amount(self):
+        if self.pick_set.count() == 2:
+            return self.entry_amount * 3
+        elif self.pick_set.count() == 3:
+            return self.entry_amount * 6
+        elif self.pick_set.count() == 4:
+            return self.entry_amount * 10
+        elif self.pick_set.count() == 5:
+            return self.entry_amount * 20
+
+    @property
+    def won(self):
+        for pick in self.pick_set.all():
+            # None or false
+            if not pick.won:
+                return False
+
+        return True
+
 
 class Pick(models.Model):
     subline = models.ForeignKey(Subline, on_delete=models.CASCADE)
@@ -129,3 +150,14 @@ class Pick(models.Model):
     under_nba_points = models.BooleanField(null=True)
 
     datetime_created = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def won(self):
+        actual_points = self.subline.line.nba_points_actual
+
+        if actual_points == None:
+            return None
+        elif self.under_nba_points:
+            return actual_points < self.subline.nba_points_line
+        elif not self.under_nba_points:
+            return actual_points > self.subline.nba_points_line

@@ -9,3 +9,7 @@ export const clearJWT = () => {
 export const getJWT = () => {
     return localStorage.getItem('jwt')
 }
+
+export const parseQuery = (string) => {
+    return new URLSearchParams(string)
+}

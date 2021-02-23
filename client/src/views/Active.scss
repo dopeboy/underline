@@ -1,5 +1,45 @@
 #ul-active {
     .slip {
-        padding-bottom: 30px;
+        width: 700px;
+
+        display: table;
+
+        .title {
+        }
+
+        .player-name {
+            margin-bottom: 0px;
+        }
+
+        .details {
+            .won {
+                color: #21ba45;
+            }
+
+            .entry-amount {
+                float: right;
+                font-weight: bold;
+            }
+            .created {
+                float: left;
+            }
+        }
+
+        .over-under {
+            font-style: italic;
+        }
+
+        .created {
+            color: rgba(0, 0, 0, 0.4);
+            font-style: italic;
+        }
+
+        .pick-table {
+            margin-top: 0px;
+            margin-bottom: 10px;
+            margin-left: 0px;
+            margin-right: 0px;
+            border: 1px dotted;
+        }
     }
 }

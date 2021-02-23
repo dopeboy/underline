@@ -56,16 +56,28 @@ class SublineType(DjangoObjectType):
 
 class MyPickType(DjangoObjectType):
     subline = graphene.Field(SublineType)
+    won = graphene.Boolean()
 
     class Meta:
         model = Pick
 
+    def resolve_won(parent, info):
+        return parent.won
+
 
 class MySlipType(DjangoObjectType):
     picks = graphene.List(MyPickType)
+    payout_amount = graphene.Int()
+    won = graphene.Boolean()
 
     def resolve_picks(parent, info):
         return Pick.objects.filter(slip=parent)
+
+    def resolve_pay_amount(parent, info):
+        return parent.payout_amount
+
+    def resolve_won(parent, info):
+        return parent.won
 
     class Meta:
         model = Slip
@@ -78,7 +90,7 @@ class Query(graphene.ObjectType):
         graphene.Boolean, lat=graphene.Float(), lng=graphene.Float()
     )
     active_slips = graphene.List(MySlipType)
-    inactive_slips = graphene.List(MySlipType)
+    complete_slips = graphene.List(MySlipType)
 
     # Get today's date. Find all the games that lie on today's
     # date. Get all the lines that roll up to these dates. Get all the sublines
@@ -118,6 +130,7 @@ class Query(graphene.ObjectType):
     def resolve_me(self, info, **kawargs):
         return info.context.user
 
+    @login_required
     def resolve_active_slips(self, info, **kawargs):
         return [
             slip
@@ -125,7 +138,8 @@ class Query(graphene.ObjectType):
             if slip.complete == False
         ]
 
-    def resolve_inactive_slips(self, info, **kawargs):
+    @login_required
+    def resolve_complete_slips(self, info, **kawargs):
         return [
             slip
             for slip in Slip.objects.filter(owner=info.context.user)
@@ -186,14 +200,15 @@ class PickType(graphene.InputObjectType):
 class SlipMutation(graphene.Mutation):
     class Arguments:
         picks = graphene.List(PickType)
+        entry_amount = graphene.Int()
 
     # The class attributes define the response of the mutation
     success = graphene.Boolean()
 
     @classmethod
-    def mutate(cls, root, info, picks):
+    def mutate(cls, root, info, picks, entry_amount):
         # Create the slip
-        slip = Slip.objects.create(owner=info.context.user)
+        slip = Slip.objects.create(owner=info.context.user, entry_amount=entry_amount)
 
         for p in picks:
             subline = Subline.objects.get(id=int(p["id"]))

@@ -62,8 +62,8 @@ const CHECK_APPROVED_LOCATION_QUERY = gql`
 `
 
 const CREATE_SLIP_MUTATION = gql`
-    mutation CreateSlip($picks: [PickType]!) {
-        createSlip(picks: $picks) {
+    mutation CreateSlip($picks: [PickType]!, $entryAmount: Int!) {
+        createSlip(picks: $picks, entryAmount: $entryAmount) {
             success
         }
     }
@@ -160,12 +160,16 @@ const Lobby = () => {
     const [multiplier, setMultiplier] = useState('1x')
     const [payout, setPayout] = useState('')
     const [entryAmount, setEntryAmount] = useState('')
+    const [checking, setChecking] = useState(false)
     const [processing, setProcessing] = useState(false)
     const [errorModalVisible, setErrorModalVisible] = useState({
         open: false,
         header: '',
         message: '',
     })
+    const [confirmationModalVisible, setConfirmationModalVisible] = useState(
+        false
+    )
     const [payoutErrorVisible, setPayoutErrorVisible] = useState(false)
     const client = useApolloClient()
     const history = useHistory()
@@ -265,15 +269,15 @@ const Lobby = () => {
     // (3) Check the location of the user
     // (4) Check if user has linked a payment method
     // (5) Check if user has sufficients funds in their wallet
-    const submitPicks = async () => {
-        setProcessing(true)
+    const checkPicks = () => {
+        setChecking(true)
         let lat,
             lng = null
 
         // (1)
         if (!payout) {
             setPayoutErrorVisible(true)
-            setProcessing(false)
+            setChecking(false)
             return
         }
 
@@ -294,7 +298,7 @@ const Lobby = () => {
                 header: 'Two teams must be involved',
                 message: 'You must select picks that span atleast two teams.',
             })
-            setProcessing(false)
+            setChecking(false)
             return
         }
 
@@ -306,7 +310,7 @@ const Lobby = () => {
                 message:
                     'We need to verify your location. Please enable location access.',
             })
-            setProcessing(false)
+            setChecking(false)
             return
         } else {
             /*
@@ -326,7 +330,7 @@ const Lobby = () => {
                         message:
                             'Sorry, you are playing from an invalid location.',
                     })
-                    setProcessing(false)
+                    setChecking(false)
                     return
                 }
 
@@ -336,6 +340,11 @@ const Lobby = () => {
             */
 
             // We made it! User is all good to go
+            // Show confirmation modal
+            setChecking(false)
+            setConfirmationModalVisible(true)
+
+            /*
             const response = await client.mutate({
                 mutation: CREATE_SLIP_MUTATION,
                 variables: {
@@ -348,11 +357,33 @@ const Lobby = () => {
                 },
             })
 
-            console.log(response.data)
             // Redirect
             if (response.data.createSlip.success) {
                 history.push('/active')
             }
+            */
+        }
+    }
+
+    const submitPicks = async () => {
+        setProcessing(true)
+
+        const response = await client.mutate({
+            mutation: CREATE_SLIP_MUTATION,
+            variables: {
+                picks: picks.map((e) => {
+                    return {
+                        id: e.id,
+                        under: e.under,
+                    }
+                }),
+                entryAmount: entryAmount,
+            },
+        })
+
+        // Redirect
+        if (response.data.createSlip.success) {
+            history.push('/active?success')
         }
     }
 
@@ -381,6 +412,34 @@ const Lobby = () => {
                     </Button>
                 </Modal.Actions>
             </Modal>
+            <Modal
+                onClose={() => setConfirmationModalVisible(false)}
+                open={confirmationModalVisible}
+                size="small"
+            >
+                <Header>
+                    <Icon name="exclamation circle" />
+                    Confirmation
+                </Header>
+                <Modal.Content>
+                    <p>Once you confirmed, your selections are locked.</p>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button
+                        color="red"
+                        onClick={() => setConfirmationModalVisible(false)}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        color="green"
+                        onClick={submitPicks}
+                        loading={processing}
+                    >
+                        Confirm
+                    </Button>
+                </Modal.Actions>
+            </Modal>
             <Header as="h2" textAlign="center">
                 Over/Under
                 <Header.Subheader>
@@ -401,7 +460,7 @@ const Lobby = () => {
                         <Progress percent={percent} color="green">
                             {multiplier}
                         </Progress>
-                        <Form loading={processing}>
+                        <Form loading={checking}>
                             <Form.Group widths="equal">
                                 <Form.Input
                                     fluid
@@ -433,7 +492,7 @@ const Lobby = () => {
                             </Form.Group>
                             <Form.Button
                                 disabled={picks.length < 2}
-                                onClick={submitPicks}
+                                onClick={checkPicks}
                                 fluid
                                 color="green"
                                 size="huge"

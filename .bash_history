@@ -71,3 +71,7 @@ python manage.py makemigrations
 python manage.py migrate
 python manage.py makemigrations
 python manage.py migrate
+sudo pip3 install --upgrade ipython
+pip3 install --upgrade ipython
+python manage.py makemigrations
+python manage.py migrate
