@@ -25,6 +25,7 @@ const GET_ME_QUERY = gql`
         me {
             firstName
             lastName
+            walletBalance
         }
     }
 `
@@ -42,7 +43,9 @@ const Main = (props) => {
         <>
             <Menu size="massive" id="ule-navbar">
                 <Menu.Item>
-                    <img src={logo} className="logo" />
+                    <Link to="/lobby">
+                        <img src={logo} className="logo" />
+                    </Link>
                 </Menu.Item>
 
                 <Menu.Item
@@ -68,6 +71,14 @@ const Main = (props) => {
                 </Menu.Item>
 
                 <Menu.Menu position="right">
+                    <Menu.Item position="right">
+                        Balance:&nbsp;&nbsp;$
+                        {data && Math.round(data.me.walletBalance)}
+                    </Menu.Item>
+                    <Menu.Item position="right">
+                        <Button primary>Deposit</Button>
+                    </Menu.Item>
+
                     <Dropdown
                         item
                         text={

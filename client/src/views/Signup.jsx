@@ -50,7 +50,6 @@ const Signup = () => {
             history.push('/lobby')
         },
         onError: (data) => {
-            console.log(data)
             setProcessing(false)
             setError(true)
         },

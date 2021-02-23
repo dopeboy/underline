@@ -284,10 +284,11 @@ const Lobby = () => {
     }
 
     // (1) Check if they entered a payout amount
-    // (2) Check that there are atleast two teams involved
-    // (3) Check the location of the user
-    // (4) Check if user has linked a payment method
-    // (5) Check if user has sufficients funds in their wallet
+    // (2) Check if entry amount is <= $10
+    // (3) Check that there are atleast two teams involved
+    // (4) Check the location of the user
+    // (5) Check if user has linked a payment method
+    // (6) Check if user has sufficients funds in their wallet
     const checkPicks = () => {
         setChecking(true)
         let lat,
@@ -296,6 +297,17 @@ const Lobby = () => {
         // (1)
         if (!payout) {
             setPayoutErrorVisible(true)
+            setChecking(false)
+            return
+        }
+
+        if (entryAmount > 10) {
+            setPayoutErrorVisible(true)
+            setErrorModalVisible({
+                open: true,
+                header: 'Max $10 entry',
+                message: 'We only allow a maximum of $10 for entry'
+            })
             setChecking(false)
             return
         }

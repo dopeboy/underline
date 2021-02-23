@@ -93,6 +93,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=timezone.now,
     )
 
+    wallet_balance = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+
     # Add additional fields here if needed
     objects = UserManager()
     USERNAME_FIELD = "email"
