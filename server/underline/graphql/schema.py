@@ -11,6 +11,7 @@ from graphql_jwt.decorators import login_required
 from turfpy.measurement import boolean_point_in_polygon
 from geojson import Point, Polygon, Feature
 from django.conf import settings
+from graphql_jwt.utils import jwt_payload
 
 
 class TeamType(DjangoObjectType):
@@ -204,8 +205,8 @@ class PickType(graphene.InputObjectType):
 
 class SlipMutation(graphene.Mutation):
     class Arguments:
-        picks = graphene.List(PickType)
-        entry_amount = graphene.Int()
+        picks = graphene.List(PickType, required=True)
+        entry_amount = graphene.Int(required=True)
 
     # The class attributes define the response of the mutation
     success = graphene.Boolean()
@@ -222,5 +223,43 @@ class SlipMutation(graphene.Mutation):
         return SlipMutation(success=True)
 
 
+class CreateUser(graphene.Mutation):
+    class Arguments:
+        first_name = graphene.String(required=True)
+        last_name = graphene.String(required=True)
+        phone_number = graphene.String(required=True)
+        birth_date = graphene.Date(required=True)
+        email_address = graphene.String(required=True)
+        password = graphene.String(required=True)
+
+    # The class attributes define the response of the mutation
+    success = graphene.Boolean()
+
+    @classmethod
+    def mutate(
+        cls,
+        root,
+        info,
+        first_name,
+        last_name,
+        phone_number,
+        birth_date,
+        email_address,
+        password,
+    ):
+        print(123)
+        user = User.objects.create_user(
+            email=email_address.lower(),
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+            phone_number=phone_number,
+            birth_date=birth_date,
+        )
+
+        return CreateUser(success=True)
+
+
 class Mutation(graphene.ObjectType):
     create_slip = SlipMutation.Field()
+    create_user = CreateUser.Field()

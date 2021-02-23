@@ -9,5 +9,11 @@
     .main-grid {
         margin-top: 30px;
     }
+
+    // Hack for the datepicker. Should
+    // find cleaner solution
+    .field {
+        width: 100%;
+    }
 }
 

@@ -61,6 +61,19 @@ class User(AbstractBaseUser, PermissionsMixin):
         max_length=150,
         blank=True,
     )
+
+    phone_number = models.CharField(
+        _("phone number"),
+        max_length=32,
+        blank=True,
+        null=True
+    )
+
+    birth_date = models.DateField(
+        blank=True,
+        null=True
+    )
+
     is_staff = models.BooleanField(
         _("staff status"),
         default=False,
