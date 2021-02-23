@@ -55,6 +55,12 @@ const GET_TODAYS_SUBLINES_QUERY = gql`
     }
 `
 
+const GET_CURRENT_DATE_QUERY = gql`
+    query currentDate {
+        currentDate
+    }
+`
+
 const CHECK_APPROVED_LOCATION_QUERY = gql`
     query ApprovedLocation($lat: Float!, $lng: Float!) {
         approvedLocation(lat: $lat, lng: $lng)
@@ -111,8 +117,11 @@ const PlayerList = ({ picks, addOrRemovePick }) => {
                                                 .abbreviation
                                         }{' '}
                                         -{' '}
-                                        {moment(subline.line.game.datetime)
-                                            .tz('America/Los_Angeles')
+                                        {moment
+                                            .tz(
+                                                subline.line.game.datetime,
+                                                moment.tz.guess()
+                                            )
                                             .format('h:mma z')}
                                     </Card.Description>
                                 </Card.Content>
@@ -150,6 +159,16 @@ const PlayerList = ({ picks, addOrRemovePick }) => {
                     })}
             </Card.Group>
         </Form>
+    )
+}
+
+const LobbyHeader = () => {
+    const { data } = useQuery(GET_CURRENT_DATE_QUERY)
+    return (
+        <Header as="h1">
+            Featured players (
+            {data && moment(data.currentDate).format('MMMM Do YYYY')})
+        </Header>
     )
 }
 
@@ -296,7 +315,7 @@ const Lobby = () => {
             setErrorModalVisible({
                 open: true,
                 header: 'Two teams must be involved',
-                message: 'You must select picks that span atleast two teams.',
+                message: 'You must select picks that span at least two teams.',
             })
             setChecking(false)
             return
@@ -443,13 +462,13 @@ const Lobby = () => {
             <Header as="h2" textAlign="center">
                 Over/Under
                 <Header.Subheader>
-                    Select 1 player from atleast two teams
+                    Select 1 player from at least two teams
                 </Header.Subheader>
             </Header>
             <Grid>
                 <Grid.Row>
                     <Grid.Column width={12}>
-                        <Header as="h1">Featured players</Header>
+                        <LobbyHeader />
                         <PlayerList
                             picks={picks}
                             addOrRemovePick={addOrRemovePick}
@@ -546,12 +565,12 @@ const Lobby = () => {
                                                                     .abbreviation
                                                             }{' '}
                                                             -{' '}
-                                                            {moment(
-                                                                pick.line.game
-                                                                    .datetime
-                                                            )
+                                                            {moment
                                                                 .tz(
-                                                                    'America/Los_Angeles'
+                                                                    pick.line
+                                                                        .game
+                                                                        .datetime,
+                                                                    moment.tz.guess()
                                                                 )
                                                                 .format(
                                                                     'h:mma z'

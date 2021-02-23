@@ -15,6 +15,7 @@ import {
     Redirect,
 } from 'react-router-dom'
 import Login from 'views/Login.jsx'
+import Signup from 'views/Signup.jsx'
 import Lobby from 'views/Lobby.jsx'
 import Active from 'views/Active.jsx'
 import Completed from 'views/Completed.jsx'
@@ -86,6 +87,9 @@ function App() {
                         path="/completed"
                         component={Completed}
                     ></PrivateRoute>
+                    <Route path="/signup">
+                        <Signup />
+                    </Route>
                     <Route path="/">
                         <Login />
                     </Route>

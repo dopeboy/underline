@@ -23,7 +23,16 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DJANGO_DEBUG", default=False)
 
 ALLOWED_HOSTS = ["*"]
-CORS_ORIGIN_WHITELIST = ("http://localhost:3000",)
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_HEADERS = (
+    "content-disposition",
+    "accept-encoding",
+    "accept-language",
+    "content-type",
+    "accept",
+    "origin",
+    "authorization",
+)
 
 
 # Application definition
@@ -58,8 +67,8 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'graphql_jwt.backends.JSONWebTokenBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    "graphql_jwt.backends.JSONWebTokenBackend",
+    "django.contrib.auth.backends.ModelBackend",
 ]
 
 ROOT_URLCONF = "underline.urls"

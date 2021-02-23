@@ -5,9 +5,11 @@ import { Helmet } from 'react-helmet'
 import { gql, useMutation } from '@apollo/client'
 import { saveJWT } from 'utils'
 import { Link, useHistory } from 'react-router-dom'
-import './Login.scss'
+import './Signup.scss'
+import SemanticDatepicker from 'react-semantic-ui-datepickers';
+import 'react-semantic-ui-datepickers/dist/react-semantic-ui-datepickers.css';
 
-const LOGIN_MUTATION = gql`
+const CREATE_ACCOUNT_MUTATION = gql`
     mutation TokenAuth($emailAddress: String!, $password: String!) {
         tokenAuth(email: $emailAddress, password: $password) {
             token
@@ -17,14 +19,20 @@ const LOGIN_MUTATION = gql`
     }
 `
 
-const Login = () => {
+const Signup = () => {
     const history = useHistory()
+    const [firstName, setFirstName] = useState('')
+    const [lastName, setLastName] = useState('')
+    const [phoneNumber, setPhoneNumber] = useState('')
     const [emailAddress, setEmailAddress] = useState('')
     const [password, setPassword] = useState('')
+      const [currentDate, setNewDate] = useState(null);
+      const onChange = (event, data) => setNewDate(data.value);
+
     const [error, setError] = useState(false)
     const [processing, setProcessing] = useState(false)
 
-    const [loginUser] = useMutation(LOGIN_MUTATION, {
+    const [signupUser] = useMutation(CREATE_ACCOUNT_MUTATION, {
         onCompleted: (data) => {
             setProcessing(false)
             setError(false)
@@ -41,15 +49,15 @@ const Login = () => {
         evt.preventDefault()
         setProcessing(true)
         setError(false)
-        loginUser({
+        signupUser({
             variables: { emailAddress: emailAddress, password: password },
         })
     }
 
     return (
-        <Container id="ul-login">
+        <Container id="ul-signup">
             <Helmet>
-                <title>Login</title>
+                <title>Sign up</title>
             </Helmet>
             <div className="main-grid">
                 <Grid centered columns={1}>
@@ -64,6 +72,46 @@ const Login = () => {
                             </Message>
                         )}
                         <Form onSubmit={handleSubmit}>
+                            <Form.Field required>
+                                <label>First name</label>
+                                <input
+                                    type="text"
+                                    size="large"
+                                    placeholder="First name"
+                                    required
+                                    onChange={(e) =>
+                                        setFirstName(e.target.value)
+                                    }
+                                />
+                            </Form.Field>
+                            <Form.Field required>
+                                <label>Last name</label>
+                                <input
+                                    type="text"
+                                    size="large"
+                                    placeholder="Last name"
+                                    required
+                                    onChange={(e) =>
+                                        setLastName(e.target.value)
+                                    }
+                                />
+                            </Form.Field>
+                            <Form.Field required>
+                                <label>Phone number</label>
+                                <input
+                                    type="text"
+                                    size="large"
+                                    placeholder="Phone number"
+                                    required
+                                    onChange={(e) =>
+                                        setPhoneNumber(e.target.value)
+                                    }
+                                />
+                            </Form.Field>
+                            <Form.Field required>
+                                <label>Birth date</label>
+                                <SemanticDatepicker onChange={onChange} />
+                            </Form.Field>
                             <Form.Field required>
                                 <label>Email address</label>
                                 <input
@@ -96,11 +144,11 @@ const Login = () => {
                                 disabled={processing}
                                 loading={processing}
                             >
-                                Login
+                                Sign up
                             </Button>
                             <p>
-                                Don't have an account?{' '}
-                                <Link to="/signup">Sign up here.</Link>
+                                Already have an account?{' '}
+                                <Link to="/">Login here.</Link>
                             </p>
                         </Form>
                     </Grid.Column>
@@ -110,4 +158,4 @@ const Login = () => {
     )
 }
 
-export default Login
+export default Signup

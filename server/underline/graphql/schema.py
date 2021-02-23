@@ -91,10 +91,12 @@ class Query(graphene.ObjectType):
     )
     active_slips = graphene.List(MySlipType)
     complete_slips = graphene.List(MySlipType)
+    current_date = graphene.Date()
 
     # Get today's date. Find all the games that lie on today's
     # date. Get all the lines that roll up to these dates. Get all the sublines
     # that these lines roll up to.
+    @login_required
     def resolve_todays_sublines(self, info, **kwargs):
         cd = CurrentDate.objects.first()
         todays_games = []
@@ -145,6 +147,9 @@ class Query(graphene.ObjectType):
             for slip in Slip.objects.filter(owner=info.context.user)
             if slip.complete == True
         ]
+
+    def resolve_current_date(self, info, **kawargs):
+        return CurrentDate.objects.first().date
 
     @login_required
     def resolve_approved_location(self, info, lat, lng):
