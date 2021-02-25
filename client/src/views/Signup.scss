@@ -10,10 +10,13 @@
         margin-top: 30px;
     }
 
+    thead.suicr-year-view-header > tr > th:nth-child(2) {
+        pointer-events: none;
+    }
+
     // Hack for the datepicker. Should
     // find cleaner solution
     .field {
         width: 100%;
     }
 }
-

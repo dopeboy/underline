@@ -76,7 +76,9 @@ const Main = (props) => {
                         {data && Math.round(data.me.walletBalance)}
                     </Menu.Item>
                     <Menu.Item position="right">
-                        <Button primary>Deposit</Button>
+                        <Button primary as={Link} to="/settings/deposit">
+                            Deposit
+                        </Button>
                     </Menu.Item>
 
                     <Dropdown
@@ -87,6 +89,9 @@ const Main = (props) => {
                         }
                     >
                         <Dropdown.Menu>
+                            <Dropdown.Item as={Link} to="/settings/account">
+                                Settings
+                            </Dropdown.Item>
                             <Dropdown.Item onClick={logoutUser}>
                                 Logout
                             </Dropdown.Item>

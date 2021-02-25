@@ -19,6 +19,7 @@ import Signup from 'views/Signup.jsx'
 import Lobby from 'views/Lobby.jsx'
 import Active from 'views/Active.jsx'
 import Completed from 'views/Completed.jsx'
+import Settings from 'views/Settings.jsx'
 import Main from 'components/Main'
 
 const authLink = setContext((_, { headers }) => {
@@ -39,15 +40,15 @@ const httpLink = createHttpLink({
 })
 
 const defaultOptions: DefaultOptions = {
-      watchQuery: {
+    watchQuery: {
         fetchPolicy: 'no-cache',
         errorPolicy: 'ignore',
-      },
-      query: {
+    },
+    query: {
         fetchPolicy: 'no-cache',
         errorPolicy: 'all',
-      },
-    }
+    },
+}
 
 const client = new ApolloClient({
     link: authLink.concat(httpLink),
@@ -86,6 +87,10 @@ function App() {
                     <PrivateRoute
                         path="/completed"
                         component={Completed}
+                    ></PrivateRoute>
+                    <PrivateRoute
+                        path="/settings/:section?"
+                        component={Settings}
                     ></PrivateRoute>
                     <Route path="/signup">
                         <Signup />
