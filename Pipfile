@@ -19,6 +19,7 @@ requests = "==2.25.1"
 pyjwt = "==1.7.0"
 django-graphql-jwt = "*"
 turfpy = "*"
+pygments = "*"
 
 [dev-packages]
 pytest-django = "==3.3.2"
