@@ -2,6 +2,7 @@ import graphene
 import json
 
 from django.db.models import Q
+import decimal
 from graphene_django import DjangoObjectType
 from pytz import timezone, utc
 from core.models import (
@@ -286,6 +287,11 @@ class RecordDeposit(graphene.Mutation):
             transaction_details=json.loads(transaction_details),
             order_details=json.loads(order_details),
         )
+
+        u = info.context.user
+        u.wallet_balance += decimal.Decimal(amount)
+        u.save()
+
         return RecordDeposit(success=True)
 
 

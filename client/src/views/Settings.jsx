@@ -3,6 +3,9 @@ import { PayPalButton } from 'react-paypal-button-v2'
 import {
     Header,
     Menu,
+    Modal,
+    Icon,
+    Success,
     Message,
     Grid,
     Divider,
@@ -78,15 +81,22 @@ const Account = () => {
 
 const Deposit = () => {
     const [selectedPaymentAmount, setSelectedPaymentAmount] = useState()
+    const [
+        depositSuccessModalVisible,
+        setDepositSuccessModalVisible,
+    ] = useState(false)
+    const [processing, setProcessing] = useState(false)
+    const history = useHistory()
 
     const [recordDeposit] = useMutation(RECORD_DEPOSIT_MUTATION, {
         onCompleted: (data) => {
             //setProcessing(false)
             //setError(false)
             // show modal
+            setDepositSuccessModalVisible(true)
         },
         onError: (data) => {
-            //setProcessing(false)
+            setProcessing(false)
             //setError(true)
         },
     })
@@ -98,7 +108,7 @@ const Deposit = () => {
                 Select an option below. All of our payments are processed
                 securely through PayPal.
             </p>
-            <div className="parent">
+            <Form className="parent" loading={processing}>
                 <Button
                     active={selectedPaymentAmount === 5}
                     className="amt-btn"
@@ -137,6 +147,7 @@ const Deposit = () => {
                     amount={selectedPaymentAmount}
                     shippingPreference="NO_SHIPPING"
                     onClick={() => {
+                        setProcessing(true)
                         return selectedPaymentAmount
                     }}
                     options={{
@@ -147,9 +158,6 @@ const Deposit = () => {
                         disableFunding: 'credit',
                     }}
                     onSuccess={(details, data) => {
-                        console.log(details)
-                        console.log(data)
-
                         recordDeposit({
                             variables: {
                                 amount: details.purchase_units[0].amount.value,
@@ -174,7 +182,34 @@ const Deposit = () => {
                         */
                     }}
                 />
-            </div>
+            </Form>
+            <Modal
+                onClose={() => setDepositSuccessModalVisible(false)}
+                open={depositSuccessModalVisible}
+                size="small"
+            >
+                <Header>
+                    <Icon name="check " />
+                    Congratulations
+                </Header>
+                <Modal.Content>
+                    <p>
+                        You have successfully deposited funds into your
+                        Underline account. Click the button below to start
+                        playing.
+                    </p>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button
+                        color="green"
+                        onClick={() => {
+                            history.push('/lobby')
+                        }}
+                    >
+                        Start playing
+                    </Button>
+                </Modal.Actions>
+            </Modal>
         </div>
     )
 }
