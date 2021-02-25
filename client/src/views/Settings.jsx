@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
+import { PayPalButton } from 'react-paypal-button-v2'
 import {
     Header,
     Menu,
     Message,
     Grid,
+    Divider,
     List,
     Form,
     Button,
@@ -24,6 +26,22 @@ const GET_ME_QUERY = gql`
             lastName
             email
             dateJoined
+        }
+    }
+`
+
+const RECORD_DEPOSIT_MUTATION = gql`
+    mutation RecordDeposit(
+        $amount: Float!
+        $transactionDetails: String!
+        $orderDetails: String!
+    ) {
+        recordDeposit(
+            amount: $amount
+            transactionDetails: $transactionDetails
+            orderDetails: $orderDetails
+        ) {
+            success
         }
     }
 `
@@ -59,19 +77,105 @@ const Account = () => {
 }
 
 const Deposit = () => {
+    const [selectedPaymentAmount, setSelectedPaymentAmount] = useState()
+
+    const [recordDeposit] = useMutation(RECORD_DEPOSIT_MUTATION, {
+        onCompleted: (data) => {
+            //setProcessing(false)
+            //setError(false)
+            // show modal
+        },
+        onError: (data) => {
+            //setProcessing(false)
+            //setError(true)
+        },
+    })
+
     return (
-        <>
+        <div className="ul-deposit">
             <Header as="h2">Deposit</Header>
-            <div>
-                <Button size="medium">Medium</Button>
+            <p>
+                Select an option below. All of our payments are processed
+                securely through PayPal.
+            </p>
+            <div className="parent">
+                <Button
+                    active={selectedPaymentAmount === 5}
+                    className="amt-btn"
+                    toggle
+                    basic
+                    fluid
+                    size="large"
+                    onClick={() => setSelectedPaymentAmount(5)}
+                >
+                    $5
+                </Button>
+                <Button
+                    active={selectedPaymentAmount === 10}
+                    className="amt-btn"
+                    toggle
+                    basic
+                    fluid
+                    size="large"
+                    onClick={() => setSelectedPaymentAmount(10)}
+                >
+                    $10
+                </Button>
+                <Button
+                    active={selectedPaymentAmount === 20}
+                    className="amt-btn"
+                    toggle
+                    basic
+                    fluid
+                    size="large"
+                    onClick={() => setSelectedPaymentAmount(20)}
+                >
+                    $20
+                </Button>
+                <Divider />
+                <PayPalButton
+                    amount={selectedPaymentAmount}
+                    shippingPreference="NO_SHIPPING"
+                    onClick={() => {
+                        return selectedPaymentAmount
+                    }}
+                    options={{
+                        clientId:
+                            process.env.NODE_ENV === 'development'
+                                ? 'AX5eD1ofG_dHeCpSVDbmlvoc9ghz53qS8eAwseFFNWOQxtGIb_H6ZD_uiOGrCSlCZRnwb41cjDPnIwo1'
+                                : 'Ad0GFGEqk719MEe6gKNnkiEwmapRr7tKRhgiCV56dQeX60G8_YD7pZ7oKvCRUW8a8ZIoweg6sFo8WzkN',
+                        disableFunding: 'credit',
+                    }}
+                    onSuccess={(details, data) => {
+                        console.log(details)
+                        console.log(data)
+
+                        recordDeposit({
+                            variables: {
+                                amount: details.purchase_units[0].amount.value,
+                                transactionDetails: JSON.stringify(details),
+                                orderDetails: JSON.stringify(data),
+                            },
+                        })
+
+                        /*
+                        alert(
+                            'Transaction completed by ' +
+                                details.payer.name.given_name
+                        )
+
+                        // OPTIONAL: Call your server to save the transaction
+                        return fetch('/paypal-transaction-complete', {
+                            method: 'post',
+                            body: JSON.stringify({
+                                orderID: data.orderID,
+                            }),
+                        })
+                        */
+                    }}
+                />
             </div>
-            <div>
-                <Button size="medium">Medium</Button>
-            </div>
-            <div>
-                <Button size="medium">Medium</Button>
-            </div>
-        </>
+        </div>
     )
 }
 

@@ -4,7 +4,17 @@ import json
 from django.db.models import Q
 from graphene_django import DjangoObjectType
 from pytz import timezone, utc
-from core.models import Team, Player, Line, CurrentDate, Game, Subline, Slip, Pick
+from core.models import (
+    Team,
+    Player,
+    Line,
+    CurrentDate,
+    Game,
+    Subline,
+    Slip,
+    Pick,
+    Deposit,
+)
 from accounts.models import User
 from graphql_jwt.decorators import login_required
 
@@ -247,7 +257,6 @@ class CreateUser(graphene.Mutation):
         email_address,
         password,
     ):
-        print(123)
         user = User.objects.create_user(
             email=email_address.lower(),
             password=password,
@@ -260,6 +269,27 @@ class CreateUser(graphene.Mutation):
         return CreateUser(success=True)
 
 
+class RecordDeposit(graphene.Mutation):
+    class Arguments:
+        amount = graphene.Float(required=True)
+        transaction_details = graphene.String(required=True)
+        order_details = graphene.String(required=True)
+
+    # The class attributes define the response of the mutation
+    success = graphene.Boolean()
+
+    @classmethod
+    def mutate(cls, root, info, amount, transaction_details, order_details):
+        Deposit.objects.create(
+            user=info.context.user,
+            amount=amount,
+            transaction_details=json.loads(transaction_details),
+            order_details=json.loads(order_details),
+        )
+        return RecordDeposit(success=True)
+
+
 class Mutation(graphene.ObjectType):
     create_slip = SlipMutation.Field()
     create_user = CreateUser.Field()
+    record_deposit = RecordDeposit.Field()

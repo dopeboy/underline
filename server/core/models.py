@@ -74,6 +74,13 @@ class Player(models.Model):
         return f"{self.name} ({self.team.league.acronym} - {self.team.name})"
 
 
+class Deposit(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    transaction_details = models.JSONField()
+    order_details = models.JSONField()
+
+
 class Line(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
