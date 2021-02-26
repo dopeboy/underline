@@ -108,46 +108,48 @@ const Deposit = () => {
                 Select an option below. All of our payments are processed
                 securely through PayPal.
             </p>
-            <Form className="parent" loading={processing}>
-                <Button
-                    active={selectedPaymentAmount === 5}
-                    className="amt-btn"
-                    toggle
-                    basic
-                    fluid
-                    size="large"
-                    onClick={() => setSelectedPaymentAmount(5)}
-                >
-                    $5
-                </Button>
-                <Button
-                    active={selectedPaymentAmount === 10}
-                    className="amt-btn"
-                    toggle
-                    basic
-                    fluid
-                    size="large"
-                    onClick={() => setSelectedPaymentAmount(10)}
-                >
-                    $10
-                </Button>
-                <Button
-                    active={selectedPaymentAmount === 20}
-                    className="amt-btn"
-                    toggle
-                    basic
-                    fluid
-                    size="large"
-                    onClick={() => setSelectedPaymentAmount(20)}
-                >
-                    $20
-                </Button>
+            <div className="parent">
+                <Form loading={processing}>
+                    <Button
+                        active={selectedPaymentAmount === 5}
+                        className="amt-btn"
+                        toggle
+                        basic
+                        fluid
+                        size="large"
+                        onClick={() => setSelectedPaymentAmount(5)}
+                    >
+                        $5
+                    </Button>
+                    <Button
+                        active={selectedPaymentAmount === 10}
+                        className="amt-btn"
+                        toggle
+                        basic
+                        fluid
+                        size="large"
+                        onClick={() => setSelectedPaymentAmount(10)}
+                    >
+                        $10
+                    </Button>
+                    <Button
+                        active={selectedPaymentAmount === 20}
+                        className="amt-btn"
+                        toggle
+                        basic
+                        fluid
+                        size="large"
+                        onClick={() => setSelectedPaymentAmount(20)}
+                    >
+                        $20
+                    </Button>
+                </Form>
                 <Divider />
                 <PayPalButton
                     amount={selectedPaymentAmount}
                     shippingPreference="NO_SHIPPING"
                     onClick={() => {
-                        setProcessing(true)
+                        if (selectedPaymentAmount) setProcessing(true)
                         return selectedPaymentAmount
                     }}
                     options={{
@@ -182,7 +184,7 @@ const Deposit = () => {
                         */
                     }}
                 />
-            </Form>
+            </div>
             <Modal
                 onClose={() => setDepositSuccessModalVisible(false)}
                 open={depositSuccessModalVisible}
