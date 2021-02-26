@@ -76,7 +76,11 @@ const Main = (props) => {
                         {data && Math.round(data.me.walletBalance)}
                     </Menu.Item>
                     <Menu.Item position="right">
-                        <Button primary as={Link} to="/settings/deposit">
+                        <Button
+                            as={Link}
+                            to="/settings/deposit"
+                            className="deposit-btn"
+                        >
                             Deposit
                         </Button>
                     </Menu.Item>

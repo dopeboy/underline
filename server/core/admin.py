@@ -26,6 +26,7 @@ from .models import (
 
 class TeamAdmin(admin.ModelAdmin):
     readonly_fields = ["logo"]  # this is for the change form
+    list_display = [field.name for field in Team._meta.fields if field.name != "id"]
 
     def logo(self, obj):
         return format_html(
@@ -45,6 +46,7 @@ class TeamAdmin(admin.ModelAdmin):
 class PlayerAdmin(admin.ModelAdmin):
     list_per_page = 500
     readonly_fields = ["headshot"]  # this is for the change form
+    list_display = [field.name for field in Player._meta.fields if field.name != "id"]
 
     def headshot(self, obj):
         return format_html(
@@ -74,6 +76,8 @@ class LineAdmin(admin.ModelAdmin):
 
 
 class GameAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in Game._meta.fields if field.name != "id"]
+
     def has_add_permission(self, request, obj=None):
         return False
 
@@ -85,6 +89,10 @@ class GameAdmin(admin.ModelAdmin):
 
 
 class CurrentDateAdmin(admin.ModelAdmin):
+    list_display = [
+        field.name for field in CurrentDate._meta.fields if field.name != "id"
+    ]
+
     def has_add_permission(self, request, obj=None):
         return False
 
@@ -92,25 +100,17 @@ class CurrentDateAdmin(admin.ModelAdmin):
         return False
 
 
-class PrettyJSONWidget(widgets.Textarea):
-    def format_value(self, value):
-        try:
-            value = json.dumps(json.loads(value), indent=2, sort_keys=True)
-            # these lines will try to adjust size of TextArea to fit to content
-            row_lengths = [len(r) for r in value.split("\n")]
-            self.attrs["rows"] = min(max(len(row_lengths) + 2, 10), 30)
-            self.attrs["cols"] = min(max(max(row_lengths) + 2, 40), 120)
-            return value
-        except Exception as e:
-            return super(PrettyJSONWidget, self).format_value(value)
-
-
 class DepositAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in Deposit._meta.fields if field.name != "id"]
+
     readonly_fields = (
         "prettified_transaction_details",
         "prettified_order_details",
     )
-    exclude = ["transaction_details", "order_details", ]
+    exclude = [
+        "transaction_details",
+        "order_details",
+    ]
 
     def prettify_json(self, data):
         # Convert the data to sorted, indented JSON
@@ -145,12 +145,14 @@ class DepositAdmin(admin.ModelAdmin):
 
 
 class PickAdmin(admin.TabularInline):
+    list_display = [field.name for field in Pick._meta.fields if field.name != "id"]
     model = Pick
     extra = 0
     can_delete = False
 
 
 class SlipAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in Slip._meta.fields if field.name != "id"]
     inlines = [
         PickAdmin,
     ]

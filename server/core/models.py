@@ -79,6 +79,7 @@ class Deposit(models.Model):
     amount = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     transaction_details = models.JSONField()
     order_details = models.JSONField()
+    datetime_created = models.DateTimeField(auto_now_add=True)
 
 
 class Line(models.Model):
@@ -89,6 +90,7 @@ class Line(models.Model):
     nba_points_actual = models.DecimalField(
         max_digits=5, decimal_places=2, blank=True, null=True
     )
+    datetime_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.player.name} - {self.game}"
