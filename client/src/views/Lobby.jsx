@@ -75,6 +75,16 @@ const CREATE_SLIP_MUTATION = gql`
     }
 `
 
+const GET_ME_QUERY = gql`
+    query {
+        me {
+            firstName
+            lastName
+            walletBalance
+        }
+    }
+`
+
 const PlayerList = ({ picks, addOrRemovePick }) => {
     const { data } = useQuery(GET_TODAYS_SUBLINES_QUERY)
     return (
@@ -289,7 +299,7 @@ const Lobby = () => {
     // (4) Check the location of the user
     // (5) Check if user has linked a payment method
     // (6) Check if user has sufficients funds in their wallet
-    const checkPicks = () => {
+    const checkPicks = async () => {
         setChecking(true)
         let lat,
             lng = null
@@ -306,7 +316,7 @@ const Lobby = () => {
             setErrorModalVisible({
                 open: true,
                 header: 'Max $10 entry',
-                message: 'We only allow a maximum of $10 for entry'
+                message: 'We only allow a maximum of $10 for entry',
             })
             setChecking(false)
             return
@@ -343,57 +353,27 @@ const Lobby = () => {
             })
             setChecking(false)
             return
-        } else {
-            /*
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                const { data } = await client.query({
-                    query: CHECK_APPROVED_LOCATION_QUERY,
-                    variables: {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude,
-                    },
-                })
-
-                if (!data.approvedLocation) {
-                    setErrorModalVisible({
-                        open: true,
-                        header: 'Invalid location',
-                        message:
-                            'Sorry, you are playing from an invalid location.',
-                    })
-                    setChecking(false)
-                    return
-                }
-
-                lat = position.coords.latitude
-                lng = position.coords.longitude
-            })
-            */
-
-            // We made it! User is all good to go
-            // Show confirmation modal
-            setChecking(false)
-            setConfirmationModalVisible(true)
-
-            /*
-            const response = await client.mutate({
-                mutation: CREATE_SLIP_MUTATION,
-                variables: {
-                    picks: picks.map((e) => {
-                        return {
-                            id: e.id,
-                            under: e.under,
-                        }
-                    }),
-                },
-            })
-
-            // Redirect
-            if (response.data.createSlip.success) {
-                history.push('/active')
-            }
-            */
         }
+
+        const { data } = await client.query({
+            query: GET_ME_QUERY,
+        })
+
+        if (parseFloat(data.me.walletBalance) < entryAmount) {
+            setErrorModalVisible({
+                open: true,
+                header: 'Insufficient funds',
+                message:
+                    "You do not have enough funds in your wallet to make this slip. Please click 'Deposit' in the upper right to fix this.",
+            })
+            setChecking(false)
+            return
+        }
+
+        // We made it! User is all good to go
+        // Show confirmation modal
+        setChecking(false)
+        setConfirmationModalVisible(true)
     }
 
     const submitPicks = async () => {

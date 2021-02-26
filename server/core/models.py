@@ -10,8 +10,8 @@ class CurrentDate(models.Model):
     date = models.DateField()
 
     class Meta:
-        verbose_name = "Change the current date"
-        verbose_name_plural = "Change the current date"
+        verbose_name = "System date"
+        verbose_name_plural = "System date"
 
     def __str__(self):
         return self.date.strftime("%m/%d/%Y")

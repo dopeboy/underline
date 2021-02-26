@@ -205,7 +205,7 @@ const Deposit = () => {
                     <Button
                         color="green"
                         onClick={() => {
-                            history.push('/lobby')
+                            window.location.href = '/lobby'
                         }}
                     >
                         Start playing
