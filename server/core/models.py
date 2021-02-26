@@ -95,6 +95,11 @@ class Line(models.Model):
     def __str__(self):
         return f"{self.player.name} - {self.game}"
 
+    def game_date(self):
+        return self.game.datetime
+
+    game_date.short_description = "Game date PST"
+
 
 class Subline(models.Model):
     line = models.ForeignKey(Line, on_delete=models.CASCADE)

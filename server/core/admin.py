@@ -1,5 +1,6 @@
 import json
 from django.contrib import admin
+from django.db import models
 from django.utils.html import format_html
 from django.forms import widgets
 from django.db.models import JSONField
@@ -70,9 +71,21 @@ class SublineAdmin(admin.TabularInline):
 
 
 class LineAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in Line._meta.fields if field.name != "id"]
+    list_display.append("number_of_orders")
     inlines = [
         SublineAdmin,
     ]
+
+    def get_queryset(self, request):
+        qs = super(LineAdmin, self).get_queryset(request)
+        qs = qs.annotate(models.Count("game__datetime"))
+        return qs
+
+    def number_of_orders(self, obj):
+        return obj.game.datetime
+
+    number_of_orders.admin_order_field = "game__datetime"
 
 
 class GameAdmin(admin.ModelAdmin):
@@ -153,6 +166,7 @@ class PickAdmin(admin.TabularInline):
 
 class SlipAdmin(admin.ModelAdmin):
     list_display = [field.name for field in Slip._meta.fields if field.name != "id"]
+    list_display.append("complete")
     inlines = [
         PickAdmin,
     ]
