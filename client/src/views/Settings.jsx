@@ -105,14 +105,6 @@ const Deposit = ({ updateMainComponent }) => {
     return (
         <div className="ul-deposit">
             <Header as="h2">Deposit</Header>
-            <Button
-                onClick={(e) => {
-                    e.preventDefault()
-                    updateMainComponent()
-                }}
-            >
-                sfsdfdsf
-            </Button>
             <p>
                 Select an option below. All of our payments are processed
                 securely through PayPal.
@@ -200,7 +192,8 @@ const Deposit = ({ updateMainComponent }) => {
                         color="green"
                         onClick={() => {
                             // Temporary hack
-                            window.location.href = '/lobby'
+                            //window.location.href = '/lobby'
+                            history.push('/lobby')
                         }}
                     >
                         Start playing
