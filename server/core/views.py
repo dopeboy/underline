@@ -91,7 +91,7 @@ class SyncGames(SuperuserRequiredMixin, View):
                 gt = record["fields"]["Time"].rstrip(" EST").rstrip(" PST")
                 date_time_obj = datetime.datetime.strptime(
                     f'{record["fields"]["Date"]} {gt}',
-                    "%m/%d/%Y %I:%M %p",
+                    "%Y-%m-%d %I:%M %p",
                 )
 
                 if "EST" in record["fields"]["Time"]:

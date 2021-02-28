@@ -79,7 +79,7 @@ const Account = () => {
     )
 }
 
-const Deposit = () => {
+const Deposit = ({ updateMainComponent }) => {
     const [selectedPaymentAmount, setSelectedPaymentAmount] = useState()
     const [
         depositSuccessModalVisible,
@@ -93,6 +93,7 @@ const Deposit = () => {
             //setProcessing(false)
             //setError(false)
             // show modal
+            updateMainComponent()
             setDepositSuccessModalVisible(true)
         },
         onError: (data) => {
@@ -104,6 +105,14 @@ const Deposit = () => {
     return (
         <div className="ul-deposit">
             <Header as="h2">Deposit</Header>
+            <Button
+                onClick={(e) => {
+                    e.preventDefault()
+                    updateMainComponent()
+                }}
+            >
+                sfsdfdsf
+            </Button>
             <p>
                 Select an option below. All of our payments are processed
                 securely through PayPal.
@@ -167,21 +176,6 @@ const Deposit = () => {
                                 orderDetails: JSON.stringify(data),
                             },
                         })
-
-                        /*
-                        alert(
-                            'Transaction completed by ' +
-                                details.payer.name.given_name
-                        )
-
-                        // OPTIONAL: Call your server to save the transaction
-                        return fetch('/paypal-transaction-complete', {
-                            method: 'post',
-                            body: JSON.stringify({
-                                orderID: data.orderID,
-                            }),
-                        })
-                        */
                     }}
                 />
             </div>
@@ -205,6 +199,7 @@ const Deposit = () => {
                     <Button
                         color="green"
                         onClick={() => {
+                            // Temporary hack
                             window.location.href = '/lobby'
                         }}
                     >
@@ -234,7 +229,7 @@ const Withdraw = () => {
     )
 }
 
-const Settings = () => {
+const Settings = ({ updateMainComponent }) => {
     const history = useHistory()
     let { section } = useParams()
     const [activeItem, setActiveItem] = useState('')
@@ -274,7 +269,11 @@ const Settings = () => {
                     </Grid.Column>
                     <Grid.Column width={13}>
                         {activeItem === 'account' && <Account />}
-                        {activeItem === 'deposit' && <Deposit />}
+                        {activeItem === 'deposit' && (
+                            <Deposit
+                                updateMainComponent={updateMainComponent}
+                            />
+                        )}
                         {activeItem === 'withdraw' && <Withdraw />}
                     </Grid.Column>
                 </Grid.Row>

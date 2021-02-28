@@ -1,4 +1,5 @@
 import { gql, useQuery } from '@apollo/client'
+import React, { useState } from 'react'
 import {
     Divider,
     Form,
@@ -31,13 +32,17 @@ const GET_ME_QUERY = gql`
 `
 
 const Main = (props) => {
-    const { data } = useQuery(GET_ME_QUERY)
+    const { data, refetch } = useQuery(GET_ME_QUERY)
+    const [updateComponent, setUpdateComponent] = useState(false)
+
     const logoutUser = () => {
         clearJWT()
         history.push('/')
     }
     const history = useHistory()
     const location = useLocation()
+
+    const updateMe = () => setUpdateComponent(!updateComponent)
 
     return (
         <>
@@ -103,7 +108,11 @@ const Main = (props) => {
                     </Dropdown>
                 </Menu.Menu>
             </Menu>
-            <div className="ule-container">{props.children}</div>
+            <div className="ule-container">
+                {React.cloneElement(props.children, {
+                    updateMainComponent: refetch,
+                })}
+            </div>
         </>
     )
 }
