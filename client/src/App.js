@@ -26,7 +26,6 @@ const authLink = setContext((_, { headers }) => {
     const token = getJWT()
     return {
         headers: {
-            ...headers,
             authorization: token ? `JWT ${token}` : '',
         },
     }
@@ -71,6 +70,15 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
     />
 )
 
+const NonLoggedInRoute = ({ component: Component, ...rest }) => (
+    <Route
+        {...rest}
+        render={(props) =>
+            getJWT() ? <Redirect to="/lobby" /> : <Component {...props} />
+        }
+    />
+)
+
 function App() {
     return (
         <ApolloProvider client={client}>
@@ -92,12 +100,14 @@ function App() {
                         path="/settings/:section?"
                         component={Settings}
                     ></PrivateRoute>
-                    <Route path="/signup">
-                        <Signup />
-                    </Route>
-                    <Route path="/">
-                        <Login />
-                    </Route>
+                    <NonLoggedInRoute
+                        path="/signup"
+                        component={Signup}
+                    ></NonLoggedInRoute>
+                    <NonLoggedInRoute
+                        path="/"
+                        component={Login}
+                    ></NonLoggedInRoute>
                 </Switch>
             </Router>
         </ApolloProvider>

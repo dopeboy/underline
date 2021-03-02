@@ -33,5 +33,5 @@ __pycache__
 server/staticfiles
 .cache
 .local
-.bash_history
 .ipython
+.bash_history

@@ -24,6 +24,9 @@ from geojson import Point, Polygon, Feature
 from django.conf import settings
 from graphql_jwt.utils import jwt_payload
 
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+
 
 class TeamType(DjangoObjectType):
     class Meta:
@@ -214,7 +217,7 @@ class PickType(graphene.InputObjectType):
     under = graphene.Boolean(required=True)
 
 
-class SlipMutation(graphene.Mutation):
+class CreateSlip(graphene.Mutation):
     class Arguments:
         picks = graphene.List(PickType, required=True)
         entry_amount = graphene.Int(required=True)
@@ -231,7 +234,16 @@ class SlipMutation(graphene.Mutation):
             subline = Subline.objects.get(id=int(p["id"]))
             Pick.objects.create(subline=subline, slip=slip, under_nba_points=p["under"])
 
-        return SlipMutation(success=True)
+        message = Mail(
+            from_email="support@underlinesports.com",
+            to_emails="manish@underlinesports.com",
+            subject=f"[AUTOMATED EMAIL] {info.context.user.first_name} {info.context.user.last_name} created a slip",
+            html_content=f"Check out it <a href='{settings.DOMAIN}/admin/core/slip/{slip.id}/change/'>here.</a>",
+        )
+        sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+        response = sg.send(message)
+
+        return CreateSlip(success=True)
 
 
 class CreateUser(graphene.Mutation):
@@ -296,6 +308,6 @@ class RecordDeposit(graphene.Mutation):
 
 
 class Mutation(graphene.ObjectType):
-    create_slip = SlipMutation.Field()
+    create_slip = CreateSlip.Field()
     create_user = CreateUser.Field()
     record_deposit = RecordDeposit.Field()

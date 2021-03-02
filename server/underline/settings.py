@@ -151,6 +151,7 @@ GRAPHENE = {
 }
 
 GRAPHQL_DEBUG = env("GRAPHQL_DEBUG", default=DEBUG)
+SECURE_SSL_REDIRECT = True
 
 if not DEBUG:
     django_heroku.settings(locals())
@@ -161,3 +162,10 @@ if not DEBUG:
 
 # 3rd party settings
 AIRTABLE_API_KEY = "keySnrFwxbtOCs96y"
+SENDGRID_API_KEY= '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'
+
+# Environmental
+if DEBUG:
+    DOMAIN = 'http://127.0.0.1:5000'
+else:
+    DOMAIN = 'https://underlineapp.herokuapp.com'
