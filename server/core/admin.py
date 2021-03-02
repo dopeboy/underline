@@ -72,7 +72,7 @@ class SublineAdmin(admin.TabularInline):
 
 class LineAdmin(admin.ModelAdmin):
     list_display = [field.name for field in Line._meta.fields if field.name != "id"]
-    list_display.append("number_of_orders")
+    list_display.append("gametime")
     inlines = [
         SublineAdmin,
     ]
@@ -82,10 +82,10 @@ class LineAdmin(admin.ModelAdmin):
         qs = qs.annotate(models.Count("game__datetime"))
         return qs
 
-    def number_of_orders(self, obj):
+    def gametime(self, obj):
         return obj.game.datetime
 
-    number_of_orders.admin_order_field = "game__datetime"
+    gametime.admin_order_field = "game__datetime"
 
 
 class GameAdmin(admin.ModelAdmin):
@@ -157,8 +157,9 @@ class DepositAdmin(admin.ModelAdmin):
         return False
 
 
-class PickAdmin(admin.TabularInline):
+class PickTabularInline(admin.TabularInline):
     list_display = [field.name for field in Pick._meta.fields if field.name != "id"]
+    readonly_fields = ("won",)
     model = Pick
     extra = 0
     can_delete = False
@@ -167,9 +168,21 @@ class PickAdmin(admin.TabularInline):
 class SlipAdmin(admin.ModelAdmin):
     list_display = [field.name for field in Slip._meta.fields if field.name != "id"]
     list_display.append("complete")
+    list_display.append("payout_amount")
+    list_display.append("won")
     inlines = [
-        PickAdmin,
+        PickTabularInline,
     ]
+
+
+class PickAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in Pick._meta.fields if field.name != "id"]
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 admin.site.register(Team, TeamAdmin)
@@ -178,6 +191,7 @@ admin.site.register(Team, TeamAdmin)
 admin.site.register(League)
 admin.site.register(Slip, SlipAdmin)
 admin.site.register(Position)
+admin.site.register(Pick, PickAdmin)
 admin.site.register(Line, LineAdmin)
 admin.site.register(CurrentDate, CurrentDateAdmin)
 admin.site.register(Player, PlayerAdmin)

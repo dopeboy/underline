@@ -479,15 +479,25 @@ const Lobby = () => {
                                     iconPosition="left"
                                     label="Entry amount"
                                     placeholder="0"
+                                    type="text"
                                     error={payoutErrorVisible}
                                     size="huge"
+                                    value={entryAmount}
                                     onChange={(e) => {
                                         setPayoutErrorVisible(false)
-                                        setEntryAmount(e.target.value)
-                                        setPayout(
-                                            (e.target.value *
-                                                getMultiplier(picks.length): '')
-                                        )
+                                        const re = /^[0-9\b]+$/
+                                        if (
+                                            re.test(e.target.value) ||
+                                            e.target.value === ''
+                                        ) {
+                                            setEntryAmount(e.target.value)
+                                            setPayout(
+                                                (e.target.value *
+                                                    getMultiplier(
+                                                        picks.length
+                                                    ): '')
+                                            )
+                                        }
                                     }}
                                 />
                                 <Form.Input
