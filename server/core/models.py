@@ -162,6 +162,10 @@ class Slip(models.Model):
 
         return True
 
+    @property
+    def is_owner_ftp(self):
+        return self.owner.free_to_play
+
 
 class Pick(models.Model):
     subline = models.ForeignKey(Subline, on_delete=models.CASCADE)

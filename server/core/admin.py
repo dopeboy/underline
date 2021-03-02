@@ -173,6 +173,7 @@ class SlipAdmin(admin.ModelAdmin):
     list_display.append("won")
     list_display.append("complete")
     list_display.append("invalidated")
+    list_display.append("is_owner_ftp")
     inlines = [
         PickTabularInline,
     ]
