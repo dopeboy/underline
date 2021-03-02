@@ -236,7 +236,7 @@ class CreateSlip(graphene.Mutation):
 
         message = Mail(
             from_email="support@underlinesports.com",
-            to_emails="manish@underlinesports.com",
+            to_emails="support@underlinesports.com",
             subject=f"[AUTOMATED EMAIL] {info.context.user.first_name} {info.context.user.last_name} created a slip",
             html_content=f"Check out it <a href='{settings.DOMAIN}/admin/core/slip/{slip.id}/change/'>here.</a>",
         )
