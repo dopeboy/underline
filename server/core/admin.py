@@ -73,6 +73,7 @@ class SublineAdmin(admin.TabularInline):
 class LineAdmin(admin.ModelAdmin):
     list_display = [field.name for field in Line._meta.fields if field.name != "id"]
     list_display.append("gametime")
+    list_editable = ('nba_points_actual',)
     inlines = [
         SublineAdmin,
     ]
