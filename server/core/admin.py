@@ -71,9 +71,10 @@ class SublineAdmin(admin.TabularInline):
 
 
 class LineAdmin(admin.ModelAdmin):
+    list_per_page = 500
     list_display = [field.name for field in Line._meta.fields if field.name != "id"]
     list_display.append("gametime")
-    list_editable = ('nba_points_actual',)
+    list_editable = ("nba_points_actual", "invalidated",)
     inlines = [
         SublineAdmin,
     ]
@@ -168,9 +169,10 @@ class PickTabularInline(admin.TabularInline):
 
 class SlipAdmin(admin.ModelAdmin):
     list_display = [field.name for field in Slip._meta.fields if field.name != "id"]
-    list_display.append("complete")
     list_display.append("payout_amount")
     list_display.append("won")
+    list_display.append("complete")
+    list_display.append("invalidated")
     inlines = [
         PickTabularInline,
     ]

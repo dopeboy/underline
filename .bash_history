@@ -89,3 +89,6 @@ pipenv install sendgrid
 pipenv install sendgrid --server
 pipenv install sendgrid --system
 pipenv install --system
+python manage.py makemigrations
+python manage.py makemigrations
+python manage.py migrate

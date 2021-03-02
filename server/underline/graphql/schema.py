@@ -84,6 +84,8 @@ class MySlipType(DjangoObjectType):
     picks = graphene.List(MyPickType)
     payout_amount = graphene.Int()
     won = graphene.Boolean()
+    complete = graphene.Boolean()
+    invalidated = graphene.Boolean()
 
     def resolve_picks(parent, info):
         return Pick.objects.filter(slip=parent)
@@ -93,6 +95,12 @@ class MySlipType(DjangoObjectType):
 
     def resolve_won(parent, info):
         return parent.won
+
+    def resolve_complete(parent, info):
+        return parent.complete
+
+    def resolve_invalidated(parent, info):
+        return parent.invalidated
 
     class Meta:
         model = Slip
@@ -152,7 +160,7 @@ class Query(graphene.ObjectType):
         return [
             slip
             for slip in Slip.objects.filter(owner=info.context.user)
-            if slip.complete == False
+            if slip.complete == False and slip.invalidated == False
         ]
 
     @login_required
@@ -160,7 +168,7 @@ class Query(graphene.ObjectType):
         return [
             slip
             for slip in Slip.objects.filter(owner=info.context.user)
-            if slip.complete == True
+            if slip.complete == True or slip.invalidated == True
         ]
 
     def resolve_current_date(self, info, **kawargs):

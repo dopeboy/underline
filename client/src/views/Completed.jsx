@@ -30,6 +30,7 @@ const GET_INACTIVE_SLIPS_QUERY = gql`
             entryAmount
             payoutAmount
             won
+            invalidated
             picks {
                 id
                 underNbaPoints
@@ -39,6 +40,7 @@ const GET_INACTIVE_SLIPS_QUERY = gql`
                     line {
                         nbaPointsActual
                         id
+                        invalidated
                         player {
                             name
                             headshotUrl
@@ -153,28 +155,44 @@ const Completed = () => {
                                             )
                                                 .tz('America/Los_Angeles')
                                                 .format('h:mma z')}
-                                            {pick.subline.line
-                                                .nbaPointsActual && (
-                                                <div>
-                                                    {`${parseInt(
-                                                        pick.subline.line
-                                                            .nbaPointsActual
-                                                    )} points scored`}
-                                                </div>
+                                            {pick.subline.line.invalidated && (
+                                                <div>DNP</div>
                                             )}
+                                            {!pick.subline.line.invalidated &&
+                                                pick.subline.line
+                                                    .nbaPointsActual && (
+                                                    <div>
+                                                        {`${parseInt(
+                                                            pick.subline.line
+                                                                .nbaPointsActual
+                                                        )} points scored`}
+                                                    </div>
+                                                )}
                                         </Grid.Column>
                                         <Grid.Column width={3}>
-                                            {pick.won === null && (
-                                                <Label color="gray">
-                                                    In progress
+                                            {pick.subline.line.invalidated && (
+                                                <Label color="black">
+                                                    Invalidated
                                                 </Label>
                                             )}
-                                            {pick.won === true && (
-                                                <Label color="green">Won</Label>
-                                            )}
-                                            {pick.won === false && (
-                                                <Label color="red">Lost</Label>
-                                            )}
+                                            {!pick.subline.line.invalidated &&
+                                                pick.won === null && (
+                                                    <Label color="gray">
+                                                        In progress
+                                                    </Label>
+                                                )}
+                                            {!pick.subline.line.invalidated &&
+                                                pick.won === true && (
+                                                    <Label color="green">
+                                                        Won
+                                                    </Label>
+                                                )}
+                                            {!pick.subline.line.invalidted &&
+                                                pick.won === false && (
+                                                    <Label color="red">
+                                                        Lost
+                                                    </Label>
+                                                )}
                                         </Grid.Column>
                                     </Grid.Row>
                                 </Grid>
@@ -185,8 +203,13 @@ const Completed = () => {
                                         slip.won ? 'won' : ''
                                     }`}
                                 >
-                                    {!slip.won && `-$${slip.entryAmount}`}
-                                    {slip.won && `+$${slip.payoutAmount}`}
+                                    {slip.invalidated && `$0`}
+                                    {!slip.invalidated &&
+                                        !slip.won &&
+                                        `-$${slip.entryAmount}`}
+                                    {!slip.invalidated &&
+                                        slip.won &&
+                                        `+$${slip.payoutAmount}`}
                                 </div>
                                 <div className="created">
                                     created{' '}

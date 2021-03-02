@@ -38,6 +38,7 @@ const GET_ACTIVE_SLIPS_QUERY = gql`
                     line {
                         nbaPointsActual
                         id
+                        invalidated
                         player {
                             name
                             headshotUrl

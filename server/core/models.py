@@ -92,6 +92,8 @@ class Line(models.Model):
     )
     datetime_created = models.DateTimeField(auto_now_add=True)
 
+    invalidated = models.BooleanField(default=False)
+
     def __str__(self):
         return f"{self.player.name} - {self.game}"
 
@@ -112,11 +114,6 @@ class Subline(models.Model):
     # Visible in lobby
     visible = models.BooleanField(default=True)
 
-    def is_nba_points_over(self):
-        if self.nba_points_line is not None and self.line.nba_points_actual is not None:
-            return self.line.nba_points_actual > self.nba_points_line
-        return None
-
     def __str__(self):
         return f"{self.line}"
 
@@ -134,6 +131,16 @@ class Slip(models.Model):
             if p.subline.line.nba_points_actual == None:
                 return False
         return True
+
+    # For every attached pick, find every attached subline.
+    # For every attached line, see if invalidated is true. If so,
+    # the entire slip is invalidated
+    @property
+    def invalidated(self):
+        for p in Pick.objects.filter(slip=self):
+            if p.subline.line.invalidated:
+                return True
+        return False
 
     @property
     def payout_amount(self):
@@ -171,6 +178,8 @@ class Pick(models.Model):
 
         if actual_points == None:
             return None
+        elif self.subline.line.invalidated:
+            return False
         elif self.under_nba_points:
             return actual_points < self.subline.nba_points_line
         elif not self.under_nba_points:
