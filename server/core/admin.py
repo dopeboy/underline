@@ -70,14 +70,14 @@ class SublineAdmin(admin.TabularInline):
     can_delete = False
 
 
-def make_published(modeladmin, request, queryset):
+def make_sublines_invisible(modeladmin, request, queryset):
     sublines = Subline.objects.filter(line__in=queryset)
     for s in sublines:
-        s.visible=False
+        s.visible = False
         s.save()
 
 
-make_published.short_description = (
+make_sublines_invisible.short_description = (
     "For the selected lines, mark all sublines that roll up to them as invisible"
 )
 
@@ -86,6 +86,7 @@ class LineAdmin(admin.ModelAdmin):
     list_per_page = 500
     list_display = [field.name for field in Line._meta.fields if field.name != "id"]
     list_display.append("gametime")
+    list_display.append("has_subline_visible")
     list_editable = (
         "nba_points_actual",
         "invalidated",
@@ -93,7 +94,7 @@ class LineAdmin(admin.ModelAdmin):
     inlines = [
         SublineAdmin,
     ]
-    actions = [make_published]
+    actions = [make_sublines_invisible]
 
     def get_queryset(self, request):
         qs = super(LineAdmin, self).get_queryset(request)
@@ -102,6 +103,13 @@ class LineAdmin(admin.ModelAdmin):
 
     def gametime(self, obj):
         return obj.game.datetime
+
+    def has_subline_visible(self, obj):
+        sublines = Subline.objects.filter(line=obj)
+        for s in sublines:
+            if s.visible:
+                return True
+        return False
 
     gametime.admin_order_field = "game__datetime"
 
