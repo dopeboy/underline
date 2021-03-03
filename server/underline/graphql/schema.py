@@ -267,7 +267,7 @@ class CreateSlip(graphene.Mutation):
         ]
 
         free_to_play = False
-        if country_code != "US" or regon_name not in approved_states:
+        if country_code != "US" or region_name not in approved_states:
             free_to_play = True
 
         # Create the slip
