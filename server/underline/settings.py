@@ -168,6 +168,7 @@ SENDGRID_API_KEY = (
 # Environmental
 if DEBUG:
     DOMAIN = "http://127.0.0.1:5000"
+    INSTALLED_APPS.append("django_extensions")
 else:
     SECURE_SSL_REDIRECT = True
     DOMAIN = "https://underlineapp.herokuapp.com"

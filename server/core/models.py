@@ -122,6 +122,7 @@ class Slip(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     entry_amount = models.PositiveIntegerField()
     datetime_created = models.DateTimeField(auto_now_add=True)
+    free_to_play = models.BooleanField(default=False)
 
     # For every attached pick, find every attached subline.
     # For every attached line, see if actual points filled out.
@@ -161,11 +162,6 @@ class Slip(models.Model):
                 return False
 
         return True
-
-    @property
-    def is_owner_ftp(self):
-        return self.owner.free_to_play
-
 
 class Pick(models.Model):
     subline = models.ForeignKey(Subline, on_delete=models.CASCADE)

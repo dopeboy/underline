@@ -3,6 +3,7 @@ import json
 
 from django.db.models import Q
 import decimal
+import requests
 from graphene_django import DjangoObjectType
 from pytz import timezone, utc
 from core.models import (
@@ -235,8 +236,46 @@ class CreateSlip(graphene.Mutation):
 
     @classmethod
     def mutate(cls, root, info, picks, entry_amount):
+        # If user is from PTP eligible state, set slip to that. Else slip is FTP
+        ip = info.context.META.get("HTTP_X_FORWARDED_FOR").split(",")[-1].strip()
+        r = requests.get(
+            f"http://api.ipstack.com/{ip}?access_key=1317f58b9d36a89840ecf6edb5af41be&format=1"
+        )
+
+        print(r.json())
+        country_code = r.json()["country_code"]
+        region_name = r.json()["region_name"]
+        approved_states = [
+            "Arkansas",
+            "California",
+            "District of Columbia",
+            "Florida",
+            "Georgia",
+            "Kansas",
+            "New Mexico",
+            "North Dakota",
+            "Oklahoma",
+            "Oregon",
+            "Rhode Island",
+            "South Carolina",
+            "South Dakota",
+            "Texas",
+            "Utah",
+            "West Virginia",
+            "Wyoming",
+            "Colorado",
+        ]
+
+        free_to_play = False
+        if country_code != "US" or regon_name not in approved_states:
+            free_to_play = True
+
         # Create the slip
-        slip = Slip.objects.create(owner=info.context.user, entry_amount=entry_amount)
+        slip = Slip.objects.create(
+            owner=info.context.user,
+            entry_amount=entry_amount,
+            free_to_play=free_to_play,
+        )
 
         for p in picks:
             subline = Subline.objects.get(id=int(p["id"]))

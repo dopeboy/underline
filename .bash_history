@@ -94,3 +94,10 @@ python manage.py makemigrations
 python manage.py migrate
 python manage.py makemigrations
 python manage.py migrate
+pipenv install
+pipenv install --system
+python manage.py shell_plus
+python manage.py 
+python manage.py 
+python manage.py makemigrations
+python manage.py migrate
