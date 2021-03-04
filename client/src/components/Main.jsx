@@ -17,6 +17,7 @@ import {
     Menu,
 } from 'semantic-ui-react'
 import logo from 'images/logo.png'
+import logoMobile from 'images/logo_m.png'
 import { clearJWT } from 'utils'
 import { Link, useLocation, useHistory } from 'react-router-dom'
 import './Main.scss'
@@ -43,68 +44,118 @@ const Main = (props) => {
 
     return (
         <>
-            <Menu size="massive" id="ule-navbar">
-                <Menu.Item>
-                    <Link to="/lobby">
-                        <img src={logo} className="logo" />
-                    </Link>
-                </Menu.Item>
+            <Grid id="ule-navbar">
+                <Grid.Row only="mobile">
+                    <Menu className="mobile">
+                        <Menu.Item>
+                            <Link to="/lobby">
+                                <img src={logoMobile} className="logo" />
+                            </Link>
+                        </Menu.Item>
 
-                <Menu.Item
-                    active={location.pathname === '/lobby'}
-                    as={Link}
-                    to="/lobby"
-                >
-                    Lobby
-                </Menu.Item>
-                <Menu.Item
-                    active={location.pathname === '/active'}
-                    as={Link}
-                    to="/active"
-                >
-                    Active
-                </Menu.Item>
-                <Menu.Item
-                    active={location.pathname === '/completed'}
-                    as={Link}
-                    to="/completed"
-                >
-                    Completed
-                </Menu.Item>
+                        <Menu.Menu position="right">
+                            <Dropdown
+                                item
+                                text={
+                                    data &&
+                                    `${data.me.firstName} ${data.me.lastName[0]}.`
+                                }
+                            >
+                                <Dropdown.Menu>
+                                    <Dropdown.Item as={Link} to="/active">
+                                        Active
+                                    </Dropdown.Item>
+                                    <Dropdown.Item as={Link} to="/completed">
+                                        Complete
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        as={Link}
+                                        to="/settings/deposit"
+                                    >
+                                        Deposit
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        as={Link}
+                                        to="/settings/account"
+                                    >
+                                        Settings
+                                    </Dropdown.Item>
+                                    <Dropdown.Item onClick={logoutUser}>
+                                        Logout
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        </Menu.Menu>
+                    </Menu>
+                </Grid.Row>
+                <Grid.Row only="computer">
+                    <Menu size="massive" className="desktop">
+                        <Menu.Item>
+                            <Link to="/lobby">
+                                <img src={logo} className="logo" />
+                            </Link>
+                        </Menu.Item>
 
-                <Menu.Menu position="right">
-                    <Menu.Item position="right">
-                        Balance:&nbsp;&nbsp;$
-                        {data && Math.round(data.me.walletBalance)}
-                    </Menu.Item>
-                    <Menu.Item position="right">
-                        <Button
+                        <Menu.Item
+                            active={location.pathname === '/lobby'}
                             as={Link}
-                            to="/settings/deposit"
-                            className="deposit-btn"
+                            to="/lobby"
                         >
-                            Deposit
-                        </Button>
-                    </Menu.Item>
+                            Lobby
+                        </Menu.Item>
+                        <Menu.Item
+                            active={location.pathname === '/active'}
+                            as={Link}
+                            to="/active"
+                        >
+                            Active
+                        </Menu.Item>
+                        <Menu.Item
+                            active={location.pathname === '/completed'}
+                            as={Link}
+                            to="/completed"
+                        >
+                            Completed
+                        </Menu.Item>
 
-                    <Dropdown
-                        item
-                        text={
-                            data &&
-                            `${data.me.firstName} ${data.me.lastName[0]}.`
-                        }
-                    >
-                        <Dropdown.Menu>
-                            <Dropdown.Item as={Link} to="/settings/account">
-                                Settings
-                            </Dropdown.Item>
-                            <Dropdown.Item onClick={logoutUser}>
-                                Logout
-                            </Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </Menu.Menu>
-            </Menu>
+                        <Menu.Menu position="right">
+                            <Menu.Item position="right">
+                                Balance:&nbsp;&nbsp;$
+                                {data && Math.round(data.me.walletBalance)}
+                            </Menu.Item>
+                            <Menu.Item position="right">
+                                <Button
+                                    as={Link}
+                                    to="/settings/deposit"
+                                    className="deposit-btn"
+                                >
+                                    Deposit
+                                </Button>
+                            </Menu.Item>
+
+                            <Dropdown
+                                item
+                                text={
+                                    data &&
+                                    `${data.me.firstName} ${data.me.lastName[0]}.`
+                                }
+                            >
+                                <Dropdown.Menu>
+                                    <Dropdown.Item
+                                        as={Link}
+                                        to="/settings/account"
+                                    >
+                                        Settings
+                                    </Dropdown.Item>
+                                    <Dropdown.Item onClick={logoutUser}>
+                                        Logout
+                                    </Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        </Menu.Menu>
+                    </Menu>
+                </Grid.Row>
+            </Grid>
             <div className="ule-container">
                 {React.cloneElement(props.children, {
                     updateMainComponent: refetch,

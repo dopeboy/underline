@@ -1,13 +1,30 @@
 #ule-navbar {
-    margin-bottom: 30px;
-
-    .logo {
-        width: 6em;
+    .desktop,
+    .mobile {
+        width: 100%;
     }
 
-    .deposit-btn {
-        background-color: #ff0006;
-        color: white;
+    .desktop {
+        margin-bottom: 10px;
+
+        .logo {
+            width: 6em;
+        }
+
+        .deposit-btn {
+            background-color: #ff0006;
+            color: white;
+        }
+    }
+
+    .mobile {
+        margin-bottom: 5px;
+        .logo {
+            max-width: 15px;
+            margin-left: 10px;
+            margin-top: 0px;
+            margin-top: 3px;
+        }
     }
 }
 
