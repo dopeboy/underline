@@ -234,7 +234,7 @@ const Settings = ({ updateMainComponent }) => {
             <Helmet>
                 <title>Settings</title>
             </Helmet>
-            <Grid columns={2}>
+            <Grid stackable columns={2}>
                 <Grid.Row>
                     <Grid.Column width={3} className="nav-menu-col">
                         <Header as="h1">Settings</Header>

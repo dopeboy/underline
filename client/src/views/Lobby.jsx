@@ -25,6 +25,7 @@ import moment from 'moment-timezone'
 import { Helmet } from 'react-helmet'
 import './Lobby.scss'
 import { useHistory } from 'react-router-dom'
+import { useMediaQuery } from 'react-responsive'
 
 const GET_TODAYS_SUBLINES_QUERY = gql`
     query {
@@ -88,6 +89,8 @@ const GET_ME_QUERY = gql`
 
 const PlayerList = ({ picks, addOrRemovePick }) => {
     const { data } = useQuery(GET_TODAYS_SUBLINES_QUERY)
+    const isTabletOrMobile = useMediaQuery({ query: '(max-width: 767px)' })
+
     return (
         <Form loading={!data}>
             <Card.Group>
@@ -98,7 +101,7 @@ const PlayerList = ({ picks, addOrRemovePick }) => {
                         })[0]
 
                         return (
-                            <Card key={subline.id}>
+                            <Card fluid={isTabletOrMobile} key={subline.id}>
                                 <Image
                                     size="small"
                                     src={subline.line.player.headshotUrl}
@@ -173,6 +176,84 @@ const PlayerList = ({ picks, addOrRemovePick }) => {
     )
 }
 
+const PicksList = ({ picks, addOrRemovePick }) => {
+    return (
+        <>
+            <Header as="h2">Slip</Header>
+            {picks.length === 0 && (
+                <p>Select a featured player from at least two teams.</p>
+            )}
+            {picks.map((pick) => (
+                <Card fluid className="slip-card">
+                    <Card.Content>
+                        <Grid columns="two" divided>
+                            <Grid.Row>
+                                <Grid.Column>
+                                    <Image src={pick.line.player.headshotUrl} />
+                                </Grid.Column>
+                                <Grid.Column>
+                                    <Header as="h4">
+                                        {pick.line.player.name}
+                                    </Header>
+                                    <List>
+                                        <List.Item className="lol">
+                                            <List.Icon name="hashtag" />
+                                            <List.Content>
+                                                Points:{' '}
+                                                {parseFloat(
+                                                    pick.nbaPointsLine
+                                                ).toFixed(1)}
+                                            </List.Content>
+                                        </List.Item>
+                                        <List.Item>
+                                            <List.Icon name="calendar outline" />
+                                            <List.Content>
+                                                {
+                                                    pick.line.game.awayTeam
+                                                        .abbreviation
+                                                }{' '}
+                                                @{' '}
+                                                {
+                                                    pick.line.game.homeTeam
+                                                        .abbreviation
+                                                }{' '}
+                                                -{' '}
+                                                {moment
+                                                    .tz(
+                                                        pick.line.game.datetime,
+                                                        moment.tz.guess()
+                                                    )
+                                                    .format('h:mma z')}
+                                            </List.Content>
+                                        </List.Item>
+                                        <List.Item>
+                                            <List.Icon name="basketball ball" />
+                                            <List.Content>
+                                                {pick.under ? 'Under' : 'Over'}
+                                            </List.Content>
+                                        </List.Item>
+                                    </List>
+                                </Grid.Column>
+                            </Grid.Row>
+                        </Grid>
+                    </Card.Content>
+                    <Card.Content extra>
+                        <Button
+                            fluid
+                            color="red"
+                            basic
+                            size="tiny"
+                            onClick={() => addOrRemovePick(pick, pick.under)}
+                        >
+                            Remove
+                        </Button>
+                    </Card.Content>
+                </Card>
+            ))}
+        </>
+    )
+}
+
 const LobbyHeader = () => {
     const { data } = useQuery(GET_CURRENT_DATE_QUERY)
     return (
@@ -207,6 +288,7 @@ const Lobby = ({ updateMainComponent }) => {
     const [payoutErrorVisible, setPayoutErrorVisible] = useState(false)
     const client = useApolloClient()
     const history = useHistory()
+    const isTabletOrMobile = useMediaQuery({ query: '(max-width: 767px)' })
 
     const addOrRemovePick = (subline, under) => {
         const pickIndex = picks.findIndex((e) => e.id === subline.id)
@@ -494,7 +576,7 @@ const Lobby = ({ updateMainComponent }) => {
                     line.
                 </Header.Subheader>
             </Header>
-            <Grid>
+            <Grid stackable>
                 <Grid.Row>
                     <Grid.Column width={12}>
                         <LobbyHeader />
@@ -502,9 +584,15 @@ const Lobby = ({ updateMainComponent }) => {
                             picks={picks}
                             addOrRemovePick={addOrRemovePick}
                         />
+                        {isTabletOrMobile && (
+                            <PicksList
+                                picks={picks}
+                                addOrRemovePick={addOrRemovePick}
+                            />
+                        )}
                     </Grid.Column>
                     <Grid.Column width={4}>
-                        <Header as="h1">Review picks</Header>
+                        <Header as="h2">Review picks</Header>
                         <Progress percent={percent} color="green">
                             {multiplier}
                         </Progress>
@@ -558,95 +646,12 @@ const Lobby = ({ updateMainComponent }) => {
                                 Submit
                             </Form.Button>
                         </Form>
-                        <Header as="h2">Slip</Header>
-                        {picks.length === 0 && (
-                            <p>
-                                Select a featured player from at least two
-                                teams.
-                            </p>
+                        {!isTabletOrMobile && (
+                            <PicksList
+                                picks={picks}
+                                addOrRemovePick={addOrRemovePick}
+                            />
                         )}
-                        {picks.map((pick) => (
-                            <Card fluid className="slip-card">
-                                <Card.Content>
-                                    <Grid columns="two" divided>
-                                        <Grid.Row>
-                                            <Grid.Column>
-                                                <Image
-                                                    src={
-                                                        pick.line.player
-                                                            .headshotUrl
-                                                    }
-                                                />
-                                            </Grid.Column>
-                                            <Grid.Column>
-                                                <Header as="h4">
-                                                    {pick.line.player.name}
-                                                </Header>
-                                                <List>
-                                                    <List.Item className="lol">
-                                                        <List.Icon name="hashtag" />
-                                                        <List.Content>
-                                                            Points:{' '}
-                                                            {parseFloat(
-                                                                pick.nbaPointsLine
-                                                            ).toFixed(1)}
-                                                        </List.Content>
-                                                    </List.Item>
-                                                    <List.Item>
-                                                        <List.Icon name="calendar outline" />
-                                                        <List.Content>
-                                                            {
-                                                                pick.line.game
-                                                                    .awayTeam
-                                                                    .abbreviation
-                                                            }{' '}
-                                                            @{' '}
-                                                            {
-                                                                pick.line.game
-                                                                    .homeTeam
-                                                                    .abbreviation
-                                                            }{' '}
-                                                            -{' '}
-                                                            {moment
-                                                                .tz(
-                                                                    pick.line
-                                                                        .game
-                                                                        .datetime,
-                                                                    moment.tz.guess()
-                                                                )
-                                                                .format(
-                                                                    'h:mma z'
-                                                                )}
-                                                        </List.Content>
-                                                    </List.Item>
-                                                    <List.Item>
-                                                        <List.Icon name="basketball ball" />
-                                                        <List.Content>
-                                                            {pick.under
-                                                                ? 'Under'
-                                                                : 'Over'}
-                                                        </List.Content>
-                                                    </List.Item>
-                                                </List>
-                                            </Grid.Column>
-                                        </Grid.Row>
-                                    </Grid>
-                                </Card.Content>
-                                <Card.Content extra>
-                                    <Button
-                                        fluid
-                                        color="red"
-                                        basic
-                                        size="tiny"
-                                        onClick={() =>
-                                            addOrRemovePick(pick, pick.under)
-                                        }
-                                    >
-                                        Remove
-                                    </Button>
-                                </Card.Content>
-                            </Card>
-                        ))}
                     </Grid.Column>
                 </Grid.Row>
             </Grid>

@@ -126,7 +126,7 @@ const Active = () => {
                                     : 'Paid Entry'}
                             </Label>
                             {slip.picks.map((pick, i) => (
-                                <Grid className="pick-table">
+                                <Grid stackable className="pick-table">
                                     <Grid.Row>
                                         <Grid.Column width={3}>
                                             <Image

@@ -54,6 +54,10 @@ const Main = (props) => {
                         </Menu.Item>
 
                         <Menu.Menu position="right">
+                            <Menu.Item position="right">
+                                Balance:&nbsp;&nbsp;$
+                                {data && Math.round(data.me.walletBalance)}
+                            </Menu.Item>
                             <Dropdown
                                 item
                                 text={
@@ -62,6 +66,9 @@ const Main = (props) => {
                                 }
                             >
                                 <Dropdown.Menu>
+                                    <Dropdown.Item as={Link} to="/lobby">
+                                        Lobby
+                                    </Dropdown.Item>
                                     <Dropdown.Item as={Link} to="/active">
                                         Active
                                     </Dropdown.Item>
