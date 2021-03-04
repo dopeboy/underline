@@ -71,6 +71,7 @@ const CREATE_SLIP_MUTATION = gql`
     mutation CreateSlip($picks: [PickType]!, $entryAmount: Int!) {
         createSlip(picks: $picks, entryAmount: $entryAmount) {
             success
+            freeToPlay
         }
     }
 `
@@ -393,7 +394,11 @@ const Lobby = () => {
 
         // Redirect
         if (response.data.createSlip.success) {
-            history.push('/active?success')
+            history.push(
+                `/active?success${
+                    response.data.createSlip.freeToPlay ? '&freetoplay' : ''
+                }`
+            )
         }
     }
 

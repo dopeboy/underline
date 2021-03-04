@@ -29,6 +29,7 @@ const GET_ACTIVE_SLIPS_QUERY = gql`
             datetimeCreated
             entryAmount
             payoutAmount
+            freeToPlay
             picks {
                 id
                 underNbaPoints
@@ -79,11 +80,19 @@ const Active = () => {
                 size="small"
             >
                 <Header>
-                    <Icon name="exclamation circle" />
+                    <Icon name="check circle" />
                     Success
                 </Header>
                 <Modal.Content>
                     <p>Your slip has been submitted.</p>
+
+                    {parseQuery(useLocation().search).get('freetoplay') !==
+                        null && (
+                        <p>
+                            Because daily fantasy sports are not legal in your
+                            state, this is a Free To Play entry.
+                        </p>
+                    )}
                 </Modal.Content>
                 <Modal.Actions>
                     <Button onClick={() => setSuccessModalVisible(false)}>
@@ -107,6 +116,14 @@ const Active = () => {
                                 {' '}
                                 {`${slip.picks.length} Picks for $${slip.payoutAmount}`}
                             </Header>
+                            <Label
+                                color={slip.freeToPlay ? '' : 'teal'}
+                                attached="top right"
+                            >
+                                {slip.freeToPlay
+                                    ? 'Free to Play'
+                                    : 'Pay to Play'}
+                            </Label>
                             {slip.picks.map((pick, i) => (
                                 <Grid className="pick-table">
                                     <Grid.Row>

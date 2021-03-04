@@ -160,7 +160,9 @@ class Query(graphene.ObjectType):
     def resolve_active_slips(self, info, **kawargs):
         return [
             slip
-            for slip in Slip.objects.filter(owner=info.context.user)
+            for slip in Slip.objects.filter(owner=info.context.user).order_by(
+                "-datetime_created"
+            )
             if slip.complete == False and slip.invalidated == False
         ]
 
@@ -168,7 +170,7 @@ class Query(graphene.ObjectType):
     def resolve_complete_slips(self, info, **kawargs):
         return [
             slip
-            for slip in Slip.objects.filter(owner=info.context.user)
+            for slip in Slip.objects.filter(owner=info.context.user).order_by("-datetime_created")
             if slip.complete == True or slip.invalidated == True
         ]
 
@@ -233,6 +235,7 @@ class CreateSlip(graphene.Mutation):
 
     # The class attributes define the response of the mutation
     success = graphene.Boolean()
+    free_to_play = graphene.Boolean()
 
     @classmethod
     def mutate(cls, root, info, picks, entry_amount):
@@ -289,7 +292,7 @@ class CreateSlip(graphene.Mutation):
         sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
         response = sg.send(message)
 
-        return CreateSlip(success=True)
+        return CreateSlip(success=True, free_to_play=free_to_play)
 
 
 class CreateUser(graphene.Mutation):

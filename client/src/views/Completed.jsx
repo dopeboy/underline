@@ -31,6 +31,7 @@ const GET_INACTIVE_SLIPS_QUERY = gql`
             payoutAmount
             won
             invalidated
+            freeToPlay
             picks {
                 id
                 underNbaPoints
@@ -109,6 +110,14 @@ const Completed = () => {
                                 {' '}
                                 {`${slip.picks.length} Picks for $${slip.payoutAmount}`}
                             </Header>
+                            <Label
+                                color={slip.freeToPlay ? '' : 'teal'}
+                                attached="top right"
+                            >
+                                {slip.freeToPlay
+                                    ? 'Free to Play'
+                                    : 'Pay to Play'}
+                            </Label>
                             {slip.picks.map((pick, i) => (
                                 <Grid className="pick-table">
                                     <Grid.Row>
