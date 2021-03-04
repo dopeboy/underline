@@ -183,7 +183,7 @@ const LobbyHeader = () => {
     )
 }
 
-const Lobby = () => {
+const Lobby = ({ updateMainComponent }) => {
     const [tab, setTab] = useState('lobby')
     const [picks, setPicks] = useState([])
     const [percent, setPercent] = useState(0)
@@ -394,6 +394,7 @@ const Lobby = () => {
 
         // Redirect
         if (response.data.createSlip.success) {
+            updateMainComponent()
             history.push(
                 `/active?success${
                     response.data.createSlip.freeToPlay ? '&freetoplay' : ''

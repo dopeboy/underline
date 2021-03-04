@@ -33,7 +33,6 @@ const GET_ME_QUERY = gql`
 
 const Main = (props) => {
     const { data, refetch } = useQuery(GET_ME_QUERY)
-    const [updateComponent, setUpdateComponent] = useState(false)
 
     const logoutUser = () => {
         clearJWT()
@@ -41,8 +40,6 @@ const Main = (props) => {
     }
     const history = useHistory()
     const location = useLocation()
-
-    const updateMe = () => setUpdateComponent(!updateComponent)
 
     return (
         <>

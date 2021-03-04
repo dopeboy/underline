@@ -170,7 +170,9 @@ class Query(graphene.ObjectType):
     def resolve_complete_slips(self, info, **kawargs):
         return [
             slip
-            for slip in Slip.objects.filter(owner=info.context.user).order_by("-datetime_created")
+            for slip in Slip.objects.filter(owner=info.context.user).order_by(
+                "-datetime_created"
+            )
             if slip.complete == True or slip.invalidated == True
         ]
 
@@ -283,11 +285,17 @@ class CreateSlip(graphene.Mutation):
             subline = Subline.objects.get(id=int(p["id"]))
             Pick.objects.create(subline=subline, slip=slip, under_nba_points=p["under"])
 
+        u = info.context.user
+        previous_wallet_balance = u.wallet_balance
+        u.wallet_balance -= entry_amount
+        u.save()
+
+        ftp_text = "free to play" if free_to_play else "pay to play"
         message = Mail(
             from_email="support@underlinesports.com",
-            to_emails="support@underlinesports.com",
+            to_emails="manish@underlinesports.com",
             subject=f"[AUTOMATED EMAIL] {info.context.user.first_name} {info.context.user.last_name} created a slip",
-            html_content=f"Check out it <a href='{settings.DOMAIN}/admin/core/slip/{slip.id}/change/'>here.</a>",
+            html_content=f"Type of slip: {ftp_text}<br/><br/>Entry amount: {entry_amount}<br/><br/>Wallet balance before: {previous_wallet_balance}<br/><br/>Wallet balance after: {u.wallet_balance}<br/><br/>Check out it <a href='{settings.DOMAIN}/admin/core/slip/{slip.id}/change/'>here.</a>",
         )
         sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
         response = sg.send(message)
