@@ -89,8 +89,9 @@ const Active = () => {
                     {parseQuery(useLocation().search).get('freetoplay') !==
                         null && (
                         <p>
-                            Because daily fantasy sports are not legal in your
-                            state, this is a Free To Play entry.
+                            This is a free to play entry. Underline only
+                            operates paid entries in certain states due to daily
+                            fantasy laws.
                         </p>
                     )}
                 </Modal.Content>
