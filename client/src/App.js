@@ -83,6 +83,22 @@ function App() {
     return (
         <ApolloProvider client={client}>
             <Router>
+                {process.env.NODE_ENV === 'production' && (
+                    <Route
+                        path="/"
+                        render={({ location }) => {
+                            if (typeof window.ga === 'function') {
+                                window.ga(
+                                    'set',
+                                    'page',
+                                    location.pathname + location.search
+                                )
+                                window.ga('send', 'pageview')
+                            }
+                            return null
+                        }}
+                    />
+                )}
                 <Switch>
                     <PrivateRoute
                         path="/lobby"
