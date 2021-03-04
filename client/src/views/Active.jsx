@@ -117,12 +117,12 @@ const Active = () => {
                                 {`${slip.picks.length} Picks for $${slip.payoutAmount}`}
                             </Header>
                             <Label
-                                color={slip.freeToPlay ? '' : 'teal'}
+                                color={slip.freeToPlay ? '' : 'black'}
                                 attached="top right"
                             >
                                 {slip.freeToPlay
                                     ? 'Free to Play'
-                                    : 'Pay to Play'}
+                                    : 'Paid Entry'}
                             </Label>
                             {slip.picks.map((pick, i) => (
                                 <Grid className="pick-table">
