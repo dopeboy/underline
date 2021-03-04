@@ -293,7 +293,7 @@ class CreateSlip(graphene.Mutation):
         ftp_text = "free to play" if free_to_play else "pay to play"
         message = Mail(
             from_email="support@underlinesports.com",
-            to_emails="manish@underlinesports.com",
+            to_emails="support@underlinesports.com",
             subject=f"[AUTOMATED EMAIL] {info.context.user.first_name} {info.context.user.last_name} created a slip",
             html_content=f"Type of slip: {ftp_text}<br/><br/>Entry amount: {entry_amount}<br/><br/>Wallet balance before: {previous_wallet_balance}<br/><br/>Wallet balance after: {u.wallet_balance}<br/><br/>Check out it <a href='{settings.DOMAIN}/admin/core/slip/{slip.id}/change/'>here.</a>",
         )
