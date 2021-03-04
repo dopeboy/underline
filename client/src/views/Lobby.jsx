@@ -550,7 +550,7 @@ const Lobby = ({ updateMainComponent }) => {
                     Confirmation
                 </Header>
                 <Modal.Content>
-                    <p>Once you confirmed, your selections are locked.</p>
+                    <p>Once confirmed, your selections are locked.</p>
                 </Modal.Content>
                 <Modal.Actions>
                     <Button
