@@ -29,7 +29,6 @@ const GET_ME_QUERY = gql`
             lastName
             email
             dateJoined
-            freeToPlay
         }
     }
 `
@@ -67,14 +66,6 @@ const Account = () => {
                     <List.Item>
                         <List.Icon name="mail" />
                         <List.Content>{data.me.email}</List.Content>
-                    </List.Item>
-                    <List.Item>
-                        <List.Icon name="setting" />
-                        <List.Content>
-                            {data.me.freeToPlay
-                                ? 'Free to play'
-                                : 'Pay to play'}
-                        </List.Content>
                     </List.Item>
                     <List.Item>
                         <List.Icon name="star" />
@@ -192,8 +183,7 @@ const Deposit = ({ updateMainComponent }) => {
                 <Modal.Content>
                     <p>
                         You have successfully deposited funds into your
-                        Underline account. Click the button below to start
-                        playing.
+                        Underline account. Click 'Start playing' to begin.
                     </p>
                 </Modal.Content>
                 <Modal.Actions>

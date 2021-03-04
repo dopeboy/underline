@@ -176,8 +176,8 @@ const LobbyHeader = () => {
     const { data } = useQuery(GET_CURRENT_DATE_QUERY)
     return (
         <Header as="h1">
-            Featured players (
-            {data && moment(data.currentDate).format('MMMM Do YYYY')})
+            Featured Players:{' '}
+            {data && moment(data.currentDate).format('MMMM Do YYYY')}
         </Header>
     )
 }
@@ -199,6 +199,10 @@ const Lobby = () => {
     const [confirmationModalVisible, setConfirmationModalVisible] = useState(
         false
     )
+    const [
+        insufficientFundsModalVisible,
+        setInsufficentFundsModalVisible,
+    ] = useState(false)
     const [payoutErrorVisible, setPayoutErrorVisible] = useState(false)
     const client = useApolloClient()
     const history = useHistory()
@@ -360,12 +364,7 @@ const Lobby = () => {
         })
 
         if (parseFloat(data.me.walletBalance) < entryAmount) {
-            setErrorModalVisible({
-                open: true,
-                header: 'Insufficient funds',
-                message:
-                    "You do not have enough funds in your wallet to make this slip. Please click 'Deposit' in the upper right to fix this.",
-            })
+            setInsufficentFundsModalVisible(true)
             setChecking(false)
             return
         }
@@ -424,6 +423,36 @@ const Lobby = () => {
                 </Modal.Actions>
             </Modal>
             <Modal
+                onClose={() => setInsufficentFundsModalVisible(false)}
+                open={insufficientFundsModalVisible}
+                size="small"
+            >
+                <Header>
+                    <Icon name="exclamation circle" />
+                    Insufficient funds
+                </Header>
+                <Modal.Content>
+                    <p>
+                        You do not have enough funds in your wallet to make this
+                        slip. Please click 'Deposit' below to fix this.
+                    </p>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button
+                        onClick={() => setInsufficentFundsModalVisible(false)}
+                    >
+                        Close
+                    </Button>
+                    <Button
+                        /* inline because this gets mounted outside of this div. TODO - use mountNode prop */
+                        style={{ backgroundColor: '#ff0006', color: 'white' }}
+                        onClick={() => history.push('/settings/deposit')}
+                    >
+                        Deposit
+                    </Button>
+                </Modal.Actions>
+            </Modal>
+            <Modal
                 onClose={() => setConfirmationModalVisible(false)}
                 open={confirmationModalVisible}
                 size="small"
@@ -454,7 +483,9 @@ const Lobby = () => {
             <Header as="h2" textAlign="center">
                 Over/Under
                 <Header.Subheader>
-                    Select 1 player from at least two teams
+                    Pick 2, 3, 4, or 5 players from at least two teams. <br />
+                    Predict if they will go OVER or UNDER their projected stat
+                    line.
                 </Header.Subheader>
             </Header>
             <Grid>
@@ -523,7 +554,10 @@ const Lobby = () => {
                         </Form>
                         <Header as="h2">Slip</Header>
                         {picks.length === 0 && (
-                            <p>Add a player from the left.</p>
+                            <p>
+                                Select a featured player from at least two
+                                teams.
+                            </p>
                         )}
                         {picks.map((pick) => (
                             <Card fluid className="slip-card">

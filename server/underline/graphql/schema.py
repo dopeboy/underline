@@ -242,7 +242,6 @@ class CreateSlip(graphene.Mutation):
             f"http://api.ipstack.com/{ip}?access_key=1317f58b9d36a89840ecf6edb5af41be&format=1"
         )
 
-        print(r.json())
         country_code = r.json()["country_code"]
         region_name = r.json()["region_name"]
         approved_states = [

@@ -212,8 +212,9 @@ const Completed = () => {
                                         `+$${slip.payoutAmount}`}
                                 </div>
                                 <div className="created">
-                                    created{' '}
-                                    {moment(slip.datetimeCreated).fromNow()}
+                                    {moment(slip.datetimeCreated).format(
+                                        'MMMM Do YYYY'
+                                    )}
                                 </div>
                             </div>
                         </Segment>

@@ -181,8 +181,9 @@ const Active = () => {
                             ))}
                             <div className="details">
                                 <div className="created">
-                                    created{' '}
-                                    {moment(slip.datetimeCreated).fromNow()}
+                                    {moment(slip.datetimeCreated).format(
+                                        'MMMM Do YYYY'
+                                    )}
                                 </div>
                                 <div className="entry-amount">
                                     ${`${slip.entryAmount} Entry`}
