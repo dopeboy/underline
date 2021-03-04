@@ -106,7 +106,7 @@ const Signup = () => {
             </Helmet>
             <div className="main-grid">
                 <Grid centered columns={1}>
-                    <Grid.Column width={6}>
+                    <Grid.Column computer={6} mobile={16}>
                         <img alt="" src={logo} className="logo" />
                         {error && (
                             <Message negative>

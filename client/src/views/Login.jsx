@@ -6,6 +6,7 @@ import { gql, useMutation } from '@apollo/client'
 import { saveJWT } from 'utils'
 import { Link, useHistory } from 'react-router-dom'
 import './Login.scss'
+import { useMediaQuery } from 'react-responsive'
 
 const LOGIN_MUTATION = gql`
     mutation TokenAuth($emailAddress: String!, $password: String!) {
@@ -23,6 +24,7 @@ const Login = () => {
     const [password, setPassword] = useState('')
     const [error, setError] = useState(false)
     const [processing, setProcessing] = useState(false)
+    const isTabletOrMobile = useMediaQuery({ query: '(max-width: 767px)' })
 
     const [loginUser] = useMutation(LOGIN_MUTATION, {
         onCompleted: (data) => {
@@ -53,7 +55,7 @@ const Login = () => {
             </Helmet>
             <div className="main-grid">
                 <Grid centered columns={1}>
-                    <Grid.Column width={6}>
+                    <Grid.Column computer={6} mobile={16}>
                         <img alt="" src={logo} className="logo" />
                         {error && (
                             <Message negative>
