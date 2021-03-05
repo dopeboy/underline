@@ -1,4 +1,4 @@
-import React, { useState, Component } from 'react'
+import React, { useRef, useState, Component } from 'react'
 import {
     Divider,
     Form,
@@ -273,6 +273,10 @@ const Lobby = ({ updateMainComponent }) => {
     const [entryAmount, setEntryAmount] = useState('')
     const [checking, setChecking] = useState(false)
     const [processing, setProcessing] = useState(false)
+    const [
+        scrollToBottomButtonVisible,
+        setScrollToBottomButtonVisible,
+    ] = useState(true)
     const [errorModalVisible, setErrorModalVisible] = useState({
         open: false,
         header: '',
@@ -485,8 +489,40 @@ const Lobby = ({ updateMainComponent }) => {
         }
     }
 
+    const handleScroll = () => {
+        const bottom =
+            Math.ceil(window.innerHeight + window.scrollY) + 50 >=
+            document.documentElement.scrollHeight
+
+        setScrollToBottomButtonVisible(!bottom)
+    }
+
+    React.useEffect(() => {
+        window.addEventListener('scroll', handleScroll, {
+            passive: true,
+        })
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll)
+        }
+    }, [])
+
+    const slipButtonRef = useRef(null)
+    const scrollToBottom = () => {
+        slipButtonRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
+
     return (
         <div id="ul-dashboard">
+            {isTabletOrMobile && scrollToBottomButtonVisible && (
+                <Button
+                    color="black"
+                    className="scroll-bottom-btn"
+                    onClick={scrollToBottom}
+                >
+                    Review slip
+                </Button>
+            )}
             <Helmet>
                 <title>Lobby</title>
             </Helmet>
@@ -645,6 +681,7 @@ const Lobby = ({ updateMainComponent }) => {
                             >
                                 Submit
                             </Form.Button>
+                            <div ref={slipButtonRef} />
                         </Form>
                         {!isTabletOrMobile && (
                             <PicksList
