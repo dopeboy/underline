@@ -95,6 +95,7 @@ class LineAdmin(admin.ModelAdmin):
         SublineAdmin,
     ]
     actions = [make_sublines_invisible]
+    ordering = ("-datetime_created",)
 
     def get_queryset(self, request):
         qs = super(LineAdmin, self).get_queryset(request)
@@ -116,6 +117,7 @@ class LineAdmin(admin.ModelAdmin):
 
 class GameAdmin(admin.ModelAdmin):
     list_display = [field.name for field in Game._meta.fields if field.name != "id"]
+    ordering = ("-datetime",)
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -200,6 +202,7 @@ class SlipAdmin(admin.ModelAdmin):
     inlines = [
         PickTabularInline,
     ]
+    ordering = ("-datetime_created",)
 
 
 class PickAdmin(admin.ModelAdmin):
@@ -207,6 +210,7 @@ class PickAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request, obj=None):
         return False
+
 
 admin.site.register(Team, TeamAdmin)
 
