@@ -20,6 +20,8 @@ from .models import (
     Game,
     Subline,
     Slip,
+    FreeToPlaySlip,
+    PaidSlip,
     Pick,
     Deposit,
 )
@@ -199,10 +201,30 @@ class SlipAdmin(admin.ModelAdmin):
     list_display.append("won")
     list_display.append("complete")
     list_display.append("invalidated")
+    list_display.append("status")
     inlines = [
         PickTabularInline,
     ]
     ordering = ("-datetime_created",)
+
+    def status(self, obj):
+        if obj.invalidated:
+            return "Invalidated"
+        elif not obj.complete:
+            return "Incomplete"
+        else:
+            if obj.won:
+                return "Won"
+            else:
+                return "Lost"
+
+
+class FreeToPlaySlipsAdmin(SlipAdmin):
+    pass
+
+
+class PaidSlipAdmin(SlipAdmin):
+    pass
 
 
 class PickAdmin(admin.ModelAdmin):
@@ -217,6 +239,8 @@ admin.site.register(Team, TeamAdmin)
 # Register your models here.
 admin.site.register(League)
 admin.site.register(Slip, SlipAdmin)
+admin.site.register(FreeToPlaySlip, FreeToPlaySlipsAdmin)
+admin.site.register(PaidSlip, PaidSlipAdmin)
 admin.site.register(Position)
 admin.site.register(Pick, PickAdmin)
 admin.site.register(Line, LineAdmin)

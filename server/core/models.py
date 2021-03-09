@@ -163,6 +163,32 @@ class Slip(models.Model):
 
         return True
 
+
+class FreeToPlaySlipManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super(FreeToPlaySlipManager, self).get_queryset().filter(free_to_play=True)
+        )
+
+class PaidSlipManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super(PaidSlipManager, self).get_queryset().filter(free_to_play=False)
+        )
+
+class FreeToPlaySlip(Slip):
+    objects = FreeToPlaySlipManager()
+
+    class Meta:
+        proxy = True
+
+class PaidSlip(Slip):
+    objects = PaidSlipManager()
+
+    class Meta:
+        proxy = True
+
+
 class Pick(models.Model):
     subline = models.ForeignKey(Subline, on_delete=models.CASCADE)
     slip = models.ForeignKey(Slip, on_delete=models.CASCADE)
