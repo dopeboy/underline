@@ -21,6 +21,10 @@ import { parseQuery, saveJWT } from 'utils'
 import { useParams, useLocation, Link, useHistory } from 'react-router-dom'
 import moment from 'moment-timezone'
 import './Settings.scss'
+import ResponsibleGaming from 'components/ResponsibleGaming'
+import CustomerSupport from 'components/CustomerSupport'
+import HowToPlay from 'components/HowToPlay'
+import CreatorCode from 'components/CreatorCode'
 
 const GET_ME_QUERY = gql`
     query {
@@ -257,6 +261,30 @@ const Settings = ({ updateMainComponent }) => {
                                 to="/settings/withdraw"
                                 active={activeItem === 'withdraw'}
                             />
+                            <Menu.Item
+                                name="Responsible Gaming"
+                                as={Link}
+                                to="/settings/responsiblegaming"
+                                active={activeItem === 'responsiblegaming'}
+                            />
+                            <Menu.Item
+                                name="Customer Support"
+                                as={Link}
+                                to="/settings/customersupport"
+                                active={activeItem === 'customersupport'}
+                            />
+                            <Menu.Item
+                                name="How to Play"
+                                as={Link}
+                                to="/settings/howtoplay"
+                                active={activeItem === 'howtoplay'}
+                            />
+                            <Menu.Item
+                                name="Creator Code"
+                                as={Link}
+                                to="/settings/creatorcode"
+                                active={activeItem === 'creatorcode'}
+                            />
                         </Menu>
                     </Grid.Column>
                     <Grid.Column width={13}>
@@ -267,6 +295,14 @@ const Settings = ({ updateMainComponent }) => {
                             />
                         )}
                         {activeItem === 'withdraw' && <Withdraw />}
+                        {activeItem === 'responsiblegaming' && (
+                            <ResponsibleGaming />
+                        )}
+                        {activeItem === 'customersupport' && (
+                            <CustomerSupport />
+                        )}
+                        {activeItem === 'howtoplay' && <HowToPlay />}
+                        {activeItem === 'creatorcode' && <CreatorCode />}
                     </Grid.Column>
                 </Grid.Row>
             </Grid>
