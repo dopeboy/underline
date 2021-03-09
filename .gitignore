@@ -36,3 +36,4 @@ server/staticfiles
 .ipython
 .bash_history
 client/.eslintcache
+server/celerybeat-schedule

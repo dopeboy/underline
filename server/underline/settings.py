@@ -1,6 +1,8 @@
 import django_heroku
 import os
 import environ
+from celery.schedules import crontab
+
 
 root = environ.Path(__file__) - 2  # two folders back (/a/b/ - 2 = /)
 DEFAULT_ENV_PATH = environ.Path(__file__) - 3  # default location of .env file
@@ -181,9 +183,20 @@ if DEBUG:
     INSTALLED_APPS.append("django_extensions")
 
     # For debug toolbar
-    DEBUG_TOOLBAR_CONFIG = {
-        'SHOW_TOOLBAR_CALLBACK': lambda _request: DEBUG
-    }
+    DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda _request: DEBUG}
 else:
     SECURE_SSL_REDIRECT = True
-    DOMAIN = "https://underlineapp.herokuapp.com"
+    DOMAIN = "https://underlinefantasy.com"
+
+# Celery Setup
+CELERY_BROKER_URL = "redis://redis:6379" if DEBUG else os.environ.get("REDIS_URL")
+CELERY_RESULT_BACKEND = "redis://redis:6379" if DEBUG else os.environ.get("REDIS_URL")
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_BEAT_SCHEDULE = {
+    "sample_task": {
+        "task": "core.tasks.sample_task",
+        "schedule": crontab(minute="*/1"),
+    },
+}

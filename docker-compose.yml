@@ -21,3 +21,22 @@ services:
       - db
     links:
       - db:postgres
+  redis:
+      image: redis
+      container_name: underline-redis
+      restart: on-failure
+  
+  celery:
+      image: 'underline:latest'    
+      command: celery -A underline worker -B -l INFO
+      container_name: underline-celery
+      volumes:
+        - .:/code
+      environment:
+        - DJANGO_SETTINGS_MODULE=underline.settings
+      env_file: .env
+      depends_on:
+        - redis
+        - db
+        - underline
+      restart: on-failure

@@ -21,6 +21,8 @@ django-graphql-jwt = "*"
 turfpy = "*"
 pygments = "*"
 sendgrid = "*"
+celery = "*"
+redis = "*"
 
 [dev-packages]
 pytest-django = "==3.3.2"
