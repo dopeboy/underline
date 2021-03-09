@@ -2,7 +2,8 @@ import os
 
 from celery import Celery
 
-# set the default Django settings module for the 'celery' program.
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(BASE_DIR)
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'underline.settings')
 
 app = Celery('underline')
