@@ -133,7 +133,7 @@ class Query(graphene.ObjectType):
         # Might be better way
         # https://stackoverflow.com/questions/18235419/how-to-chain-django-querysets-preserving-individual-order
         q1 = Subline.objects.filter(
-            line__in=Line.objects.filter(game__in=todays_games)
+            line__in=Line.objects.filter(game__in=todays_games, invalidated=False)
             .filter(player__premier=True)
             .order_by("game__datetime")
         ).filter(visible=True)
@@ -142,7 +142,7 @@ class Query(graphene.ObjectType):
         len(q1)
 
         q2 = Subline.objects.filter(
-            line__in=Line.objects.filter(game__in=todays_games)
+            line__in=Line.objects.filter(game__in=todays_games, invalidated=False)
             .filter(player__premier=False)
             .order_by("game__datetime")
         ).filter(visible=True)

@@ -93,6 +93,9 @@ const PlayerList = ({ picks, addOrRemovePick }) => {
 
     return (
         <Form loading={!data}>
+            {data && data.todaysSublines.length === 0 && (
+                <p>There are no more games today.</p>
+            )}
             <Card.Group>
                 {data &&
                     data.todaysSublines.map((subline) => {

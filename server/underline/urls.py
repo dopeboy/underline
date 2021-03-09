@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.urls import path, re_path, include
 from django.views.decorators.csrf import csrf_exempt
 
+
 from .views import FrontendAppView, GraphQLView
 
 urlpatterns = [
@@ -13,5 +14,9 @@ urlpatterns = [
     re_path(r".*", FrontendAppView.as_view()),
 ]
 
-admin.site.enable_nav_sidebar = False
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += [path("__debug__/", include(debug_toolbar.urls))]
 
+
+admin.site.enable_nav_sidebar = False

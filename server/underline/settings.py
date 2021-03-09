@@ -44,7 +44,17 @@ INSTALLED_APPS = [
     "core",
 ]
 
-MIDDLEWARE = [
+if DEBUG:
+    INSTALLED_APPS.append("debug_toolbar")
+
+MIDDLEWARE = []
+
+if DEBUG:
+    MIDDLEWARE += [
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+    ]
+
+MIDDLEWARE += [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
@@ -169,6 +179,11 @@ SENDGRID_API_KEY = (
 if DEBUG:
     DOMAIN = "http://127.0.0.1:5000"
     INSTALLED_APPS.append("django_extensions")
+
+    # For debug toolbar
+    DEBUG_TOOLBAR_CONFIG = {
+        'SHOW_TOOLBAR_CALLBACK': lambda _request: DEBUG
+    }
 else:
     SECURE_SSL_REDIRECT = True
     DOMAIN = "https://underlineapp.herokuapp.com"

@@ -101,3 +101,15 @@ python manage.py
 python manage.py 
 python manage.py makemigrations
 python manage.py migrate
+python manage.py shell_plus
+cat /usr/local/lib/python3.9/site-packages/django_extensions/management/commands/shell_plus.py
+pipenv uninstall django_extensions
+pipenv install --system
+pipenv install django_extensions
+pipenv install --system
+python manage.py shell_plus
+pipenv install
+pipenv install --system
+pipenv install --dev
+pipenv install
+pipenv install --system --dev

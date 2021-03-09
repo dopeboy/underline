@@ -56,7 +56,7 @@ case $task in
     shell)
         # SSH (bash) into server container.
         # Useful for running Django shell commands.
-        docker exec -it underline python manage.py shell
+        docker exec -it underline python manage.py shell_plus
         ;;
     lint)
         # Lint server code automatically with autopep8.
