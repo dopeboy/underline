@@ -5,7 +5,7 @@ from django.utils import timezone as tz
 
 from accounts.models import User
 
-
+# US based date (PST - EST)
 class CurrentDate(models.Model):
     date = models.DateField()
 
