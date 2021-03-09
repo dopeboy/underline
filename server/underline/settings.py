@@ -197,6 +197,6 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_BEAT_SCHEDULE = {
     "sample_task": {
         "task": "core.tasks.remove_lines_when_game_starts",
-        "schedule": crontab(minute="*/1"),
+        "schedule": crontab(minute="*/30"),
     },
 }
