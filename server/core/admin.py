@@ -85,7 +85,7 @@ make_sublines_invisible.short_description = (
 
 
 class LineAdmin(admin.ModelAdmin):
-    list_per_page = 500
+    list_per_page = 50
     list_display = [field.name for field in Line._meta.fields if field.name != "id"]
     list_display.append("gametime")
     list_display.append("has_subline_visible")
@@ -108,11 +108,7 @@ class LineAdmin(admin.ModelAdmin):
         return obj.game.datetime
 
     def has_subline_visible(self, obj):
-        sublines = Subline.objects.filter(line=obj)
-        for s in sublines:
-            if s.visible:
-                return True
-        return False
+        return obj.subline_set.filter(visible=True).count() != 0
 
     gametime.admin_order_field = "game__datetime"
 
@@ -196,6 +192,7 @@ class PickTabularInline(admin.TabularInline):
 
 
 class SlipAdmin(admin.ModelAdmin):
+    list_per_page = 20
     list_display = [field.name for field in Slip._meta.fields if field.name != "id"]
     list_display.append("payout_amount")
     list_display.append("won")

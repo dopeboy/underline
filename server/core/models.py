@@ -129,30 +129,36 @@ class Slip(models.Model):
     # For every attached line, see if actual points filled out.
     @property
     def complete(self):
-        for p in Pick.objects.filter(slip=self):
-            if p.subline.line.nba_points_actual == None:
-                return False
-        return True
+        return (
+            False
+            if Pick.objects.filter(
+                slip=self, subline__line__nba_points_actual=None
+            ).count()
+            else True
+        )
 
     # For every attached pick, find every attached subline.
     # For every attached line, see if invalidated is true. If so,
     # the entire slip is invalidated
     @property
     def invalidated(self):
-        for p in Pick.objects.filter(slip=self):
-            if p.subline.line.invalidated:
-                return True
-        return False
+        return (
+            True
+            if Pick.objects.filter(slip=self, subline__line__invalidated=True).count()
+            else False
+        )
 
     @property
     def payout_amount(self):
-        if self.pick_set.count() == 2:
+        num_picks = self.pick_set.count()
+
+        if num_picks == 2:
             return self.entry_amount * 3
-        elif self.pick_set.count() == 3:
+        elif num_picks == 3:
             return self.entry_amount * 6
-        elif self.pick_set.count() == 4:
+        elif num_picks == 4:
             return self.entry_amount * 10
-        elif self.pick_set.count() == 5:
+        elif num_picks == 5:
             return self.entry_amount * 20
 
     @property
@@ -171,17 +177,18 @@ class FreeToPlaySlipManager(models.Manager):
             super(FreeToPlaySlipManager, self).get_queryset().filter(free_to_play=True)
         )
 
+
 class PaidSlipManager(models.Manager):
     def get_queryset(self):
-        return (
-            super(PaidSlipManager, self).get_queryset().filter(free_to_play=False)
-        )
+        return super(PaidSlipManager, self).get_queryset().filter(free_to_play=False)
+
 
 class FreeToPlaySlip(Slip):
     objects = FreeToPlaySlipManager()
 
     class Meta:
         proxy = True
+
 
 class PaidSlip(Slip):
     objects = PaidSlipManager()

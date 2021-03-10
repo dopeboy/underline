@@ -5,6 +5,9 @@ services:
     container_name: underline-db
     environment:
       POSTGRES_HOST_AUTH_METHOD: "trust"
+    volumes:
+      - .:/code
+
   underline:
     build:
       context: .
