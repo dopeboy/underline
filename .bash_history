@@ -113,3 +113,5 @@ pipenv install --system
 pipenv install --dev
 pipenv install
 pipenv install --system --dev
+python manage.py makemigrations
+python manage.py migrate

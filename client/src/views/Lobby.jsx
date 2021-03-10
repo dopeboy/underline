@@ -675,6 +675,17 @@ const Lobby = ({ updateMainComponent }) => {
                                     size="huge"
                                 />
                             </Form.Group>
+                            {/*
+                            <Form.Input
+                                fluid
+                                icon="barcode"
+                                iconPosition="left"
+                                className=""
+                                placeholder="Creator code (optional)"
+                                label="Creator code"
+                                size="huge"
+                            />
+                            */}
                             <Form.Button
                                 disabled={picks.length < 2}
                                 onClick={checkPicks}

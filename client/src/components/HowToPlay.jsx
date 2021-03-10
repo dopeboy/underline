@@ -10,13 +10,16 @@ const HowToPlay = (props) => {
                 they will go OVER or UNDER their projected stat line. All picks
                 in an entry must be correct to win
             </p>
-            <u>What are the Payouts</u>
-            <p>Payouts include entry fee being paid back</p>
+            <u>Payout Multiplier</u>
+            <p>
+                Winning Payouts include entry fee being paid back. All picks in
+                an entry must be correct to win.
+            </p>
             <ul>
                 <li>2 Players: 3x</li>
-                <li>3 Players 6x</li>
-                <li>4 Players 10x </li>
-                <li>5 Players 20x</li>
+                <li>3 Players: 6x</li>
+                <li>4 Players: 10x </li>
+                <li>5 Players: 20x</li>
             </ul>
             <u>Where Can I Play Underline</u>
             <p>
