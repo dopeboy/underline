@@ -50,6 +50,7 @@ class PlayerAdmin(admin.ModelAdmin):
     list_per_page = 500
     readonly_fields = ["headshot"]  # this is for the change form
     list_display = [field.name for field in Player._meta.fields if field.name != "id"]
+    search_fields = ["name"]
 
     def headshot(self, obj):
         return format_html(
@@ -98,10 +99,15 @@ class LineAdmin(admin.ModelAdmin):
     ]
     actions = [make_sublines_invisible]
     ordering = ("-datetime_created",)
+    autocomplete_fields = [
+        "player",
+    ]
 
     def get_queryset(self, request):
         qs = super(LineAdmin, self).get_queryset(request)
-        qs = qs.annotate(models.Count("game__datetime"))
+        qs = qs.annotate(models.Count("game__datetime")).select_related(
+            "player", "player__team"
+        )
         return qs
 
     def gametime(self, obj):
