@@ -185,7 +185,10 @@ class DepositAdmin(admin.ModelAdmin):
 
 class PickTabularInline(admin.TabularInline):
     list_display = [field.name for field in Pick._meta.fields if field.name != "id"]
-    readonly_fields = ("won",)
+    readonly_fields = (
+        "won",
+        "subline",
+    )
     model = Pick
     extra = 0
     can_delete = False

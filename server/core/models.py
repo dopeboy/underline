@@ -130,11 +130,10 @@ class Slip(models.Model):
     @property
     def complete(self):
         return (
-            False
-            if Pick.objects.filter(
+            Pick.objects.filter(
                 slip=self, subline__line__nba_points_actual=None
             ).count()
-            else True
+            == 0
         )
 
     # For every attached pick, find every attached subline.
@@ -143,9 +142,7 @@ class Slip(models.Model):
     @property
     def invalidated(self):
         return (
-            True
-            if Pick.objects.filter(slip=self, subline__line__invalidated=True).count()
-            else False
+            Pick.objects.filter(slip=self, subline__line__invalidated=True).count() != 0
         )
 
     @property
