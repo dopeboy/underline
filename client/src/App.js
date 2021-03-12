@@ -125,9 +125,17 @@ function App() {
                         component={Signup}
                     ></NonLoggedInRoute>
                     <NonLoggedInRoute
-                        path="/"
+                        path="/login"
                         component={Login}
                     ></NonLoggedInRoute>
+                    <Route
+                        path="/"
+                        render={(props) => (
+                            <Main>
+                                <Lobby />
+                            </Main>
+                        )}
+                    />
                 </Switch>
             </Router>
         </ApolloProvider>

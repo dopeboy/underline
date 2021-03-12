@@ -64,7 +64,7 @@ const Main = (props) => {
                                         }`}
                                         className="deposit-btn"
                                     >
-                                        Sign up
+                                        Sign Up
                                     </Button>
                                 </Menu.Item>
                             )}
@@ -127,7 +127,10 @@ const Main = (props) => {
                         </Menu.Item>
 
                         <Menu.Item
-                            active={location.pathname.startsWith('/lobby')}
+                            active={
+                                location.pathname === '/' ||
+                                location.pathname.startsWith('/lobby')
+                            }
                             as={Link}
                             to="/lobby"
                         >
@@ -180,7 +183,7 @@ const Main = (props) => {
                                         }`}
                                         className="deposit-btn"
                                     >
-                                        Sign up
+                                        Sign Up
                                     </Button>
                                 </Menu.Item>
                             )}
