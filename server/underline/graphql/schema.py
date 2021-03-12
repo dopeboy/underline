@@ -120,7 +120,6 @@ class Query(graphene.ObjectType):
     # Get today's date. Find all the games that lie on today's
     # date. Get all the lines that roll up to these dates. Get all the sublines
     # that these lines roll up to.
-    @login_required
     def resolve_todays_sublines(self, info, **kwargs):
         cd = CurrentDate.objects.first()
         todays_games = []
@@ -234,13 +233,14 @@ class CreateSlip(graphene.Mutation):
     class Arguments:
         picks = graphene.List(PickType, required=True)
         entry_amount = graphene.Int(required=True)
+        creator_code = graphene.String(required=False)
 
     # The class attributes define the response of the mutation
     success = graphene.Boolean()
     free_to_play = graphene.Boolean()
 
     @classmethod
-    def mutate(cls, root, info, picks, entry_amount):
+    def mutate(cls, root, info, picks, entry_amount, creator_code):
         # If user is from PTP eligible state, set slip to that. Else slip is FTP
         ip = info.context.META.get("HTTP_X_FORWARDED_FOR").split(",")[-1].strip()
         r = requests.get(
@@ -279,6 +279,7 @@ class CreateSlip(graphene.Mutation):
             owner=info.context.user,
             entry_amount=entry_amount,
             free_to_play=free_to_play,
+            creator_code=creator_code,
         )
 
         for p in picks:
@@ -290,15 +291,16 @@ class CreateSlip(graphene.Mutation):
         u.wallet_balance -= entry_amount
         u.save()
 
-        ftp_text = "free to play" if free_to_play else "pay to play"
-        message = Mail(
-            from_email="support@underlinesports.com",
-            to_emails="support@underlinesports.com",
-            subject=f"[AUTOMATED EMAIL] {info.context.user.first_name} {info.context.user.last_name} created a slip",
-            html_content=f"Type of slip: {ftp_text}<br/><br/>Entry amount: {entry_amount}<br/><br/>Wallet balance before: {previous_wallet_balance}<br/><br/>Wallet balance after: {u.wallet_balance}<br/><br/>Check out it <a href='{settings.DOMAIN}/admin/core/slip/{slip.id}/change/'>here.</a>",
-        )
-        sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
-        response = sg.send(message)
+        if not settings.DEBUG:
+            ftp_text = "free to play" if free_to_play else "pay to play"
+            message = Mail(
+                from_email="support@underlinesports.com",
+                to_emails="support@underlinesports.com",
+                subject=f"[AUTOMATED EMAIL] {info.context.user.first_name} {info.context.user.last_name} created a slip",
+                html_content=f"Type of slip: {ftp_text}<br/><br/>Entry amount: {entry_amount}<br/><br/>Wallet balance before: {previous_wallet_balance}<br/><br/>Wallet balance after: {u.wallet_balance}<br/><br/>Check out it <a href='{settings.DOMAIN}/admin/core/slip/{slip.id}/change/'>here.</a>",
+            )
+            sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+            response = sg.send(message)
 
         return CreateSlip(success=True, free_to_play=free_to_play)
 

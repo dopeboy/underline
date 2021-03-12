@@ -18,8 +18,8 @@ import {
 } from 'semantic-ui-react'
 import logo from 'images/logo.png'
 import logoMobile from 'images/logo_m.png'
-import { clearJWT } from 'utils'
-import { Link, useLocation, useHistory } from 'react-router-dom'
+import { getJWT, clearJWT } from 'utils'
+import { useParams, Link, useLocation, useHistory } from 'react-router-dom'
 import './Main.scss'
 
 const GET_ME_QUERY = gql`
@@ -41,6 +41,7 @@ const Main = (props) => {
     }
     const history = useHistory()
     const location = useLocation()
+    const { code } = useParams()
 
     return (
         <>
@@ -54,44 +55,66 @@ const Main = (props) => {
                         </Menu.Item>
 
                         <Menu.Menu position="right">
-                            <Menu.Item position="right">
-                                Balance:&nbsp;&nbsp;$
-                                {data && Math.round(data.me.walletBalance)}
-                            </Menu.Item>
-                            <Dropdown
-                                item
-                                text={
-                                    data &&
-                                    `${data.me.firstName} ${data.me.lastName[0]}.`
-                                }
-                            >
-                                <Dropdown.Menu>
-                                    <Dropdown.Item as={Link} to="/lobby">
-                                        Lobby
-                                    </Dropdown.Item>
-                                    <Dropdown.Item as={Link} to="/active">
-                                        Active
-                                    </Dropdown.Item>
-                                    <Dropdown.Item as={Link} to="/completed">
-                                        Complete
-                                    </Dropdown.Item>
-                                    <Dropdown.Item
+                            {!getJWT() && (
+                                <Menu.Item position="right">
+                                    <Button
                                         as={Link}
-                                        to="/settings/deposit"
+                                        to={`/signup${
+                                            code ? '?code=' + code : ''
+                                        }`}
+                                        className="deposit-btn"
                                     >
-                                        Deposit
-                                    </Dropdown.Item>
-                                    <Dropdown.Item
-                                        as={Link}
-                                        to="/settings/account"
-                                    >
-                                        Settings
-                                    </Dropdown.Item>
-                                    <Dropdown.Item onClick={logoutUser}>
-                                        Logout
-                                    </Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
+                                        Sign up
+                                    </Button>
+                                </Menu.Item>
+                            )}
+                            {getJWT() && (
+                                <Menu.Item position="right">
+                                    Balance:&nbsp;&nbsp;$
+                                    {data && Math.round(data.me.walletBalance)}
+                                </Menu.Item>
+                            )}
+                            {getJWT() && (
+                                <Dropdown
+                                    item
+                                    text={
+                                        getJWT()
+                                            ? data &&
+                                              `${data.me.firstName} ${data.me.lastName[0]}.`
+                                            : ''
+                                    }
+                                >
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item as={Link} to="/lobby">
+                                            Lobby
+                                        </Dropdown.Item>
+                                        <Dropdown.Item as={Link} to="/active">
+                                            Active
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            as={Link}
+                                            to="/completed"
+                                        >
+                                            Complete
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            as={Link}
+                                            to="/settings/deposit"
+                                        >
+                                            Deposit
+                                        </Dropdown.Item>
+                                        <Dropdown.Item
+                                            as={Link}
+                                            to="/settings/account"
+                                        >
+                                            Settings
+                                        </Dropdown.Item>
+                                        <Dropdown.Item onClick={logoutUser}>
+                                            Logout
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            )}
                         </Menu.Menu>
                     </Menu>
                 </Grid.Row>
@@ -104,61 +127,86 @@ const Main = (props) => {
                         </Menu.Item>
 
                         <Menu.Item
-                            active={location.pathname === '/lobby'}
+                            active={location.pathname.startsWith('/lobby')}
                             as={Link}
                             to="/lobby"
                         >
                             Lobby
                         </Menu.Item>
-                        <Menu.Item
-                            active={location.pathname === '/active'}
-                            as={Link}
-                            to="/active"
-                        >
-                            Active
-                        </Menu.Item>
-                        <Menu.Item
-                            active={location.pathname === '/completed'}
-                            as={Link}
-                            to="/completed"
-                        >
-                            Completed
-                        </Menu.Item>
+                        {getJWT() && (
+                            <Menu.Item
+                                active={location.pathname === '/active'}
+                                as={Link}
+                                to="/active"
+                            >
+                                Active
+                            </Menu.Item>
+                        )}
+                        {getJWT() && (
+                            <Menu.Item
+                                active={location.pathname === '/completed'}
+                                as={Link}
+                                to="/completed"
+                            >
+                                Completed
+                            </Menu.Item>
+                        )}
 
                         <Menu.Menu position="right">
-                            <Menu.Item position="right">
-                                Balance:&nbsp;&nbsp;$
-                                {data && Math.round(data.me.walletBalance)}
-                            </Menu.Item>
-                            <Menu.Item position="right">
-                                <Button
-                                    as={Link}
-                                    to="/settings/deposit"
-                                    className="deposit-btn"
-                                >
-                                    Deposit
-                                </Button>
-                            </Menu.Item>
-
-                            <Dropdown
-                                item
-                                text={
-                                    data &&
-                                    `${data.me.firstName} ${data.me.lastName[0]}.`
-                                }
-                            >
-                                <Dropdown.Menu>
-                                    <Dropdown.Item
+                            {getJWT() && (
+                                <Menu.Item position="right">
+                                    Balance:&nbsp;&nbsp;$
+                                    {data && Math.round(data.me.walletBalance)}
+                                </Menu.Item>
+                            )}
+                            {getJWT() && (
+                                <Menu.Item position="right">
+                                    <Button
                                         as={Link}
-                                        to="/settings/account"
+                                        to="/settings/deposit"
+                                        className="deposit-btn"
                                     >
-                                        Settings
-                                    </Dropdown.Item>
-                                    <Dropdown.Item onClick={logoutUser}>
-                                        Logout
-                                    </Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
+                                        Deposit
+                                    </Button>
+                                </Menu.Item>
+                            )}
+
+                            {!getJWT() && (
+                                <Menu.Item position="right">
+                                    <Button
+                                        as={Link}
+                                        to={`/signup${
+                                            code ? '?code=' + code : ''
+                                        }`}
+                                        className="deposit-btn"
+                                    >
+                                        Sign up
+                                    </Button>
+                                </Menu.Item>
+                            )}
+
+                            {getJWT() && (
+                                <Dropdown
+                                    item
+                                    text={
+                                        getJWT() &&
+                                        data &&
+                                        `${data.me.firstName} ${data.me.lastName[0]}.`
+                                    }
+                                >
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item
+                                            as={Link}
+                                            to="/settings/account"
+                                        >
+                                            Settings
+                                        </Dropdown.Item>
+                                        <Dropdown.Item onClick={logoutUser}>
+                                            Logout
+                                        </Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            )}
                         </Menu.Menu>
                     </Menu>
                 </Grid.Row>

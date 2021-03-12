@@ -213,6 +213,9 @@ const Completed = () => {
                                     }`}
                                 >
                                     {slip.invalidated && `$0`}
+                                    {slip.creatorCode && (
+                                        <div>Code: {slip.creatorCode}</div>
+                                    )}
                                     {!slip.invalidated &&
                                         !slip.won &&
                                         `-$${slip.entryAmount}`}

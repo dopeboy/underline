@@ -115,3 +115,10 @@ pipenv install
 pipenv install --system --dev
 python manage.py makemigrations
 python manage.py migrate
+python manage.py shell_plus --print-sql
+ls
+cd ..
+ls
+pwd
+cd ..
+ls

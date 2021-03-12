@@ -9,6 +9,7 @@ import {
     Label,
     Icon,
     List,
+    Popup,
     Modal,
     Card,
     Image,
@@ -24,8 +25,9 @@ import { gql, useApolloClient, useQuery } from '@apollo/client'
 import moment from 'moment-timezone'
 import { Helmet } from 'react-helmet'
 import './Lobby.scss'
-import { useHistory } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 import { useMediaQuery } from 'react-responsive'
+import { getJWT, clearJWT } from 'utils'
 
 const GET_TODAYS_SUBLINES_QUERY = gql`
     query {
@@ -69,8 +71,16 @@ const CHECK_APPROVED_LOCATION_QUERY = gql`
 `
 
 const CREATE_SLIP_MUTATION = gql`
-    mutation CreateSlip($picks: [PickType]!, $entryAmount: Int!) {
-        createSlip(picks: $picks, entryAmount: $entryAmount) {
+    mutation CreateSlip(
+        $picks: [PickType]!
+        $entryAmount: Int!
+        $creatorCode: String
+    ) {
+        createSlip(
+            picks: $picks
+            entryAmount: $entryAmount
+            creatorCode: $creatorCode
+        ) {
             success
             freeToPlay
         }
@@ -288,6 +298,8 @@ const Lobby = ({ updateMainComponent }) => {
     const [confirmationModalVisible, setConfirmationModalVisible] = useState(
         false
     )
+    const { code } = useParams()
+    const [creatorCode, setCreatorCode] = useState(code)
     const [
         insufficientFundsModalVisible,
         setInsufficentFundsModalVisible,
@@ -394,6 +406,11 @@ const Lobby = ({ updateMainComponent }) => {
     // (5) Check if user has linked a payment method
     // (6) Check if user has sufficients funds in their wallet
     const checkPicks = async () => {
+        if (!getJWT()) {
+            history.push(`/signup${code ? '?code=' + code : ''}`)
+            return
+        }
+
         setChecking(true)
         let lat,
             lng = null
@@ -478,6 +495,7 @@ const Lobby = ({ updateMainComponent }) => {
                     }
                 }),
                 entryAmount: entryAmount,
+                creatorCode: creatorCode,
             },
         })
 
@@ -675,17 +693,32 @@ const Lobby = ({ updateMainComponent }) => {
                                     size="huge"
                                 />
                             </Form.Group>
-                            {/*
-                            <Form.Input
+                            <Form.Field
                                 fluid
-                                icon="barcode"
-                                iconPosition="left"
-                                className=""
                                 placeholder="Creator code (optional)"
-                                label="Creator code"
-                                size="huge"
-                            />
-                            */}
+                                onChange={(e) => setCreatorCode(e.target.value)}
+                            >
+                                <label>
+                                    Creator code
+                                    <Popup
+                                        trigger={
+                                            <Icon
+                                                className="creator-code"
+                                                circular
+                                                name="question"
+                                            />
+                                        }
+                                        content="Support your favorite sports content creator. Underline bonuses creators anytime a user wins."
+                                        on="click"
+                                        position="right center"
+                                    />
+                                </label>
+                                <input
+                                    className="creator-code-input"
+                                    placeholder="Creator code (optional)"
+                                    value={creatorCode}
+                                />
+                            </Form.Field>
                             <Form.Button
                                 disabled={picks.length < 2}
                                 onClick={checkPicks}

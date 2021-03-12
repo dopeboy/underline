@@ -30,6 +30,7 @@ const GET_ACTIVE_SLIPS_QUERY = gql`
             entryAmount
             payoutAmount
             freeToPlay
+            creatorCode
             picks {
                 id
                 underNbaPoints
@@ -204,6 +205,9 @@ const Active = () => {
                                     )}
                                 </div>
                                 <div className="entry-amount">
+                                    {slip.creatorCode && (
+                                        <div>Code: {slip.creatorCode}</div>
+                                    )}
                                     ${`${slip.entryAmount} Entry`}
                                 </div>
                             </div>

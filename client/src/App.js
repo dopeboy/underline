@@ -100,10 +100,14 @@ function App() {
                     />
                 )}
                 <Switch>
-                    <PrivateRoute
-                        path="/lobby"
-                        component={Lobby}
-                    ></PrivateRoute>
+                    <Route
+                        path="/lobby/:code?"
+                        render={(props) => (
+                            <Main>
+                                <Lobby />
+                            </Main>
+                        )}
+                    />
                     <PrivateRoute
                         path="/active"
                         component={Active}

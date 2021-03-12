@@ -3,8 +3,8 @@ import { Message, Grid, Form, Button, Container } from 'semantic-ui-react'
 import logo from 'images/logo.png'
 import { Helmet } from 'react-helmet'
 import { gql, useMutation } from '@apollo/client'
-import { saveJWT } from 'utils'
-import { Link, useHistory } from 'react-router-dom'
+import { parseQuery, saveJWT } from 'utils'
+import { useLocation, Link, useHistory } from 'react-router-dom'
 import './Signup.scss'
 import moment from 'moment-timezone'
 
@@ -53,13 +53,14 @@ const Signup = () => {
 
     const [error, setError] = useState(false)
     const [processing, setProcessing] = useState(false)
+    const code = parseQuery(useLocation().search).get('code')
 
     const [loginUser] = useMutation(LOGIN_MUTATION, {
         onCompleted: (data) => {
             setProcessing(false)
             setError(false)
             saveJWT(data.tokenAuth.token)
-            history.push('/lobby')
+            history.push(`/lobby${code ? '/' + code : ''}`)
         },
         onError: (data) => {
             setProcessing(false)
