@@ -94,6 +94,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
 
     wallet_balance = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    free_to_play = models.BooleanField(default=False)
 
     # Add additional fields here if needed
     objects = UserManager()

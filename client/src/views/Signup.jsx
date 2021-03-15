@@ -1,5 +1,14 @@
 import React, { useState } from 'react'
-import { Message, Grid, Form, Button, Container } from 'semantic-ui-react'
+import {
+    Modal,
+    Icon,
+    Header,
+    Message,
+    Grid,
+    Form,
+    Button,
+    Container,
+} from 'semantic-ui-react'
 import logo from 'images/logo.png'
 import { Helmet } from 'react-helmet'
 import { gql, useMutation } from '@apollo/client'
@@ -28,6 +37,7 @@ const CREATE_ACCOUNT_MUTATION = gql`
             birthDate: $birthDate
         ) {
             success
+            freeToPlay
         }
     }
 `
@@ -52,8 +62,11 @@ const Signup = () => {
     const [birthDate, setBirthDate] = useState(null)
 
     const [error, setError] = useState(false)
+    const [loggingIn, setLoggingIn] = useState(false)
     const [processing, setProcessing] = useState(false)
     const code = parseQuery(useLocation().search).get('code')
+    const [freeToPlayModalVisible, setFreeToPlayModalVisible] = useState(false)
+    const [payToPlayModalVisible, setPayToPlayModalVisible] = useState(false)
 
     const [loginUser] = useMutation(LOGIN_MUTATION, {
         onCompleted: (data) => {
@@ -65,18 +78,17 @@ const Signup = () => {
         onError: (data) => {
             setProcessing(false)
             setError(true)
+            setLoggingIn(false)
         },
     })
 
     const [signupUser] = useMutation(CREATE_ACCOUNT_MUTATION, {
         onCompleted: (data) => {
-            loginUser({
-                variables: { emailAddress: emailAddress, password: password },
-            })
-            ///setProcessing(false)
-            //setError(false)
-            //saveJWT(data.tokenAuth.token)
-            //history.push('/lobby')
+            if (data.createUser.freeToPlay) {
+                setFreeToPlayModalVisible(true)
+            } else {
+                setPayToPlayModalVisible(true)
+            }
         },
         onError: (data) => {
             setProcessing(false)
@@ -105,6 +117,89 @@ const Signup = () => {
             <Helmet>
                 <title>Sign up</title>
             </Helmet>
+            <Modal
+                closeOnEscape={false}
+                closeOnDimmerClick={false}
+                open={freeToPlayModalVisible}
+                size="small"
+            >
+                <Header>
+                    <Icon name="exclamation circle" />
+                    Free to play mode
+                </Header>
+                <Modal.Content>
+                    <p>
+                        Underline only operates paid entries in certain states
+                        due to daily fantasy laws. You live in a state where
+                        free to play is only allowed.
+                    </p>
+                    <p>
+                        You will be given $100 of free to play credits now. At
+                        the end of every day, your wallet balance will be
+                        refreshed to $100.
+                    </p>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button
+                        loading={loggingIn}
+                        disabled={loggingIn}
+                        size="large"
+                        color="green"
+                        onClick={() => {
+                            setLoggingIn(true)
+                            loginUser({
+                                variables: {
+                                    emailAddress: emailAddress,
+                                    password: password,
+                                },
+                            })
+                        }}
+                    >
+                        OK
+                    </Button>
+                </Modal.Actions>
+            </Modal>
+            <Modal
+                closeOnEscape={false}
+                closeOnDimmerClick={false}
+                open={payToPlayModalVisible}
+                size="small"
+            >
+                <Header>
+                    <Icon name="exclamation circle" />
+                    Pay to play mode
+                </Header>
+                <Modal.Content>
+                    <p>
+                        Underline only operates paid entries in certain states
+                        due to daily fantasy laws. You live in a state where pay
+                        to play is allowed.
+                    </p>
+                    <p>
+                        Remember to add funds to your wallet once you are ready
+                        to play.
+                    </p>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button
+                        loading={loggingIn}
+                        disabled={loggingIn}
+                        size="large"
+                        color="green"
+                        onClick={() => {
+                            setLoggingIn(true)
+                            loginUser({
+                                variables: {
+                                    emailAddress: emailAddress,
+                                    password: password,
+                                },
+                            })
+                        }}
+                    >
+                        OK
+                    </Button>
+                </Modal.Actions>
+            </Modal>
             <div className="main-grid">
                 <Grid centered columns={1}>
                     <Grid.Column computer={6} mobile={16}>

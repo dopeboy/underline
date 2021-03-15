@@ -11,6 +11,7 @@ class UserAdmin(admin.ModelAdmin):
         "last_name",
         "wallet_balance",
         "date_joined",
+        "free_to_play",
     )
     list_editable = ("wallet_balance",)
     ordering = ('-date_joined',)

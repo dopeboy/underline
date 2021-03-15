@@ -110,9 +110,6 @@ class MySlipType(DjangoObjectType):
 class Query(graphene.ObjectType):
     todays_sublines = graphene.List(SublineType)
     me = graphene.Field(UserType)
-    approved_location = graphene.Field(
-        graphene.Boolean, lat=graphene.Float(), lng=graphene.Float()
-    )
     active_slips = graphene.List(MySlipType)
     complete_slips = graphene.List(MySlipType)
     current_date = graphene.Date()
@@ -178,50 +175,6 @@ class Query(graphene.ObjectType):
     def resolve_current_date(self, info, **kawargs):
         return CurrentDate.objects.first().date
 
-    @login_required
-    def resolve_approved_location(self, info, lat, lng):
-        point = Feature(geometry=Point((lng, lat)))
-
-        approved_states = [
-            "Arkansas",
-            "California",
-            "District of Columbia",
-            "Florida",
-            "Georgia",
-            "Kansas",
-            "New Mexico",
-            "North Dakota",
-            "Oklahoma",
-            "Oregon",
-            "Rhode Island",
-            "South Carolina",
-            "South Dakota",
-            "Texas",
-            "Utah",
-            "West Virginia",
-            "Wyoming",
-            "Colorado",
-        ]
-
-        with open(f"{settings.BASE_DIR}/gz_2010_us_040_00_20m.json") as f:
-            js = json.load(f)
-
-        for feature in js["features"]:
-            features = feature["geometry"]
-
-            if feature["properties"]["NAME"] in approved_states:
-                if features["type"] == "Polygon":
-                    p = Polygon(features["coordinates"])
-                    if boolean_point_in_polygon(point, p):
-                        return True
-                else:
-                    for polygon in features["coordinates"]:
-                        p = Polygon(polygon)
-                        if boolean_point_in_polygon(point, p):
-                            return True
-
-        return False
-
 
 class PickType(graphene.InputObjectType):
     # This is the subline_id
@@ -241,44 +194,11 @@ class CreateSlip(graphene.Mutation):
 
     @classmethod
     def mutate(cls, root, info, picks, entry_amount, creator_code):
-        # If user is from PTP eligible state, set slip to that. Else slip is FTP
-        ip = info.context.META.get("HTTP_X_FORWARDED_FOR").split(",")[-1].strip()
-        r = requests.get(
-            f"http://api.ipstack.com/{ip}?access_key=1317f58b9d36a89840ecf6edb5af41be&format=1"
-        )
-
-        country_code = r.json()["country_code"]
-        region_name = r.json()["region_name"]
-        approved_states = [
-            "Arkansas",
-            "California",
-            "District of Columbia",
-            "Florida",
-            "Georgia",
-            "Kansas",
-            "New Mexico",
-            "North Dakota",
-            "Oklahoma",
-            "Oregon",
-            "Rhode Island",
-            "South Carolina",
-            "South Dakota",
-            "Texas",
-            "Utah",
-            "West Virginia",
-            "Wyoming",
-            "Colorado",
-        ]
-
-        free_to_play = False
-        if country_code != "US" or region_name not in approved_states:
-            free_to_play = True
-
         # Create the slip
         slip = Slip.objects.create(
             owner=info.context.user,
             entry_amount=entry_amount,
-            free_to_play=free_to_play,
+            free_to_play=info.context.user.free_to_play,
             creator_code=creator_code,
         )
 
@@ -316,6 +236,7 @@ class CreateUser(graphene.Mutation):
 
     # The class attributes define the response of the mutation
     success = graphene.Boolean()
+    free_to_play = graphene.Boolean()
 
     @classmethod
     def mutate(
@@ -329,6 +250,37 @@ class CreateUser(graphene.Mutation):
         email_address,
         password,
     ):
+        # If user is from PTP eligible state, set slip to that. Else slip is FTP
+        ip = info.context.META.get("HTTP_X_FORWARDED_FOR").split(",")[-1].strip()
+        r = requests.get(
+            f"http://api.ipstack.com/{ip}?access_key=1317f58b9d36a89840ecf6edb5af41be&format=1"
+        )
+
+        country_code = r.json()["country_code"]
+        region_name = r.json()["region_name"]
+        approved_states = [
+            "Arkansas",
+            "California",
+            "District of Columbia",
+            "Florida",
+            "Georgia",
+            "Kansas",
+            "New Mexico",
+            "North Dakota",
+            "Oklahoma",
+            "Oregon",
+            "Rhode Island",
+            "South Carolina",
+            "South Dakota",
+            "Texas",
+            "Utah",
+            "West Virginia",
+            "Wyoming",
+            "Colorado",
+        ]
+
+        free_to_play = region_name not in approved_states
+
         user = User.objects.create_user(
             email=email_address.lower(),
             password=password,
@@ -336,9 +288,11 @@ class CreateUser(graphene.Mutation):
             last_name=last_name,
             phone_number=phone_number,
             birth_date=birth_date,
+            free_to_play=free_to_play,
+            wallet_balance=100 if free_to_play else 0,
         )
 
-        return CreateUser(success=True)
+        return CreateUser(success=True, free_to_play=False)
 
 
 class RecordDeposit(graphene.Mutation):

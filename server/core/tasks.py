@@ -3,6 +3,7 @@ from celery import shared_task
 from datetime import datetime
 from pytz import timezone, utc
 
+from accounts.models import User
 from .models import CurrentDate, Game
 
 app = Celery()
@@ -30,3 +31,9 @@ def remove_lines_when_game_starts():
         ):
             for line in game.line_set.all():
                 line.subline_set.all().update(visible=False)
+
+
+# Every midnight PST, set balance of free to play users to $100
+@shared_task
+def top_off_free_to_play_user_balances():
+    User.objects.filter(free_to_play=True).update(wallet_balance=100)

@@ -33,6 +33,7 @@ const GET_ME_QUERY = gql`
             lastName
             email
             dateJoined
+            freeToPlay
         }
     }
 `
@@ -77,6 +78,14 @@ const Account = () => {
                             {moment(data.me.dateJoined).format('MMMM Do YYYY')}
                         </List.Content>
                     </List.Item>
+                    <List.Item>
+                        <List.Icon name="settings" />
+                        <List.Content>
+                            {data.me.freeToPlay
+                                ? 'Free to play'
+                                : 'Pay to play'}
+                        </List.Content>
+                    </List.Item>
                 </List>
             )}
         </Form>
@@ -84,6 +93,7 @@ const Account = () => {
 }
 
 const Deposit = ({ updateMainComponent }) => {
+    const { data } = useQuery(GET_ME_QUERY)
     const [selectedPaymentAmount, setSelectedPaymentAmount] = useState()
     const [
         depositSuccessModalVisible,
@@ -107,103 +117,135 @@ const Deposit = ({ updateMainComponent }) => {
     })
 
     return (
-        <div className="ul-deposit">
+        <Form className="ul-deposit" loading={!data}>
             <Header as="h2">Deposit</Header>
-            <p>
-                Select an option below. All of our payments are processed
-                securely through PayPal.
-            </p>
-            <div className="parent">
-                <Form loading={processing}>
-                    <Button
-                        active={selectedPaymentAmount === 5}
-                        className="amt-btn"
-                        toggle
-                        basic
-                        fluid
-                        size="large"
-                        onClick={() => setSelectedPaymentAmount(5)}
-                    >
-                        $5
-                    </Button>
-                    <Button
-                        active={selectedPaymentAmount === 10}
-                        className="amt-btn"
-                        toggle
-                        basic
-                        fluid
-                        size="large"
-                        onClick={() => setSelectedPaymentAmount(10)}
-                    >
-                        $10
-                    </Button>
-                    <Button
-                        active={selectedPaymentAmount === 20}
-                        className="amt-btn"
-                        toggle
-                        basic
-                        fluid
-                        size="large"
-                        onClick={() => setSelectedPaymentAmount(20)}
-                    >
-                        $20
-                    </Button>
-                </Form>
-                <Divider />
-                <PayPalButton
-                    amount={selectedPaymentAmount}
-                    shippingPreference="NO_SHIPPING"
-                    onClick={() => {
-                        if (selectedPaymentAmount) setProcessing(true)
-                        return selectedPaymentAmount
-                    }}
-                    options={{
-                        clientId:
-                            process.env.NODE_ENV === 'development'
-                                ? 'AX5eD1ofG_dHeCpSVDbmlvoc9ghz53qS8eAwseFFNWOQxtGIb_H6ZD_uiOGrCSlCZRnwb41cjDPnIwo1'
-                                : 'Ad0GFGEqk719MEe6gKNnkiEwmapRr7tKRhgiCV56dQeX60G8_YD7pZ7oKvCRUW8a8ZIoweg6sFo8WzkN',
-                        disableFunding: 'credit',
-                    }}
-                    onSuccess={(details, data) => {
-                        recordDeposit({
-                            variables: {
-                                amount: details.purchase_units[0].amount.value,
-                                transactionDetails: JSON.stringify(details),
-                                orderDetails: JSON.stringify(data),
-                            },
-                        })
-                    }}
-                />
-            </div>
-            <Modal
-                onClose={() => setDepositSuccessModalVisible(false)}
-                open={depositSuccessModalVisible}
-                size="small"
-            >
-                <Header>
-                    <Icon name="check " />
-                    Congratulations
-                </Header>
-                <Modal.Content>
-                    <p>
-                        You have successfully deposited funds into your
-                        Underline account. Click 'Start playing' to begin.
-                    </p>
-                </Modal.Content>
-                <Modal.Actions>
-                    <Button
-                        color="green"
-                        onClick={() => {
-                            // Temporary hack
-                            //window.location.href = '/lobby'
-                            history.push('/lobby')
-                        }}
-                    >
-                        Start playing
-                    </Button>
-                </Modal.Actions>
-            </Modal>
-        </div>
+            {data && (
+                <>
+                    {data.me.freeToPlay && (
+                        <p>
+                            Because you are a free to play member, you do not
+                            need to deposit any funds. You will be given $100
+                            everyday.
+                        </p>
+                    )}
+                    {!data.me.freeToPlay && (
+                        <>
+                            <p>
+                                Select an option below. All of our payments are
+                                processed securely through PayPal.
+                            </p>
+                            <div className="parent">
+                                <Form loading={processing}>
+                                    <Button
+                                        active={selectedPaymentAmount === 5}
+                                        className="amt-btn"
+                                        toggle
+                                        basic
+                                        fluid
+                                        size="large"
+                                        onClick={() =>
+                                            setSelectedPaymentAmount(5)
+                                        }
+                                    >
+                                        $5
+                                    </Button>
+                                    <Button
+                                        active={selectedPaymentAmount === 10}
+                                        className="amt-btn"
+                                        toggle
+                                        basic
+                                        fluid
+                                        size="large"
+                                        onClick={() =>
+                                            setSelectedPaymentAmount(10)
+                                        }
+                                    >
+                                        $10
+                                    </Button>
+                                    <Button
+                                        active={selectedPaymentAmount === 20}
+                                        className="amt-btn"
+                                        toggle
+                                        basic
+                                        fluid
+                                        size="large"
+                                        onClick={() =>
+                                            setSelectedPaymentAmount(20)
+                                        }
+                                    >
+                                        $20
+                                    </Button>
+                                </Form>
+                                <Divider />
+                                <PayPalButton
+                                    amount={selectedPaymentAmount}
+                                    shippingPreference="NO_SHIPPING"
+                                    onClick={() => {
+                                        if (selectedPaymentAmount)
+                                            setProcessing(true)
+                                        return selectedPaymentAmount
+                                    }}
+                                    options={{
+                                        clientId:
+                                            process.env.NODE_ENV ===
+                                            'development'
+                                                ? 'AX5eD1ofG_dHeCpSVDbmlvoc9ghz53qS8eAwseFFNWOQxtGIb_H6ZD_uiOGrCSlCZRnwb41cjDPnIwo1'
+                                                : 'Ad0GFGEqk719MEe6gKNnkiEwmapRr7tKRhgiCV56dQeX60G8_YD7pZ7oKvCRUW8a8ZIoweg6sFo8WzkN',
+                                        disableFunding: 'credit',
+                                    }}
+                                    onSuccess={(details, data) => {
+                                        recordDeposit({
+                                            variables: {
+                                                amount:
+                                                    details.purchase_units[0]
+                                                        .amount.value,
+                                                transactionDetails: JSON.stringify(
+                                                    details
+                                                ),
+                                                orderDetails: JSON.stringify(
+                                                    data
+                                                ),
+                                            },
+                                        })
+                                    }}
+                                />
+                            </div>
+                            <Modal
+                                onClose={() =>
+                                    setDepositSuccessModalVisible(false)
+                                }
+                                open={depositSuccessModalVisible}
+                                size="small"
+                            >
+                                <Header>
+                                    <Icon name="check " />
+                                    Congratulations
+                                </Header>
+                                <Modal.Content>
+                                    <p>
+                                        You have successfully deposited funds
+                                        into your Underline account. Click
+                                        'Start playing' to begin.
+                                    </p>
+                                </Modal.Content>
+                                <Modal.Actions>
+                                    <Button
+                                        color="green"
+                                        onClick={() => {
+                                            // Temporary hack
+                                            //window.location.href = '/lobby'
+                                            history.push('/lobby')
+                                        }}
+                                    >
+                                        Start playing
+                                    </Button>
+                                </Modal.Actions>
+                            </Modal>
+                        </>
+                    )}
+                </>
+            )}
+        </Form>
     )
 }
 
