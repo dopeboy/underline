@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "underline",
     "accounts",
     "core",
+    "import_export",
 ]
 
 if DEBUG:

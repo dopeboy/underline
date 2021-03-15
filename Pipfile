@@ -23,6 +23,7 @@ pygments = "*"
 sendgrid = "*"
 celery = "*"
 redis = "*"
+django-import-export = "*"
 
 [dev-packages]
 pytest-django = "==3.3.2"

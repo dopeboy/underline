@@ -9,6 +9,10 @@ from pygments.lexers import JsonLexer
 from pygments.formatters import HtmlFormatter
 from django.utils.safestring import mark_safe
 
+from import_export.admin import ExportMixin
+
+from import_export import resources
+
 
 from .models import (
     League,
@@ -85,7 +89,13 @@ make_sublines_invisible.short_description = (
 )
 
 
-class LineAdmin(admin.ModelAdmin):
+class LineResource(resources.ModelResource):
+    class Meta:
+        model = Line
+
+
+class LineAdmin(ExportMixin, admin.ModelAdmin):
+    resource_class = LineResource
     list_per_page = 50
     list_display = [field.name for field in Line._meta.fields if field.name != "id"]
     list_display.append("gametime")
@@ -145,8 +155,14 @@ class CurrentDateAdmin(admin.ModelAdmin):
         return False
 
 
-class DepositAdmin(admin.ModelAdmin):
+class DepositResource(resources.ModelResource):
+    class Meta:
+        model = Deposit
+
+
+class DepositAdmin(ExportMixin, admin.ModelAdmin):
     list_display = [field.name for field in Deposit._meta.fields if field.name != "id"]
+    resource_class = DepositResource
 
     readonly_fields = (
         "prettified_transaction_details",
@@ -200,7 +216,12 @@ class PickTabularInline(admin.TabularInline):
     can_delete = False
 
 
-class SlipAdmin(admin.ModelAdmin):
+class SlipResource(resources.ModelResource):
+    class Meta:
+        model = Slip
+
+class SlipAdmin(ExportMixin, admin.ModelAdmin):
+    resource_class = SlipResource
     list_per_page = 20
     list_display = [field.name for field in Slip._meta.fields if field.name != "id"]
     list_display.append("payout_amount")
