@@ -299,7 +299,7 @@ const Lobby = ({ updateMainComponent }) => {
         false
     )
     const { code } = useParams()
-    const [creatorCode, setCreatorCode] = useState(code)
+    const [creatorCode, setCreatorCode] = useState(code ? code : '')
     const [
         insufficientFundsModalVisible,
         setInsufficentFundsModalVisible,

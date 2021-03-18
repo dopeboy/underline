@@ -212,7 +212,9 @@ class CreateSlip(graphene.Mutation):
         u.save()
 
         if not settings.DEBUG:
-            ftp_text = "free to play" if free_to_play else "pay to play"
+            ftp_text = (
+                "free to play" if info.context.user.free_to_play else "pay to play"
+            )
             message = Mail(
                 from_email="support@underlinesports.com",
                 to_emails="support@underlinesports.com",
@@ -222,7 +224,7 @@ class CreateSlip(graphene.Mutation):
             sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
             response = sg.send(message)
 
-        return CreateSlip(success=True, free_to_play=free_to_play)
+        return CreateSlip(success=True, free_to_play=info.context.user.free_to_play)
 
 
 class CreateUser(graphene.Mutation):
@@ -292,7 +294,7 @@ class CreateUser(graphene.Mutation):
             wallet_balance=100 if free_to_play else 0,
         )
 
-        return CreateUser(success=True, free_to_play=False)
+        return CreateUser(success=True, free_to_play=free_to_play)
 
 
 class RecordDeposit(graphene.Mutation):
