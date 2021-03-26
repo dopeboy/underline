@@ -1,5 +1,5 @@
 import { gql, useQuery } from '@apollo/client'
-import { getJWT } from './utils'
+import { isActiveJWT, getJWT } from './utils'
 import {
     createHttpLink,
     ApolloProvider,
@@ -22,12 +22,16 @@ import Completed from 'views/Completed.jsx'
 import Settings from 'views/Settings.jsx'
 import Main from 'components/Main'
 
+// If there isn't a valid token, don't send it. This is because we can have an expired
+// token and send it for a page that doesn't need it but it'll error out.
 const authLink = setContext((_, { headers }) => {
-    const token = getJWT()
-    return {
-        headers: {
-            authorization: token ? `JWT ${token}` : '',
-        },
+    if (isActiveJWT()) {
+        const token = getJWT()
+        return {
+            headers: {
+                authorization: token ? `JWT ${token}` : '',
+            },
+        }
     }
 })
 
@@ -59,7 +63,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
     <Route
         {...rest}
         render={(props) =>
-            getJWT() ? (
+            isActiveJWT() ? (
                 <Main>
                     <Component {...props} />
                 </Main>
@@ -74,7 +78,7 @@ const NonLoggedInRoute = ({ component: Component, ...rest }) => (
     <Route
         {...rest}
         render={(props) =>
-            getJWT() ? <Redirect to="/lobby" /> : <Component {...props} />
+            isActiveJWT() ? <Redirect to="/lobby" /> : <Component {...props} />
         }
     />
 )

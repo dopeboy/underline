@@ -18,7 +18,7 @@ import {
 } from 'semantic-ui-react'
 import logo from 'images/logo.png'
 import logoMobile from 'images/logo_m.png'
-import { getJWT, clearJWT } from 'utils'
+import { isActiveJWT, clearJWT } from 'utils'
 import { useParams, Link, useLocation, useHistory } from 'react-router-dom'
 import './Main.scss'
 
@@ -55,7 +55,7 @@ const Main = (props) => {
                         </Menu.Item>
 
                         <Menu.Menu position="right">
-                            {!getJWT() && (
+                            {!isActiveJWT() && (
                                 <Menu.Item position="right">
                                     <Button
                                         as={Link}
@@ -68,17 +68,17 @@ const Main = (props) => {
                                     </Button>
                                 </Menu.Item>
                             )}
-                            {getJWT() && (
+                            {isActiveJWT() && (
                                 <Menu.Item position="right">
                                     Balance:&nbsp;&nbsp;$
                                     {data && Math.round(data.me.walletBalance)}
                                 </Menu.Item>
                             )}
-                            {getJWT() && (
+                            {isActiveJWT() && (
                                 <Dropdown
                                     item
                                     text={
-                                        getJWT()
+                                        isActiveJWT()
                                             ? data &&
                                               `${data.me.firstName} ${data.me.lastName[0]}.`
                                             : ''
@@ -136,7 +136,7 @@ const Main = (props) => {
                         >
                             Lobby
                         </Menu.Item>
-                        {getJWT() && (
+                        {isActiveJWT() && (
                             <Menu.Item
                                 active={location.pathname === '/active'}
                                 as={Link}
@@ -145,7 +145,7 @@ const Main = (props) => {
                                 Active
                             </Menu.Item>
                         )}
-                        {getJWT() && (
+                        {isActiveJWT() && (
                             <Menu.Item
                                 active={location.pathname === '/completed'}
                                 as={Link}
@@ -156,13 +156,13 @@ const Main = (props) => {
                         )}
 
                         <Menu.Menu position="right">
-                            {getJWT() && (
+                            {isActiveJWT() && (
                                 <Menu.Item position="right">
                                     Balance:&nbsp;&nbsp;$
                                     {data && Math.round(data.me.walletBalance)}
                                 </Menu.Item>
                             )}
-                            {getJWT() && (
+                            {isActiveJWT() && (
                                 <Menu.Item position="right">
                                     <Button
                                         as={Link}
@@ -174,7 +174,7 @@ const Main = (props) => {
                                 </Menu.Item>
                             )}
 
-                            {!getJWT() && (
+                            {!isActiveJWT() && (
                                 <Menu.Item position="right">
                                     <Button
                                         as={Link}
@@ -188,11 +188,11 @@ const Main = (props) => {
                                 </Menu.Item>
                             )}
 
-                            {getJWT() && (
+                            {isActiveJWT() && (
                                 <Dropdown
                                     item
                                     text={
-                                        getJWT() &&
+                                        isActiveJWT() &&
                                         data &&
                                         `${data.me.firstName} ${data.me.lastName[0]}.`
                                     }

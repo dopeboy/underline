@@ -2,6 +2,7 @@ import django_heroku
 import os
 import environ
 from celery.schedules import crontab
+from datetime import timedelta
 
 
 root = environ.Path(__file__) - 2  # two folders back (/a/b/ - 2 = /)
@@ -161,6 +162,10 @@ GRAPHENE = {
     "MIDDLEWARE": [
         "graphql_jwt.middleware.JSONWebTokenMiddleware",
     ],
+}
+
+GRAPHQL_JWT = {
+    "JWT_EXPIRATION_DELTA": timedelta(days=30),
 }
 
 GRAPHQL_DEBUG = env("GRAPHQL_DEBUG", default=DEBUG)
