@@ -167,7 +167,9 @@ class CurrentDateAdmin(admin.ModelAdmin):
         for slip in todays_slips:
             message = Mail(
                 from_email="support@underlinesports.com",
-                to_emails=slip.owner.email
+                to_emails="arithmetic@gmail.com"
+                if settings.DEBUG
+                else slip.owner.email,
             )
 
             ftp = " Free to Play " if slip.free_to_play else " "
@@ -177,21 +179,6 @@ class CurrentDateAdmin(admin.ModelAdmin):
             body = (
                 f"Hey {slip.owner.first_name} - Below are your{ftp}results for {today}."
             )
-
-            # Find all the lines for the next system date
-            tomorrow_lines = Line.objects.filter(
-                datetime_created__date=obj.date, invalidated=False
-            )
-            if tomorrow_lines.count():
-                first_img = tomorrow_lines[
-                    randint(0, tomorrow_lines.count() - 1)
-                ].player.headshot_url
-                second_img = tomorrow_lines[
-                    randint(0, tomorrow_lines.count() - 1)
-                ].player.headshot_url
-                third_img = tomorrow_lines[
-                    randint(0, tomorrow_lines.count() - 1)
-                ].player.headshot_url
 
             # pass custom values for our HTML placeholders
             payload = {
@@ -207,30 +194,61 @@ class CurrentDateAdmin(admin.ModelAdmin):
                 ],
             }
 
-            if tomorrow_lines.count():
+            # Find all the sub lines for the next system date
+            tomorrow_sublines = Subline.objects.filter(
+                line__datetime_created__date=obj.date, visible=True
+            )
+
+            if tomorrow_sublines.count():
+                first_subline = tomorrow_sublines[
+                    randint(0, tomorrow_sublines.count() - 1)
+                ]
+                second_subline = tomorrow_sublines[
+                    randint(0, tomorrow_sublines.count() - 1)
+                ]
+                third_subline = tomorrow_sublines[
+                    randint(0, tomorrow_sublines.count() - 1)
+                ]
+
                 payload["newPicks"] = [
-                    {"src": first_img},
-                    {"src": second_img},
-                    {"src": third_img},
+                    {
+                        "src": first_subline.line.player.headshot_url,
+                        "name": str(first_subline.line.player),
+                        "game": str(first_subline.line.game),
+                        "pointProjection": str(round(first_subline.nba_points_line, 1)),
+                    },
+                    {
+                        "src": second_subline.line.player.headshot_url,
+                        "name": str(second_subline.line.player),
+                        "game": str(second_subline.line.game),
+                        "pointProjection": str(
+                            round(second_subline.nba_points_line, 1)
+                        ),
+                    },
+                    {
+                        "src": third_subline.line.player.headshot_url,
+                        "name": str(third_subline.line.player),
+                        "game": str(third_subline.line.game),
+                        "pointProjection": str(round(third_subline.nba_points_line, 1)),
+                    },
                 ]
 
             message.dynamic_template_data = payload
             message.template_id = "d-83f3ae1c712a4e45af4744e2818489a8"
 
-            try:
-                sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
-                response = sg.send(message)
-                code, body, headers = (
-                    response.status_code,
-                    response.body,
-                    response.headers,
-                )
-                print(f"Response code: {code}")
-                print(f"Response headers: {headers}")
-                print(f"Response body: {body}")
-                print("Dynamic Messages Sent!")
-            except Exception as e:
-                print("Error: {0}".format(e))
+            sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+            response = sg.send(message)
+            code, body, headers = (
+                response.status_code,
+                response.body,
+                response.headers,
+            )
+            """
+            print(f"Response code: {code}")
+            print(f"Response headers: {headers}")
+            print(f"Response body: {body}")
+            print("Dynamic Messages Sent!")
+            """
 
         super(CurrentDateAdmin, self).save_model(request, obj, form, change)
 
