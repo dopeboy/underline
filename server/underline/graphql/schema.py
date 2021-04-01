@@ -24,6 +24,7 @@ from turfpy.measurement import boolean_point_in_polygon
 from geojson import Point, Polygon, Feature
 from django.conf import settings
 from graphql_jwt.utils import jwt_payload
+from sendgrid.helpers.mail import Mail
 
 
 class TeamType(DjangoObjectType):
