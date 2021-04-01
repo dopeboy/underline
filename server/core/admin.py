@@ -196,7 +196,7 @@ class CurrentDateAdmin(admin.ModelAdmin):
 
             # Find all the sub lines for the next system date
             tomorrow_sublines = Subline.objects.filter(
-                line__datetime_created__date=obj.date, visible=True
+                line__game__datetime__date=obj.date, visible=True
             )
 
             if tomorrow_sublines.count():
