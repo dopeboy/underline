@@ -25,6 +25,7 @@ from geojson import Point, Polygon, Feature
 from django.conf import settings
 from graphql_jwt.utils import jwt_payload
 from sendgrid.helpers.mail import Mail
+from sendgrid import SendGridAPIClient
 
 
 class TeamType(DjangoObjectType):
