@@ -1,5 +1,6 @@
 import json
 from django.contrib import admin
+from django.conf import settings
 from django.db import models
 from django.utils.html import format_html
 from django.forms import widgets
@@ -8,6 +9,9 @@ from pygments import highlight
 from pygments.lexers import JsonLexer
 from pygments.formatters import HtmlFormatter
 from django.utils.safestring import mark_safe
+from sendgrid import SendGridAPIClient
+from random import randint
+from sendgrid.helpers.mail import Mail
 
 from import_export.admin import ExportMixin
 
@@ -154,6 +158,82 @@ class CurrentDateAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    # Before saving, for the current date, find all slips created and send emails
+    # In each email, send outcome of the slip and if new lines exist, a preview of those
+    def save_model(self, request, obj, form, change):
+        cd = CurrentDate.objects.first()
+        todays_slips = Slip.objects.filter(datetime_created__date=cd.date)
+
+        for slip in todays_slips:
+            message = Mail(
+                from_email="support@underlinesports.com",
+                to_emails=slip.owner.email
+            )
+
+            ftp = " Free to Play " if slip.free_to_play else " "
+            today = cd.date.strftime("%B %d")
+            tomorrow = obj.date.strftime("%B %d")
+            subject = f"Underline{ftp}Results for {today}"
+            body = (
+                f"Hey {slip.owner.first_name} - Below are your{ftp}results for {today}."
+            )
+
+            # Find all the lines for the next system date
+            tomorrow_lines = Line.objects.filter(
+                datetime_created__date=obj.date, invalidated=False
+            )
+            if tomorrow_lines.count():
+                first_img = tomorrow_lines[
+                    randint(0, tomorrow_lines.count() - 1)
+                ].player.headshot_url
+                second_img = tomorrow_lines[
+                    randint(0, tomorrow_lines.count() - 1)
+                ].player.headshot_url
+                third_img = tomorrow_lines[
+                    randint(0, tomorrow_lines.count() - 1)
+                ].player.headshot_url
+
+            # pass custom values for our HTML placeholders
+            payload = {
+                "subject": subject,
+                "body": body,
+                "tomorrow_date": tomorrow,
+                "slips": [
+                    {
+                        "numPicks": slip.pick_set.count(),
+                        "payoutAmount": f"${slip.payout_amount}",
+                        "outcome": "Won" if slip.won else "Lost",
+                    }
+                ],
+            }
+
+            if tomorrow_lines.count():
+                payload["newPicks"] = [
+                    {"src": first_img},
+                    {"src": second_img},
+                    {"src": third_img},
+                ]
+
+            message.dynamic_template_data = payload
+            message.template_id = "d-83f3ae1c712a4e45af4744e2818489a8"
+
+            try:
+                sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+                response = sg.send(message)
+                code, body, headers = (
+                    response.status_code,
+                    response.body,
+                    response.headers,
+                )
+                print(f"Response code: {code}")
+                print(f"Response headers: {headers}")
+                print(f"Response body: {body}")
+                print("Dynamic Messages Sent!")
+            except Exception as e:
+                print("Error: {0}".format(e))
+
+        super(CurrentDateAdmin, self).save_model(request, obj, form, change)
+
 
 class DepositResource(resources.ModelResource):
     class Meta:
@@ -219,6 +299,7 @@ class PickTabularInline(admin.TabularInline):
 class SlipResource(resources.ModelResource):
     class Meta:
         model = Slip
+
 
 class SlipAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = SlipResource
