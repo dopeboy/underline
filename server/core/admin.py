@@ -162,7 +162,17 @@ class CurrentDateAdmin(admin.ModelAdmin):
     # In each email, send outcome of the slip and if new lines exist, a preview of those
     def save_model(self, request, obj, form, change):
         cd = CurrentDate.objects.first()
-        todays_slips = Slip.objects.filter(datetime_created__date=cd.date)
+        d = cd.date
+
+        # Find all the games for this date. Find all the lines that roll up those
+        # games. Find all the slips attached to those lines.
+        todays_picks = Pick.objects.filter(subline__line__game__datetime__date=d)
+
+        todays_slips = []
+        ## Hacky
+        for pick in todays_picks:
+            if pick.slip not in todays_slips:
+                todays_slips.append(pick.slip)
 
         for slip in todays_slips:
             message = Mail(
