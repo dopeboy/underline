@@ -17,7 +17,7 @@ from import_export.admin import ExportMixin
 
 from import_export import resources
 
-
+from accounts.models import User
 from .models import (
     League,
     Team,
@@ -164,17 +164,38 @@ class CurrentDateAdmin(admin.ModelAdmin):
         cd = CurrentDate.objects.first()
         d = cd.date
 
+        # Hacky - needs revisiting
+
         # Find all the games for this date. Find all the lines that roll up those
         # games. Find all the slips attached to those lines.
         todays_picks = Pick.objects.filter(subline__line__game__datetime__date=d)
 
         todays_slips = []
-        ## Hacky
         for pick in todays_picks:
             if pick.slip not in todays_slips:
                 todays_slips.append(pick.slip)
 
+        users_with_slips_today = {}
         for slip in todays_slips:
+            if slip.owner.id not in users_with_slips_today:
+                users_with_slips_today[slip.owner.id] = []
+            users_with_slips_today[slip.owner.id].append(slip)
+
+        for user_id in users_with_slips_today:
+            u = User.objects.get(id=user_id)
+
+            slips = users_with_slips_today[user_id]
+            slips_sg = []
+
+            for slip in slips:
+                slips_sg.append(
+                    {
+                        "numPicks": slip.pick_set.count(),
+                        "payoutAmount": f"${slip.payout_amount}",
+                        "outcome": "Won" if slip.won else "Lost",
+                    }
+                )
+
             message = Mail(
                 from_email="support@underlinesports.com",
                 to_emails="arithmetic@gmail.com"
@@ -182,26 +203,18 @@ class CurrentDateAdmin(admin.ModelAdmin):
                 else slip.owner.email,
             )
 
-            ftp = " Free to Play " if slip.free_to_play else " "
+            ftp = " Free to Play " if u.free_to_play else " "
             today = cd.date.strftime("%B %d")
             tomorrow = obj.date.strftime("%B %d")
             subject = f"Underline{ftp}Results for {today}"
-            body = (
-                f"Hey {slip.owner.first_name} - Below are your{ftp}results for {today}."
-            )
+            body = f"Hey {u.first_name} - Below are your{ftp}results for {today}."
 
             # pass custom values for our HTML placeholders
             payload = {
                 "subject": subject,
                 "body": body,
                 "tomorrow_date": tomorrow,
-                "slips": [
-                    {
-                        "numPicks": slip.pick_set.count(),
-                        "payoutAmount": f"${slip.payout_amount}",
-                        "outcome": "Won" if slip.won else "Lost",
-                    }
-                ],
+                "slips": slips_sg,
             }
 
             # Find all the sub lines for the next system date
