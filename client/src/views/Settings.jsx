@@ -139,6 +139,7 @@ const Deposit = ({ updateMainComponent }) => {
                                     <Button
                                         active={selectedPaymentAmount === 5}
                                         className="amt-btn"
+                                        type="button"
                                         toggle
                                         basic
                                         fluid
@@ -154,6 +155,7 @@ const Deposit = ({ updateMainComponent }) => {
                                         className="amt-btn"
                                         toggle
                                         basic
+                                        type="button"
                                         fluid
                                         size="large"
                                         onClick={() =>
@@ -168,6 +170,7 @@ const Deposit = ({ updateMainComponent }) => {
                                         toggle
                                         basic
                                         fluid
+                                        type="button"
                                         size="large"
                                         onClick={() =>
                                             setSelectedPaymentAmount(20)
