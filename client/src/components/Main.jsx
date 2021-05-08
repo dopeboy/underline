@@ -75,7 +75,7 @@ const Main = (props) => {
                                     {data && Math.round(data.me.walletBalance)}
                                 </Menu.Item>
                             )}
-                            {isActiveJWT() && (
+                            {isActiveJWT() && data && (
                                 <Dropdown
                                     item
                                     text={
@@ -98,11 +98,18 @@ const Main = (props) => {
                                         >
                                             Complete
                                         </Dropdown.Item>
-                                        <Dropdown.Item as={Link} to="/me">
+                                        <Dropdown.Item
+                                            as={Link}
+                                            to={`/${
+                                                data && data.me.username
+                                                    ? data.me.username
+                                                    : 'lobby'
+                                            }`}
+                                        >
                                             @
                                             {data && data.me.username
                                                 ? data.me.username
-                                                : 'Me'}
+                                                : 'me'}
                                         </Dropdown.Item>
                                         <Dropdown.Item
                                             as={Link}
@@ -161,16 +168,22 @@ const Main = (props) => {
                                 Completed
                             </Menu.Item>
                         )}
-                        {isActiveJWT() && (
+                        {isActiveJWT() && data && (
                             <Menu.Item
-                                active={location.pathname === '/me'}
+                                active={
+                                    location.pathname === `/${data.me.username}`
+                                }
                                 as={Link}
-                                to="/me"
+                                to={`/${
+                                    data && data.me.username
+                                        ? data.me.username
+                                        : 'lobby'
+                                }`}
                             >
                                 @
                                 {data && data.me.username
                                     ? data.me.username
-                                    : 'Me'}
+                                    : 'me'}
                             </Menu.Item>
                         )}
 

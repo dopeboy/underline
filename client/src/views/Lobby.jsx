@@ -87,11 +87,20 @@ const CREATE_SLIP_MUTATION = gql`
     }
 `
 
+const CREATE_CREATOR_SLIP_MUTATION = gql`
+    mutation CreateCreatorSlip($picks: [PickType]!) {
+        createCreatorSlip(picks: $picks) {
+            success
+        }
+    }
+`
+
 const GET_ME_QUERY = gql`
     query {
         me {
             firstName
             lastName
+            username
             walletBalance
         }
     }
@@ -189,7 +198,9 @@ const PlayerList = ({ picks, addOrRemovePick }) => {
     )
 }
 
-const PicksList = ({ picks, addOrRemovePick }) => {
+const PicksList = ({ picks, addOrRemovePick, isSelf }) => {
+    const lol = () => {}
+
     return (
         <>
             <Header as="h2">Slip</Header>
@@ -298,7 +309,11 @@ const Lobby = ({ updateMainComponent }) => {
     const [confirmationModalVisible, setConfirmationModalVisible] = useState(
         false
     )
-    const { code } = useParams()
+    const [
+        creatorSlipCreatedModalVisible,
+        setCreatorSlipCreatedModalVisible,
+    ] = useState(false)
+    const { code, username } = useParams()
     const [creatorCode, setCreatorCode] = useState(code ? code : '')
     const [
         insufficientFundsModalVisible,
@@ -308,6 +323,9 @@ const Lobby = ({ updateMainComponent }) => {
     const client = useApolloClient()
     const history = useHistory()
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 767px)' })
+
+    const { data } = useQuery(GET_ME_QUERY)
+    const isSelf = data && data.me.username === username
 
     const addOrRemovePick = (subline, under) => {
         const pickIndex = picks.findIndex((e) => e.id === subline.id)
@@ -485,6 +503,34 @@ const Lobby = ({ updateMainComponent }) => {
     const submitPicks = async () => {
         setProcessing(true)
 
+        if (!getJWT()) {
+            history.push(`/signup${username ? '?username=' + username : ''}`)
+            return
+        }
+
+        setChecking(true)
+
+        // (1)
+        let teamIds = []
+        for (let i = 0; i < picks.length; i++) {
+            const teamId = picks[i].line.player.team.id
+
+            if (!teamIds.includes(teamId)) {
+                teamIds.push(teamId)
+            }
+        }
+
+        if (teamIds.length < 2) {
+            // Error
+            setErrorModalVisible({
+                open: true,
+                header: 'Two teams must be involved',
+                message: 'You must select picks that span at least two teams.',
+            })
+            setChecking(false)
+            return
+        }
+
         const response = await client.mutate({
             mutation: CREATE_SLIP_MUTATION,
             variables: {
@@ -494,19 +540,28 @@ const Lobby = ({ updateMainComponent }) => {
                         under: e.under,
                     }
                 }),
-                entryAmount: entryAmount,
                 creatorCode: creatorCode,
             },
         })
+    }
 
-        // Redirect
-        if (response.data.createSlip.success) {
-            updateMainComponent()
-            history.push(
-                `/active?success${
-                    response.data.createSlip.freeToPlay ? '&freetoplay' : ''
-                }`
-            )
+    const createCreatorSlip = async () => {
+        setProcessing(true)
+
+        const response = await client.mutate({
+            mutation: CREATE_CREATOR_SLIP_MUTATION,
+            variables: {
+                picks: picks.map((e) => {
+                    return {
+                        id: e.id,
+                        under: e.under,
+                    }
+                }),
+            },
+        })
+
+        if (response.data.createCreatorSlip.success) {
+            setCreatorSlipCreatedModalVisible(true)
         }
     }
 
@@ -547,6 +602,39 @@ const Lobby = ({ updateMainComponent }) => {
             <Helmet>
                 <title>Lobby</title>
             </Helmet>
+            <Modal
+                closeOnEscape={false}
+                closeOnDimmerClick={false}
+                open={creatorSlipCreatedModalVisible}
+                size="small"
+            >
+                <Header>
+                    <Icon name="exclamation circle" />
+                    You created your own slip!
+                </Header>
+                <Modal.Content>
+                    <p>
+                        Congratulations, now share it with the world and earn a
+                        share of their profits.
+                    </p>
+                    <p>
+                        <a
+                            href={`https://www.underlinefantasy.com/${username}`}
+                        >
+                            {`https://www.underlinefantasy.com/${username}`}
+                        </a>
+                    </p>
+                </Modal.Content>
+                <Modal.Actions>
+                    <Button
+                        size="large"
+                        color="green"
+                        onClick={() => (window.location.href = '/')}
+                    >
+                        OK
+                    </Button>
+                </Modal.Actions>
+            </Modal>
             <Modal
                 onClose={() => setErrorModalVisible({ open: false })}
                 open={errorModalVisible.open}
@@ -642,99 +730,141 @@ const Lobby = ({ updateMainComponent }) => {
                             addOrRemovePick={addOrRemovePick}
                         />
                         {isTabletOrMobile && (
-                            <PicksList
-                                picks={picks}
-                                addOrRemovePick={addOrRemovePick}
-                            />
+                            <>
+                                <PicksList
+                                    isSelf={isSelf}
+                                    picks={picks}
+                                    addOrRemovePick={addOrRemovePick}
+                                />
+                                {isSelf && (
+                                    <Button
+                                        disabled={
+                                            picks.length < 2 || processing
+                                        }
+                                        onClick={createCreatorSlip}
+                                        fluid
+                                        loading={processing}
+                                        color="green"
+                                        size="huge"
+                                    >
+                                        Submit
+                                    </Button>
+                                )}
+                            </>
                         )}
                     </Grid.Column>
                     <Grid.Column width={4}>
-                        <Header as="h2">Review picks</Header>
-                        <Progress percent={percent} color="green">
-                            {multiplier}
-                        </Progress>
-                        <Form loading={checking}>
-                            <Form.Group widths="equal">
-                                <Form.Input
-                                    fluid
-                                    icon="dollar"
-                                    iconPosition="left"
-                                    label="Entry amount"
-                                    placeholder="0"
-                                    type="text"
-                                    error={payoutErrorVisible}
-                                    size="huge"
-                                    value={entryAmount}
-                                    onChange={(e) => {
-                                        setPayoutErrorVisible(false)
-                                        const re = /^[0-9\b]+$/
-                                        if (
-                                            re.test(e.target.value) ||
-                                            e.target.value === ''
-                                        ) {
-                                            setEntryAmount(e.target.value)
-                                            setPayout(
-                                                (e.target.value *
-                                                    getMultiplier(
-                                                        picks.length
-                                                    ): '')
-                                            )
+                        {!isSelf && (
+                            <>
+                                <Header as="h2">Review picks</Header>
+                                <Progress percent={percent} color="green">
+                                    {multiplier}
+                                </Progress>
+                                <Form loading={checking}>
+                                    <Form.Group widths="equal">
+                                        <Form.Input
+                                            fluid
+                                            icon="dollar"
+                                            iconPosition="left"
+                                            label="Entry amount"
+                                            placeholder="0"
+                                            type="text"
+                                            error={payoutErrorVisible}
+                                            size="huge"
+                                            value={entryAmount}
+                                            onChange={(e) => {
+                                                setPayoutErrorVisible(false)
+                                                const re = /^[0-9\b]+$/
+                                                if (
+                                                    re.test(e.target.value) ||
+                                                    e.target.value === ''
+                                                ) {
+                                                    setEntryAmount(
+                                                        e.target.value
+                                                    )
+                                                    setPayout(
+                                                        (e.target.value *
+                                                            getMultiplier(
+                                                                picks.length
+                                                            ): '')
+                                                    )
+                                                }
+                                            }}
+                                        />
+                                        <Form.Input
+                                            fluid
+                                            icon="dollar"
+                                            iconPosition="left"
+                                            className="payout-box"
+                                            label="Payout"
+                                            placeholder="0"
+                                            value={payout}
+                                            size="huge"
+                                        />
+                                    </Form.Group>
+                                    <Form.Field
+                                        fluid
+                                        placeholder="Creator code (optional)"
+                                        onChange={(e) =>
+                                            setCreatorCode(e.target.value)
                                         }
-                                    }}
-                                />
-                                <Form.Input
-                                    fluid
-                                    icon="dollar"
-                                    iconPosition="left"
-                                    className="payout-box"
-                                    label="Payout"
-                                    placeholder="0"
-                                    value={payout}
-                                    size="huge"
-                                />
-                            </Form.Group>
-                            <Form.Field
-                                fluid
-                                placeholder="Creator code (optional)"
-                                onChange={(e) => setCreatorCode(e.target.value)}
-                            >
-                                <label>
-                                    Creator code
-                                    <Popup
-                                        trigger={
-                                            <Icon
-                                                className="creator-code"
-                                                circular
-                                                name="question"
+                                    >
+                                        <label>
+                                            Creator code
+                                            <Popup
+                                                trigger={
+                                                    <Icon
+                                                        className="creator-code"
+                                                        circular
+                                                        name="question"
+                                                    />
+                                                }
+                                                content="Support your favorite sports content creator. Underline bonuses creators anytime a user wins."
+                                                on="click"
+                                                position="right center"
                                             />
-                                        }
-                                        content="Support your favorite sports content creator. Underline bonuses creators anytime a user wins."
-                                        on="click"
-                                        position="right center"
-                                    />
-                                </label>
-                                <input
-                                    className="creator-code-input"
-                                    placeholder="Creator code (optional)"
-                                    value={creatorCode}
-                                />
-                            </Form.Field>
-                            <Form.Button
-                                disabled={picks.length < 2}
-                                onClick={checkPicks}
-                                fluid
-                                color="green"
-                                size="huge"
-                            >
-                                Submit
-                            </Form.Button>
-                            <div ref={slipButtonRef} />
-                        </Form>
+                                        </label>
+                                        <input
+                                            className="creator-code-input"
+                                            placeholder="Creator code (optional)"
+                                            value={creatorCode}
+                                        />
+                                    </Form.Field>
+                                    <Form.Button
+                                        disabled={picks.length < 2}
+                                        onClick={checkPicks}
+                                        fluid
+                                        color="green"
+                                        size="huge"
+                                    >
+                                        Submit
+                                    </Form.Button>
+                                    <div ref={slipButtonRef} />
+                                </Form>
+                            </>
+                        )}
                         {!isTabletOrMobile && (
-                            <PicksList
-                                picks={picks}
-                                addOrRemovePick={addOrRemovePick}
-                            />
+                            <>
+                                <PicksList
+                                    picks={picks}
+                                    isSelf={isSelf}
+                                    addOrRemovePick={addOrRemovePick}
+                                />
+                                {isSelf && (
+                                    <Button
+                                        disabled={
+                                            picks.length < 2 || processing
+                                        }
+                                        onClick={createCreatorSlip}
+                                        fluid
+                                        loading={processing}
+                                        color="green"
+                                        size="huge"
+                                    >
+                                        Submit
+                                    </Button>
+                                )}
+                            </>
                         )}
                     </Grid.Column>
                 </Grid.Row>

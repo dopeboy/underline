@@ -226,6 +226,33 @@ class CreateSlip(graphene.Mutation):
         return CreateSlip(success=True, free_to_play=info.context.user.free_to_play)
 
 
+class CreateCreatorSlip(graphene.Mutation):
+    class Arguments:
+        picks = graphene.List(PickType, required=True)
+
+    # The class attributes define the response of the mutation
+    success = graphene.Boolean()
+
+    @classmethod
+    def mutate(cls, root, info, picks):
+        # Create the slip
+        slip = Slip.objects.create(
+            owner=info.context.user,
+            entry_amount=0,
+            creator_slip=True,
+        )
+
+        u = info.context.user
+        u.current_creator_slip = slip
+        u.save()
+
+        for p in picks:
+            subline = Subline.objects.get(id=int(p["id"]))
+            Pick.objects.create(subline=subline, slip=slip, under_nba_points=p["under"])
+
+        return CreateCreatorSlip(success=True)
+
+
 class CreateUser(graphene.Mutation):
     class Arguments:
         first_name = graphene.String(required=True)
@@ -326,5 +353,6 @@ class RecordDeposit(graphene.Mutation):
 
 class Mutation(graphene.ObjectType):
     create_slip = CreateSlip.Field()
+    create_creator_slip = CreateCreatorSlip.Field()
     create_user = CreateUser.Field()
     record_deposit = RecordDeposit.Field()

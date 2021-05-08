@@ -124,6 +124,7 @@ class Slip(models.Model):
     datetime_created = models.DateTimeField(auto_now_add=True)
     free_to_play = models.BooleanField(default=False)
     creator_code = models.CharField(max_length=128, blank=True, null=True)
+    creator_slip = models.BooleanField(default=False)
 
     # For every attached pick, find every attached subline.
     # For every attached line, see if actual points filled out.

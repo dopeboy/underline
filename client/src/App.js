@@ -42,7 +42,7 @@ const httpLink = createHttpLink({
             : 'http://localhost:5000/graphql/',
 })
 
-const defaultOptions: DefaultOptions = {
+const defaultOptions = {
     watchQuery: {
         fetchPolicy: 'no-cache',
         errorPolicy: 'ignore',
@@ -104,24 +104,12 @@ function App() {
                     />
                 )}
                 <Switch>
-                    <Route
-                        path="/lobby/:code?"
-                        render={(props) => (
-                            <Main>
-                                <Lobby />
-                            </Main>
-                        )}
-                    />
                     <PrivateRoute
                         path="/active"
                         component={Active}
                     ></PrivateRoute>
                     <PrivateRoute
                         path="/completed"
-                        component={Completed}
-                    ></PrivateRoute>
-                    <PrivateRoute
-                        path="/me"
                         component={Completed}
                     ></PrivateRoute>
                     <PrivateRoute
@@ -136,6 +124,14 @@ function App() {
                         path="/login"
                         component={Login}
                     ></NonLoggedInRoute>
+                    <Route
+                        path="/:username?"
+                        render={(props) => (
+                            <Main>
+                                <Lobby />
+                            </Main>
+                        )}
+                    />
                     <Route
                         path="/"
                         render={(props) => (
