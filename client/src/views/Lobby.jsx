@@ -325,7 +325,7 @@ const Lobby = ({ updateMainComponent }) => {
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 767px)' })
 
     const { data } = useQuery(GET_ME_QUERY)
-    const isSelf = data && data.me.username === username
+    const isSelf = data && data.me && data.me.username === username
 
     const addOrRemovePick = (subline, under) => {
         const pickIndex = picks.findIndex((e) => e.id === subline.id)

@@ -125,7 +125,7 @@ function App() {
                         component={Login}
                     ></NonLoggedInRoute>
                     <Route
-                        path="/:username?"
+                        path="/:username"
                         render={(props) => (
                             <Main>
                                 <Lobby />
