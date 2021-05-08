@@ -230,6 +230,7 @@ class CreateUser(graphene.Mutation):
     class Arguments:
         first_name = graphene.String(required=True)
         last_name = graphene.String(required=True)
+        username = graphene.String(required=True)
         phone_number = graphene.String(required=True)
         birth_date = graphene.Date(required=True)
         email_address = graphene.String(required=True)
@@ -246,6 +247,7 @@ class CreateUser(graphene.Mutation):
         info,
         first_name,
         last_name,
+        username,
         phone_number,
         birth_date,
         email_address,
@@ -285,6 +287,7 @@ class CreateUser(graphene.Mutation):
         user = User.objects.create_user(
             email=email_address.lower(),
             password=password,
+            username=username,
             first_name=first_name,
             last_name=last_name,
             phone_number=phone_number,

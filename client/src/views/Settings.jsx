@@ -31,6 +31,7 @@ const GET_ME_QUERY = gql`
         me {
             firstName
             lastName
+            username
             email
             dateJoined
             freeToPlay
@@ -67,6 +68,10 @@ const Account = () => {
                         <List.Content>
                             {data.me.firstName} {data.me.lastName}
                         </List.Content>
+                    </List.Item>
+                    <List.Item>
+                        <List.Icon name="info circle" />
+                        <List.Content>@{data.me.username}</List.Content>
                     </List.Item>
                     <List.Item>
                         <List.Icon name="mail" />

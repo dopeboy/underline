@@ -27,6 +27,7 @@ const CREATE_ACCOUNT_MUTATION = gql`
         $emailAddress: String!
         $password: String!
         $birthDate: Date!
+        $username: String!
     ) {
         createUser(
             firstName: $firstName
@@ -35,6 +36,7 @@ const CREATE_ACCOUNT_MUTATION = gql`
             emailAddress: $emailAddress
             password: $password
             birthDate: $birthDate
+            username: $username
         ) {
             success
             freeToPlay
@@ -59,6 +61,7 @@ const Signup = () => {
     const [phoneNumber, setPhoneNumber] = useState('')
     const [emailAddress, setEmailAddress] = useState('')
     const [password, setPassword] = useState('')
+    const [username, setUsername] = useState('')
     const [birthDate, setBirthDate] = useState(null)
 
     const [error, setError] = useState(false)
@@ -104,6 +107,7 @@ const Signup = () => {
             variables: {
                 emailAddress,
                 password,
+                username,
                 birthDate: moment(birthDate).format('YYYY-MM-DD'),
                 phoneNumber,
                 firstName,
@@ -234,6 +238,18 @@ const Signup = () => {
                                     required
                                     onChange={(e) =>
                                         setLastName(e.target.value)
+                                    }
+                                />
+                            </Form.Field>
+                            <Form.Field required>
+                                <label>Username</label>
+                                <input
+                                    type="text"
+                                    size="large"
+                                    placeholder="Username"
+                                    required
+                                    onChange={(e) =>
+                                        setUsername(e.target.value)
                                     }
                                 />
                             </Form.Field>

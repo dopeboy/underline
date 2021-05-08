@@ -27,6 +27,7 @@ const GET_ME_QUERY = gql`
         me {
             firstName
             lastName
+            username
             walletBalance
         }
     }
@@ -97,6 +98,12 @@ const Main = (props) => {
                                         >
                                             Complete
                                         </Dropdown.Item>
+                                        <Dropdown.Item as={Link} to="/me">
+                                            @
+                                            {data && data.me.username
+                                                ? data.me.username
+                                                : 'Me'}
+                                        </Dropdown.Item>
                                         <Dropdown.Item
                                             as={Link}
                                             to="/settings/deposit"
@@ -152,6 +159,18 @@ const Main = (props) => {
                                 to="/completed"
                             >
                                 Completed
+                            </Menu.Item>
+                        )}
+                        {isActiveJWT() && (
+                            <Menu.Item
+                                active={location.pathname === '/me'}
+                                as={Link}
+                                to="/me"
+                            >
+                                @
+                                {data && data.me.username
+                                    ? data.me.username
+                                    : 'Me'}
                             </Menu.Item>
                         )}
 

@@ -7,7 +7,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
 
-
 class UserManager(BaseUserManager):
 
     use_in_migrations = True
@@ -63,16 +62,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
 
     phone_number = models.CharField(
-        _("phone number"),
-        max_length=32,
-        blank=True,
-        null=True
+        _("phone number"), max_length=32, blank=True, null=True
     )
 
-    birth_date = models.DateField(
-        blank=True,
-        null=True
-    )
+    birth_date = models.DateField(blank=True, null=True)
 
     is_staff = models.BooleanField(
         _("staff status"),
@@ -95,6 +88,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     wallet_balance = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     free_to_play = models.BooleanField(default=False)
+    username = models.CharField(max_length=32, blank=True, null=True, unique=True)
 
     # Add additional fields here if needed
     objects = UserManager()

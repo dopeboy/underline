@@ -122,3 +122,10 @@ ls
 pwd
 cd ..
 ls
+history
+ls
+history
+python manage.py makemigrations
+python manage.py migrate
+python manage.py makemigrations
+python manage.py migrate

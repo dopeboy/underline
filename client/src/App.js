@@ -121,6 +121,10 @@ function App() {
                         component={Completed}
                     ></PrivateRoute>
                     <PrivateRoute
+                        path="/me"
+                        component={Completed}
+                    ></PrivateRoute>
+                    <PrivateRoute
                         path="/settings/:section?"
                         component={Settings}
                     ></PrivateRoute>
