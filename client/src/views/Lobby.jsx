@@ -541,8 +541,19 @@ const Lobby = ({ updateMainComponent }) => {
                     }
                 }),
                 creatorCode: creatorCode,
+                entryAmount: entryAmount,
             },
         })
+
+        // Redirect
+        if (response.data.createSlip.success) {
+            updateMainComponent()
+            history.push(
+                `/active?success${
+                    response.data.createSlip.freeToPlay ? '&freetoplay' : ''
+                }`
+            )
+        }
     }
 
     const createCreatorSlip = async () => {
