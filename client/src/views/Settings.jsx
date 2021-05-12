@@ -183,6 +183,20 @@ const Deposit = ({ updateMainComponent }) => {
                                     >
                                         $20
                                     </Button>
+                                    <Button
+                                        active={selectedPaymentAmount === 50}
+                                        className="amt-btn"
+                                        toggle
+                                        basic
+                                        fluid
+                                        type="button"
+                                        size="large"
+                                        onClick={() =>
+                                            setSelectedPaymentAmount(50)
+                                        }
+                                    >
+                                        $50
+                                    </Button>
                                 </Form>
                                 <Divider />
                                 <PayPalButton
