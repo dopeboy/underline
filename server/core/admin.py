@@ -65,15 +65,6 @@ class PlayerAdmin(admin.ModelAdmin):
             '<img src="{0}" style="max-width: 200px" />'.format(obj.headshot_url)
         )
 
-    def has_add_permission(self, request, obj=None):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
 
 class SublineAdmin(admin.TabularInline):
     model = Subline
