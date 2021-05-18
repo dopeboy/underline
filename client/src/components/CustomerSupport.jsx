@@ -5,8 +5,8 @@ const CustomerSupport = (props) => {
         <>
             <Header as="h2">Customer Support</Header>
             Email{' '}
-            <a href="mailto: support@underlinefantasy.com">
-                support@underlinefantasy.com
+            <a href="mailto: support@underlinesports.com">
+                support@underlinesports.com
             </a>{' '}
             to submit a support request. We will process your request within 48
             hours.

@@ -12,8 +12,8 @@ const ResponsibleGaming = (props) => {
             </p>
             <p>
                 You can email us at{' '}
-                <a href="mailto: support@underlinefantasy.com">
-                    support@underlinefantasy.com
+                <a href="mailto: support@underlinesports.com">
+                    support@underlinesports.com
                 </a>{' '}
                 to set restrictions on deposits, entry fees, and game entry
                 amounts.
@@ -21,13 +21,13 @@ const ResponsibleGaming = (props) => {
             <p>
                 You can also self-exclude if you feel you should not be playing
                 at all by emailing{' '}
-                <a href="mailto: support@underlinefantasy.com">
-                    support@underlinefantasy.com
+                <a href="mailto: support@underlinesports.com">
+                    support@underlinesports.com
                 </a>
                 . If there are any concerns or questions about your playing
                 habits or how restrictions work you can email us at{' '}
-                <a href="mailto: support@underlinefantasy.com">
-                    support@underlinefantasy.com
+                <a href="mailto: support@underlinesports.com">
+                    support@underlinesports.com
                 </a>{' '}
                 as well.
             </p>
