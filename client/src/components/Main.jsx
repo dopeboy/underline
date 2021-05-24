@@ -98,6 +98,7 @@ const Main = (props) => {
                                         >
                                             Complete
                                         </Dropdown.Item>
+                                        {/*
                                         <Dropdown.Item
                                             as={Link}
                                             to={`/${
@@ -111,6 +112,7 @@ const Main = (props) => {
                                                 ? data.me.username
                                                 : 'me'}
                                         </Dropdown.Item>
+                                        */}
                                         <Dropdown.Item
                                             as={Link}
                                             to="/settings/deposit"
@@ -168,7 +170,7 @@ const Main = (props) => {
                                 Completed
                             </Menu.Item>
                         )}
-                        {isActiveJWT() && data && (
+                        {/* isActiveJWT() && data && (
                             <Menu.Item
                                 active={
                                     location.pathname === `/${data.me.username}`
@@ -185,7 +187,7 @@ const Main = (props) => {
                                     ? data.me.username
                                     : 'me'}
                             </Menu.Item>
-                        )}
+                        )*/}
 
                         <Menu.Menu position="right">
                             {isActiveJWT() && (
