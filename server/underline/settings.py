@@ -213,6 +213,6 @@ CELERY_BEAT_SCHEDULE = {
     },
     "update_player_scores": {
         "task": "core.tasks.update_player_scores",
-        "schedule": crontab(),
+        "schedule": crontab(minute=0),
     },
 }
