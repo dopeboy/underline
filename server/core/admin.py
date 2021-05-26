@@ -336,12 +336,14 @@ class SlipResource(resources.ModelResource):
 class SlipAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = SlipResource
     list_per_page = 20
-    list_display = [field.name for field in Slip._meta.fields if field.name != "id"]
+    list_display = [field.name for field in Slip._meta.fields]
     list_display.append("payout_amount")
     list_display.append("won")
     list_display.append("complete")
     list_display.append("invalidated")
     list_display.append("status")
+    list_display.append("num_picks_total")
+    list_display.append("num_picks_won")
     inlines = [
         PickTabularInline,
     ]
@@ -357,6 +359,19 @@ class SlipAdmin(ExportMixin, admin.ModelAdmin):
                 return "Won"
             else:
                 return "Lost"
+
+    def num_picks_total(self, obj):
+        return obj.pick_set.count()
+
+    def num_picks_won(self, obj):
+        picks = obj.pick_set.all()
+        cnt = 0
+
+        for pick in picks:
+            if pick.won:
+                cnt = cnt + 1
+
+        return cnt
 
 
 class FreeToPlaySlipsAdmin(SlipAdmin):

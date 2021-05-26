@@ -182,6 +182,7 @@ AIRTABLE_API_KEY = "keySnrFwxbtOCs96y"
 SENDGRID_API_KEY = (
     "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"
 )
+FANTASY_DATA_API_KEY = "5027edf53fce4983bc2db1733e760b9a"
 
 # Environmental
 if DEBUG:
@@ -209,5 +210,9 @@ CELERY_BEAT_SCHEDULE = {
     "top_off_free_to_play_user_balances": {
         "task": "core.tasks.top_off_free_to_play_user_balances",
         "schedule": crontab(minute=0, hour=0),
+    },
+    "update_player_scores": {
+        "task": "core.tasks.update_player_scores",
+        "schedule": crontab(),
     },
 }

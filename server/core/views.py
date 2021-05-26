@@ -1,5 +1,6 @@
 import datetime
-from pytz import timezone
+import urllib.parse
+from pytz import timezone, utc
 import requests
 import urllib
 
@@ -11,12 +12,157 @@ from django.urls import reverse
 from django.shortcuts import render
 from django.views import View
 
-from .models import League, Team, Position, Player, CurrentDate, Line, Game
+from .models import League, Team, Position, Player, CurrentDate, Line, Game, Subline
 
 
 class SuperuserRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.is_superuser
+
+
+class RunWholeShebang(SuperuserRequiredMixin, View):
+    def sync_games_for_date(self, cd):
+        headers = {"Authorization": f"Bearer {settings.AIRTABLE_API_KEY}"}
+        nba = League.objects.get(acronym="NBA")
+
+        offset = None
+        all_records_synced = False
+        airtable_date_filter = f'SEARCH("{cd.date.strftime("%Y-%m-%d")}",{{Date}})'
+        quoted_airtable_date_filter = urllib.parse.quote_plus(airtable_date_filter)
+
+        while all_records_synced == False:
+            r = requests.get(
+                f"https://api.airtable.com/v0/appsIaaLtmzxMRopo/Week%201%20Games%20(12%2F22-28)?view=Grid%20view&filterByFormula={quoted_airtable_date_filter}"
+                + (f"&offset={offset}" if offset else ""),
+                headers=headers,
+            )
+            data = r.json()
+
+            for record in data["records"]:
+                home_team = Team.objects.get(
+                    abbreviation=record["fields"]["Home Team"].strip(), league=nba
+                )
+                away_team = Team.objects.get(
+                    abbreviation=record["fields"]["Away Team"].strip(), league=nba
+                )
+                gt = record["fields"]["Time"].rstrip(" EST").rstrip(" PST")
+                date_time_obj = datetime.datetime.strptime(
+                    f'{record["fields"]["Date"]} {gt}',
+                    "%Y-%m-%d %I:%M %p",
+                )
+
+                if "EST" in record["fields"]["Time"]:
+                    localtz = timezone("America/New_York")
+                    date_time_obj = localtz.localize(date_time_obj)
+                elif "PST" in record["fields"]["Time"]:
+                    localtz = timezone("America/Los_Angeles")
+                    date_time_obj = localtz.localize(date_time_obj)
+
+                game, created = Game.objects.update_or_create(
+                    league=nba,
+                    home_team=home_team,
+                    away_team=away_team,
+                    datetime=date_time_obj,
+                )
+
+            if "offset" in data:
+                offset = data["offset"]
+            else:
+                all_records_synced = True
+
+    def sync_lines_for_date(self, cd):
+        headers = {"Authorization": f"Bearer {settings.AIRTABLE_API_KEY}"}
+        nba = League.objects.get(acronym="NBA")
+
+        offset = None
+        all_records_synced = False
+        airtable_date_filter = f'SEARCH("{cd.date.strftime("%Y-%m-%d")}",{{Date}})'
+        quoted_airtable_date_filter = urllib.parse.quote_plus(airtable_date_filter)
+
+        while all_records_synced == False:
+            r = requests.get(
+                f"https://api.airtable.com/v0/appugpzfLrIqV0Qfd/master?view=Grid%20view&filterByFormula={quoted_airtable_date_filter}"
+                + (f"&offset={offset}" if offset else ""),
+                headers=headers,
+            )
+            data = r.json()
+
+            todays_games = []
+            for game in Game.objects.all():
+                if game.pst_gametime.date() == cd.date:
+                    todays_games.append(game)
+
+            if not todays_games:
+                print("No games today")
+                return
+
+            # Lookup player. Check if player is playing in a game today. If not, skip.
+            for record in data["records"]:
+                try:
+                    player = Player.objects.get(
+                        name=record["fields"]["Player name"].strip()
+                    )
+
+                    todays_game = None
+                    for game in todays_games:
+                        if (
+                            player.team == game.home_team
+                            or player.team == game.away_team
+                        ):
+                            todays_game = game
+                            break
+
+                    if not todays_game:
+                        raise Exception()
+
+                    # OK, all good. Create line and subline.
+                    line, created = Line.objects.update_or_create(
+                        player=player,
+                        game=todays_game,
+                    )
+
+                    subline, created = Subline.objects.update_or_create(
+                        line=line,
+                        defaults={
+                            "nba_points_line": record["fields"]["Projected points"],
+                            "visible": True,
+                        },
+                    )
+
+                except Exception as e:
+                    print(e)
+                    print(
+                        f'This player either does not exist or is not playing today: {record["fields"]["Player name"]}'
+                    )
+
+            if "offset" in data:
+                offset = data["offset"]
+            else:
+                all_records_synced = True
+
+    # 1) Change system date to current date
+    # 2) Sync games from airtable for current date
+    # 3) Sync lines from airtable for current date
+    def get(self, request, format=None):
+        # (1)
+        cd = CurrentDate.objects.first()
+        cd.date = datetime.datetime.now(timezone("US/Pacific")).date()
+        cd.save()
+
+        """
+        from datetime import timedelta
+        cd.date = datetime.datetime.now(timezone("US/Pacific")).date() - timedelta(
+            days=1
+        )
+        """
+
+        # (2)
+        self.sync_games_for_date(cd)
+
+        # (3)
+        self.sync_lines_for_date(cd)
+
+        return HttpResponseRedirect(reverse("admin:index"))
 
 
 class SyncPlayers(SuperuserRequiredMixin, View):
