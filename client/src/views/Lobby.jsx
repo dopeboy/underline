@@ -418,7 +418,7 @@ const Lobby = ({ updateMainComponent }) => {
     }
 
     // (1) Check if they entered a payout amount
-    // (2) Check if entry amount is <= $30
+    // (2) Check if entry amount is <= $50
     // (3) Check that there are atleast two teams involved
     // (4) Check the location of the user
     // (5) Check if user has linked a payment method
@@ -440,12 +440,12 @@ const Lobby = ({ updateMainComponent }) => {
             return
         }
 
-        if (entryAmount > 30) {
+        if (entryAmount > 50) {
             setPayoutErrorVisible(true)
             setErrorModalVisible({
                 open: true,
-                header: 'Max $30 entry',
-                message: 'We only allow a maximum of $30 for entry',
+                header: 'Max $50 entry',
+                message: 'We only allow a maximum of $50 for entry',
             })
             setChecking(false)
             return
