@@ -227,7 +227,7 @@ const Deposit = ({ updateMainComponent }) => {
                                             'development'
                                                 ? 'AX5eD1ofG_dHeCpSVDbmlvoc9ghz53qS8eAwseFFNWOQxtGIb_H6ZD_uiOGrCSlCZRnwb41cjDPnIwo1'
                                                 : 'Ad0GFGEqk719MEe6gKNnkiEwmapRr7tKRhgiCV56dQeX60G8_YD7pZ7oKvCRUW8a8ZIoweg6sFo8WzkN',
-                                        disableFunding: 'credit',
+                                        disableFunding: ['card', 'credit'],
                                     }}
                                     onSuccess={(details, data) => {
                                         recordDeposit({
