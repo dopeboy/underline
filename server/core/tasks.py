@@ -42,7 +42,7 @@ def top_off_free_to_play_user_balances():
     User.objects.filter(free_to_play=True).update(wallet_balance=100)
 
 
-# Every hour, get the scores for players today. Save them to db
+# At 330AM PST, get the players' scores and save them.
 @shared_task
 def update_player_scores():
     headers = {"Ocp-Apim-Subscription-Key": f"{settings.FANTASY_DATA_API_KEY}"}
