@@ -25,6 +25,14 @@ class League(models.Model):
         return self.acronym
 
 
+class LeagueLineType(models.Model):
+    league = models.ForeignKey(League, on_delete=models.CASCADE)
+    line_type = models.CharField(max_length=128)
+
+    def __str__(self):
+        return f"{self.league.acronym} - {self.line_type}"
+
+
 class Team(models.Model):
     name = models.CharField(max_length=128)
     abbreviation = models.CharField(max_length=128)
@@ -85,9 +93,9 @@ class Deposit(models.Model):
 class Line(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    line_type = models.ForeignKey(LeagueLineType, on_delete=models.CASCADE, default=1)
 
-    # NBA specific
-    nba_points_actual = models.DecimalField(
+    actual_value = models.DecimalField(
         max_digits=5, decimal_places=2, blank=True, null=True
     )
     datetime_created = models.DateTimeField(auto_now_add=True)
@@ -105,9 +113,7 @@ class Line(models.Model):
 
 class Subline(models.Model):
     line = models.ForeignKey(Line, on_delete=models.CASCADE)
-
-    # NBA specific
-    nba_points_line = models.DecimalField(
+    projected_value = models.DecimalField(
         max_digits=5, decimal_places=2, blank=True, null=True
     )
 
@@ -200,7 +206,7 @@ class Pick(models.Model):
     slip = models.ForeignKey(Slip, on_delete=models.CASCADE)
 
     # NBA specific
-    under_nba_points = models.BooleanField(null=True)
+    under = models.BooleanField(null=True)
 
     datetime_created = models.DateTimeField(auto_now_add=True)
 

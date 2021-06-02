@@ -32,6 +32,7 @@ from .models import (
     PaidSlip,
     Pick,
     Deposit,
+    LeagueLineType,
 )
 
 
@@ -96,7 +97,7 @@ class LineAdmin(ExportMixin, admin.ModelAdmin):
     list_display.append("gametime")
     list_display.append("has_subline_visible")
     list_editable = (
-        "nba_points_actual",
+        "actual_value",
         "invalidated",
     )
     inlines = [
@@ -389,6 +390,18 @@ class PickAdmin(admin.ModelAdmin):
         return False
 
 
+class LeagueLineTypeAdmin(admin.ModelAdmin):
+    list_display = [
+        field.name for field in LeagueLineType._meta.fields if field.name != "id"
+    ]
+
+    class Meta:
+        model = LeagueLineType
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
 admin.site.register(Team, TeamAdmin)
 
 # Register your models here.
@@ -403,3 +416,4 @@ admin.site.register(CurrentDate, CurrentDateAdmin)
 admin.site.register(Player, PlayerAdmin)
 admin.site.register(Game, GameAdmin)
 admin.site.register(Deposit, DepositAdmin)
+admin.site.register(LeagueLineType, LeagueLineTypeAdmin)

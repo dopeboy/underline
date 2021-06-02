@@ -1,0 +1,26 @@
+[
+    {
+        "model": "core.leaguelinetype",
+        "pk": 1,
+        "fields": {
+            "line_type": "points",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.leaguelinetype",
+        "pk": 2,
+        "fields": {
+            "line_type": "rebounds",
+            "league": 2
+        }
+    },
+    {
+        "model": "core.leaguelinetype",
+        "pk": 3,
+        "fields": {
+            "line_type": "assists",
+            "league": 2
+        }
+    }
+]
