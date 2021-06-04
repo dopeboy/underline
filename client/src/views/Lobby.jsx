@@ -119,7 +119,7 @@ const PlayerList = ({ picks, addOrRemovePick }) => {
     const { data } = useQuery(GET_TODAYS_SUBLINES_AND_LINE_CATEGORIES_QUERY)
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 767px)' })
 
-    const panes1 =
+    const panes =
         data &&
         data.lineCategories.map((lineCategory) => {
             return {
@@ -244,7 +244,7 @@ const PlayerList = ({ picks, addOrRemovePick }) => {
             {data && data.todaysSublines.length === 0 && (
                 <p>There are no more games today.</p>
             )}
-            <Tab panes={panes1} renderActiveOnly={false} />
+            <Tab panes={panes} renderActiveOnly={false} />
         </Form>
     )
 }

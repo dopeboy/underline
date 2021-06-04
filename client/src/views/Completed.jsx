@@ -41,6 +41,10 @@ const GET_INACTIVE_SLIPS_QUERY = gql`
                     line {
                         actualValue
                         id
+                        category {
+                            id
+                            category
+                        }
                         invalidated
                         player {
                             name
