@@ -16,6 +16,8 @@ from core.models import (
     Slip,
     Pick,
     Deposit,
+    LineCategory,
+    League,
 )
 from accounts.models import User
 from graphql_jwt.decorators import login_required
@@ -54,9 +56,22 @@ class PlayerType(DjangoObjectType):
         model = Player
 
 
+class LeagueType(DjangoObjectType):
+    class Meta:
+        model = League
+
+
+class LineCategoryType(DjangoObjectType):
+    league = graphene.Field(LeagueType)
+
+    class Meta:
+        model = LineCategory
+
+
 class LineType(DjangoObjectType):
     player = graphene.Field(PlayerType)
     game = graphene.Field(GameType)
+    category = graphene.Field(LineCategoryType)
 
     class Meta:
         model = Line
@@ -108,6 +123,9 @@ class MySlipType(DjangoObjectType):
 
 class Query(graphene.ObjectType):
     todays_sublines = graphene.List(SublineType)
+    line_categories = graphene.Field(
+        graphene.List(LineCategoryType), league=graphene.String(required=True)
+    )
     me = graphene.Field(UserType)
     active_slips = graphene.List(MySlipType)
     complete_slips = graphene.List(MySlipType)
@@ -150,6 +168,12 @@ class Query(graphene.ObjectType):
     @login_required
     def resolve_me(self, info, **kawargs):
         return info.context.user
+
+    def resolve_line_categories(self, info, **kwargs):
+        name = kwargs.get("league")
+        return LineCategory.objects.filter(league__acronym=name).order_by(
+            "display_order"
+        )
 
     @login_required
     def resolve_active_slips(self, info, **kawargs):
@@ -203,7 +227,7 @@ class CreateSlip(graphene.Mutation):
 
         for p in picks:
             subline = Subline.objects.get(id=int(p["id"]))
-            Pick.objects.create(subline=subline, slip=slip, under_nba_points=p["under"])
+            Pick.objects.create(subline=subline, slip=slip, under=p["under"])
 
         u = info.context.user
         previous_wallet_balance = u.wallet_balance
@@ -248,7 +272,7 @@ class CreateCreatorSlip(graphene.Mutation):
 
         for p in picks:
             subline = Subline.objects.get(id=int(p["id"]))
-            Pick.objects.create(subline=subline, slip=slip, under_nba_points=p["under"])
+            Pick.objects.create(subline=subline, slip=slip, under=p["under"])
 
         return CreateCreatorSlip(success=True)
 
