@@ -42,7 +42,8 @@ def top_off_free_to_play_user_balances():
     User.objects.filter(free_to_play=True).update(wallet_balance=100)
 
 
-# At 330AM PST, get the players' scores and save them.
+# every hour, get the players' scores and save them.
+# TODO - just run once
 @shared_task
 def update_player_scores():
     headers = {"Ocp-Apim-Subscription-Key": f"{settings.FANTASY_DATA_API_KEY}"}
@@ -75,9 +76,20 @@ def update_player_scores():
             if not todays_game:
                 raise Exception()
 
-            l = Line.objects.get(player=player, game=game)
-            l.nba_points_actual = record["Points"]
-            l.save()
+            lines = Line.objects.filter(player=player, game=game)
+            for line in lines:
+                if line.category.category == "Points":
+                    line.actual_value = record["Points"]
+                    line.save()
+                elif line.category.category == "Rebounds":
+                    line.actual_value = record["Rebounds"]
+                    line.save()
+                elif line.category.category == "Assists":
+                    line.actual_value = record["Assists"]
+                    line.save()
+                elif line.category.category == "Fantasy points":
+                    line.actual_value = record["FantasyPoints"]
+                    line.save()
 
         except Exception as e:
             print(e)
