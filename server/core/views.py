@@ -12,7 +12,17 @@ from django.urls import reverse
 from django.shortcuts import render
 from django.views import View
 
-from .models import League, Team, Position, Player, CurrentDate, Line, Game, Subline
+from .models import (
+    League,
+    Team,
+    Position,
+    Player,
+    CurrentDate,
+    Line,
+    Game,
+    Subline,
+    LineCategory,
+)
 
 
 class SuperuserRequiredMixin(UserPassesTestMixin):
@@ -70,6 +80,19 @@ class RunWholeShebang(SuperuserRequiredMixin, View):
             else:
                 all_records_synced = True
 
+    def create_line(self, category, value, player, todays_game):
+        line, created = Line.objects.update_or_create(
+            player=player, game=todays_game, category=category
+        )
+
+        subline, created = Subline.objects.update_or_create(
+            line=line,
+            defaults={
+                "projected_value": value,
+                "visible": True,
+            },
+        )
+
     def sync_lines_for_date(self, cd):
         headers = {"Authorization": f"Bearer {settings.AIRTABLE_API_KEY}"}
         nba = League.objects.get(acronym="NBA")
@@ -115,19 +138,51 @@ class RunWholeShebang(SuperuserRequiredMixin, View):
                     if not todays_game:
                         raise Exception()
 
-                    # OK, all good. Create line and subline.
-                    line, created = Line.objects.update_or_create(
-                        player=player,
-                        game=todays_game,
-                    )
+                    league = League.objects.get(acronym="NBA")
 
-                    subline, created = Subline.objects.update_or_create(
-                        line=line,
-                        defaults={
-                            "nba_points_line": record["fields"]["Projected points"],
-                            "visible": True,
-                        },
-                    )
+                    if "Projected points" in record["fields"]:
+                        self.create_line(
+                            LineCategory.objects.get(
+                                league=league,
+                                category="Points",
+                            ),
+                            record["fields"]["Projected points"],
+                            player,
+                            todays_game,
+                        )
+
+                    if "Projected rebounds" in record["fields"]:
+                        self.create_line(
+                            LineCategory.objects.get(
+                                league=league,
+                                category="Rebounds",
+                            ),
+                            record["fields"]["Projected rebounds"],
+                            player,
+                            todays_game,
+                        )
+
+                    if "Projected assists" in record["fields"]:
+                        self.create_line(
+                            LineCategory.objects.get(
+                                league=league,
+                                category="Assists",
+                            ),
+                            record["fields"]["Projected assists"],
+                            player,
+                            todays_game,
+                        )
+
+                    if "Projected fantasy points" in record["fields"]:
+                        self.create_line(
+                            LineCategory.objects.get(
+                                league=league,
+                                category="Fantasy points",
+                            ),
+                            record["fields"]["Projected fantasy points"],
+                            player,
+                            todays_game,
+                        )
 
                 except Exception as e:
                     print(e)
@@ -149,12 +204,13 @@ class RunWholeShebang(SuperuserRequiredMixin, View):
         cd.date = datetime.datetime.now(timezone("US/Pacific")).date()
         cd.save()
 
-        """
+        # TODO disable
         from datetime import timedelta
+
         cd.date = datetime.datetime.now(timezone("US/Pacific")).date() - timedelta(
-            days=1
+            days=3
         )
-        """
+        cd.save()
 
         # (2)
         self.sync_games_for_date(cd)

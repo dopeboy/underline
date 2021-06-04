@@ -33,12 +33,16 @@ const GET_ACTIVE_SLIPS_QUERY = gql`
             creatorCode
             picks {
                 id
-                underNbaPoints
+                under
                 won
                 subline {
-                    nbaPointsLine
+                    projectedValue
                     line {
-                        nbaPointsActual
+                        category {
+                            id
+                            category
+                        }
+                        actualValue
                         id
                         invalidated
                         player {
@@ -147,14 +151,16 @@ const Active = () => {
                                             </Header>
                                             <span className="over-under">
                                                 {`${
-                                                    pick.underNbaPoints
+                                                    pick.under
                                                         ? 'Under'
                                                         : 'Over'
                                                 }`}
                                             </span>{' '}
                                             {`${parseFloat(
-                                                pick.subline.nbaPointsLine
-                                            ).toFixed(1)} points`}
+                                                pick.subline.projectedValue
+                                            ).toFixed(
+                                                1
+                                            )} ${pick.subline.line.category.category.toLowerCase()}`}
                                         </Grid.Column>
                                         <Grid.Column width={5}>
                                             {
@@ -172,13 +178,12 @@ const Active = () => {
                                             )
                                                 .tz('America/Los_Angeles')
                                                 .format('h:mma z')}
-                                            {pick.subline.line
-                                                .nbaPointsActual && (
+                                            {pick.subline.line.actualValue && (
                                                 <div>
                                                     {`${parseInt(
                                                         pick.subline.line
-                                                            .nbaPointsActual
-                                                    )} points scored`}
+                                                            .actualValue
+                                                    )} ${pick.subline.line.category.category.toLowerCase()} scored`}
                                                 </div>
                                             )}
                                         </Grid.Column>

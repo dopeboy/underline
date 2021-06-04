@@ -1,0 +1,38 @@
+[
+    {
+        "model": "core.linecategory",
+        "pk": 1,
+        "fields": {
+            "category": "Points",
+            "display_order": 1,
+            "league": 2
+        }
+    },
+    {
+        "model": "core.linecategory",
+        "pk": 2,
+        "fields": {
+            "category": "Rebounds",
+            "display_order": 3,
+            "league": 2
+        }
+    },
+    {
+        "model": "core.linecategory",
+        "pk": 3,
+        "fields": {
+            "category": "Assists",
+            "display_order": 2,
+            "league": 2
+        }
+    },
+    {
+        "model": "core.linecategory",
+        "pk": 4,
+        "fields": {
+            "category": "Fantasy points",
+            "display_order": 3,
+            "league": 2
+        }
+    }
+]

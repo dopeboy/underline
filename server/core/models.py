@@ -25,14 +25,6 @@ class League(models.Model):
         return self.acronym
 
 
-class LeagueLineType(models.Model):
-    league = models.ForeignKey(League, on_delete=models.CASCADE)
-    line_type = models.CharField(max_length=128)
-
-    def __str__(self):
-        return f"{self.league.acronym} - {self.line_type}"
-
-
 class Team(models.Model):
     name = models.CharField(max_length=128)
     abbreviation = models.CharField(max_length=128)
@@ -90,10 +82,19 @@ class Deposit(models.Model):
     datetime_created = models.DateTimeField(auto_now_add=True)
 
 
+class LineCategory(models.Model):
+    league = models.ForeignKey(League, on_delete=models.CASCADE)
+    category = models.CharField(max_length=128)
+    display_order = models.PositiveSmallIntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.league.acronym} - {self.category}"
+
+
 class Line(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
-    line_type = models.ForeignKey(LeagueLineType, on_delete=models.CASCADE, default=1)
+    category = models.ForeignKey(LineCategory, on_delete=models.CASCADE)
 
     actual_value = models.DecimalField(
         max_digits=5, decimal_places=2, blank=True, null=True
@@ -103,7 +104,7 @@ class Line(models.Model):
     invalidated = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.player.name} - {self.game}"
+        return f"{self.player.name} - {self.game} [{self.category.category}]"
 
     def game_date(self):
         return self.game.datetime
@@ -137,9 +138,7 @@ class Slip(models.Model):
     @property
     def complete(self):
         return (
-            Pick.objects.filter(
-                slip=self, subline__line__nba_points_actual=None
-            ).count()
+            Pick.objects.filter(slip=self, subline__line__actual_value=None).count()
             == 0
         )
 
@@ -204,21 +203,19 @@ class PaidSlip(Slip):
 class Pick(models.Model):
     subline = models.ForeignKey(Subline, on_delete=models.CASCADE)
     slip = models.ForeignKey(Slip, on_delete=models.CASCADE)
-
-    # NBA specific
     under = models.BooleanField(null=True)
 
     datetime_created = models.DateTimeField(auto_now_add=True)
 
     @property
     def won(self):
-        actual_points = self.subline.line.nba_points_actual
+        actual_value = self.subline.line.actual_value
 
-        if actual_points == None:
+        if actual_value == None:
             return None
         elif self.subline.line.invalidated:
             return False
-        elif self.under_nba_points:
-            return actual_points < self.subline.nba_points_line
-        elif not self.under_nba_points:
-            return actual_points > self.subline.nba_points_line
+        elif self.under:
+            return actual_value < self.subline.projected_value
+        elif not self.under:
+            return actual_value > self.subline.projected_value

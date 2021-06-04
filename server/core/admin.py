@@ -32,7 +32,7 @@ from .models import (
     PaidSlip,
     Pick,
     Deposit,
-    LeagueLineType,
+    LineCategory,
 )
 
 
@@ -390,15 +390,18 @@ class PickAdmin(admin.ModelAdmin):
         return False
 
 
-class LeagueLineTypeAdmin(admin.ModelAdmin):
+class LineCategoryAdmin(admin.ModelAdmin):
     list_display = [
-        field.name for field in LeagueLineType._meta.fields if field.name != "id"
+        field.name for field in LineCategory._meta.fields if field.name != "id"
     ]
 
     class Meta:
-        model = LeagueLineType
+        model = LineCategory
 
     def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
         return False
 
 
@@ -416,4 +419,4 @@ admin.site.register(CurrentDate, CurrentDateAdmin)
 admin.site.register(Player, PlayerAdmin)
 admin.site.register(Game, GameAdmin)
 admin.site.register(Deposit, DepositAdmin)
-admin.site.register(LeagueLineType, LeagueLineTypeAdmin)
+admin.site.register(LineCategory, LineCategoryAdmin)

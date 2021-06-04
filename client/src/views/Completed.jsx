@@ -34,12 +34,12 @@ const GET_INACTIVE_SLIPS_QUERY = gql`
             freeToPlay
             picks {
                 id
-                underNbaPoints
+                under
                 won
                 subline {
-                    nbaPointsLine
+                    projectedValue
                     line {
-                        nbaPointsActual
+                        actualValue
                         id
                         invalidated
                         player {
@@ -139,14 +139,16 @@ const Completed = () => {
                                             </Header>
                                             <span className="over-under">
                                                 {`${
-                                                    pick.underNbaPoints
+                                                    pick.under
                                                         ? 'Under'
                                                         : 'Over'
                                                 }`}
                                             </span>{' '}
                                             {`${parseFloat(
-                                                pick.subline.nbaPointsLine
-                                            ).toFixed(1)} points`}
+                                                pick.subline.projectedValue
+                                            ).toFixed(
+                                                1
+                                            )} ${pick.subline.line.category.category.toLowerCase()}`}
                                         </Grid.Column>
                                         <Grid.Column width={5}>
                                             {
@@ -169,12 +171,12 @@ const Completed = () => {
                                             )}
                                             {!pick.subline.line.invalidated &&
                                                 pick.subline.line
-                                                    .nbaPointsActual && (
+                                                    .actualValue && (
                                                     <div>
                                                         {`${parseInt(
                                                             pick.subline.line
-                                                                .nbaPointsActual
-                                                        )} points scored`}
+                                                                .actualValue
+                                                        )} ${pick.subline.line.category.category.toLowerCase()} scored`}
                                                     </div>
                                                 )}
                                         </Grid.Column>
