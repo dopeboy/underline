@@ -61,7 +61,6 @@ const HowToPlay = (props) => {
                 entries that include that player will be considered inactive and
                 considered a push
             </p>
-
             <u>Player/Stat Availability</u>
             <p>
                 Underline reserves the right to add, edit or remove players from

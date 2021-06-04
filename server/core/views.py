@@ -177,7 +177,7 @@ class RunWholeShebang(SuperuserRequiredMixin, View):
                         self.create_line(
                             LineCategory.objects.get(
                                 league=league,
-                                category="Fantasy points",
+                                category="Fantasy Points",
                             ),
                             record["fields"]["Projected fantasy points"],
                             player,

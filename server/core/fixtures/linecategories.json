@@ -13,7 +13,7 @@
         "pk": 2,
         "fields": {
             "category": "Rebounds",
-            "display_order": 3,
+            "display_order": 4,
             "league": 2
         }
     },
@@ -22,7 +22,7 @@
         "pk": 3,
         "fields": {
             "category": "Assists",
-            "display_order": 2,
+            "display_order": 3,
             "league": 2
         }
     },
@@ -30,8 +30,8 @@
         "model": "core.linecategory",
         "pk": 4,
         "fields": {
-            "category": "Fantasy points",
-            "display_order": 3,
+            "category": "Fantasy Points",
+            "display_order": 2,
             "league": 2
         }
     }

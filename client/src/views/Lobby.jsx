@@ -26,7 +26,7 @@ import { gql, useApolloClient, useQuery } from '@apollo/client'
 import moment from 'moment-timezone'
 import { Helmet } from 'react-helmet'
 import './Lobby.scss'
-import { useParams, useHistory } from 'react-router-dom'
+import { useParams, Link, useHistory } from 'react-router-dom'
 import { useMediaQuery } from 'react-responsive'
 import { getJWT, clearJWT } from 'utils'
 
@@ -115,7 +115,7 @@ const GET_ME_QUERY = gql`
     }
 `
 
-const PlayerList = ({ picks, addOrRemovePick }) => {
+const PlayerList = ({ picks, addOrRemovePick, setTabActiveIndex }) => {
     const { data } = useQuery(GET_TODAYS_SUBLINES_AND_LINE_CATEGORIES_QUERY)
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 767px)' })
 
@@ -127,7 +127,7 @@ const PlayerList = ({ picks, addOrRemovePick }) => {
                 pane: {
                     key: lineCategory.category,
                     content: (
-                        <Card.Group>
+                        <Card.Group itemsPerRow={!isTabletOrMobile && 4}>
                             {data.todaysSublines
                                 .filter(
                                     (subline) =>
@@ -145,7 +145,7 @@ const PlayerList = ({ picks, addOrRemovePick }) => {
                                             key={subline.id}
                                         >
                                             <Image
-                                                size="small"
+                                                size="tiny"
                                                 src={
                                                     subline.line.player
                                                         .headshotUrl
@@ -244,7 +244,13 @@ const PlayerList = ({ picks, addOrRemovePick }) => {
             {data && data.todaysSublines.length === 0 && (
                 <p>There are no more games today.</p>
             )}
-            <Tab panes={panes} renderActiveOnly={false} />
+            <Tab
+                panes={panes}
+                onTabChange={(e, { activeIndex }) =>
+                    setTabActiveIndex(activeIndex)
+                }
+                renderActiveOnly={false}
+            />
         </Form>
     )
 }
@@ -329,8 +335,10 @@ const PicksList = ({ picks, addOrRemovePick, isSelf }) => {
 
 const LobbyHeader = () => {
     const { data } = useQuery(GET_CURRENT_DATE_QUERY)
+    const isTabletOrMobile = useMediaQuery({ query: '(max-width: 767px)' })
+
     return (
-        <Header as="h1">
+        <Header as={isTabletOrMobile ? 'h3' : 'h2'}>
             Featured Players:{' '}
             {data && moment(data.currentDate).format('MMMM Do YYYY')}
         </Header>
@@ -364,6 +372,7 @@ const Lobby = ({ updateMainComponent }) => {
     ] = useState(false)
     const { code, username } = useParams()
     const [creatorCode, setCreatorCode] = useState(code ? code : '')
+    const [tabActiveIndex, setTabActiveIndex] = useState()
     const [
         insufficientFundsModalVisible,
         setInsufficentFundsModalVisible,
@@ -773,12 +782,22 @@ const Lobby = ({ updateMainComponent }) => {
                     </Button>
                 </Modal.Actions>
             </Modal>
-            <Header as="h2" textAlign="center">
+            <Header
+                as={isTabletOrMobile ? 'h3' : 'h2'}
+                textAlign="center"
+                className="over-under-header"
+            >
                 Over/Under
                 <Header.Subheader>
                     Pick 2, 3, 4, or 5 players from at least two teams. <br />
                     Predict if they will go OVER or UNDER their projected stat
                     line.
+                    <br />
+                    {tabActiveIndex == 1 && (
+                        <Link to="/settings/fantasypoints">
+                            What are fantasy points?
+                        </Link>
+                    )}
                 </Header.Subheader>
             </Header>
             <Grid stackable>
@@ -788,6 +807,7 @@ const Lobby = ({ updateMainComponent }) => {
                         <PlayerList
                             picks={picks}
                             addOrRemovePick={addOrRemovePick}
+                            setTabActiveIndex={setTabActiveIndex}
                         />
                         {isTabletOrMobile && (
                             <>

@@ -87,7 +87,7 @@ def update_player_scores():
                 elif line.category.category == "Assists":
                     line.actual_value = record["Assists"]
                     line.save()
-                elif line.category.category == "Fantasy points":
+                elif line.category.category == "Fantasy Points":
                     line.actual_value = record["FantasyPoints"]
                     line.save()
 

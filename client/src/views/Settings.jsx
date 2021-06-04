@@ -25,6 +25,7 @@ import ResponsibleGaming from 'components/ResponsibleGaming'
 import CustomerSupport from 'components/CustomerSupport'
 import HowToPlay from 'components/HowToPlay'
 import CreatorCode from 'components/CreatorCode'
+import FantasyPoints from 'components/FantasyPoints'
 
 const GET_ME_QUERY = gql`
     query {
@@ -358,6 +359,12 @@ const Settings = ({ updateMainComponent }) => {
                                 active={activeItem === 'howtoplay'}
                             />
                             <Menu.Item
+                                name="Fantasy Points"
+                                as={Link}
+                                to="/settings/fantasypoints"
+                                active={activeItem === 'fantasypoints'}
+                            />
+                            <Menu.Item
                                 name="Creator Code"
                                 as={Link}
                                 to="/settings/creatorcode"
@@ -380,6 +387,7 @@ const Settings = ({ updateMainComponent }) => {
                             <CustomerSupport />
                         )}
                         {activeItem === 'howtoplay' && <HowToPlay />}
+                        {activeItem === 'fantasypoints' && <FantasyPoints />}
                         {activeItem === 'creatorcode' && <CreatorCode />}
                     </Grid.Column>
                 </Grid.Row>
