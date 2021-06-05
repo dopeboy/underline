@@ -241,16 +241,17 @@ const PlayerList = ({ picks, addOrRemovePick, setTabActiveIndex }) => {
 
     return (
         <Form loading={!data}>
-            {data && data.todaysSublines.length === 0 && (
+            {data && data.todaysSublines.length === 0 ? (
                 <p>There are no more games today.</p>
+            ) : (
+                <Tab
+                    panes={panes}
+                    onTabChange={(e, { activeIndex }) =>
+                        setTabActiveIndex(activeIndex)
+                    }
+                    renderActiveOnly={false}
+                />
             )}
-            <Tab
-                panes={panes}
-                onTabChange={(e, { activeIndex }) =>
-                    setTabActiveIndex(activeIndex)
-                }
-                renderActiveOnly={false}
-            />
         </Form>
     )
 }
