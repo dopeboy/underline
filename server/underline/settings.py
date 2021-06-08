@@ -195,12 +195,11 @@ else:
     SECURE_SSL_REDIRECT = True
     DOMAIN = "https://underlinefantasy.com"
 
-# Celery Setup. NOTE - it uses TIME_ZONE above so cron jobs will respect
-# pacific timezone.
 CELERY_BROKER_URL = "redis://redis:6379" if DEBUG else os.environ.get("REDIS_URL")
 CELERY_RESULT_BACKEND = "redis://redis:6379" if DEBUG else os.environ.get("REDIS_URL")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
+CELERY_TIMEZONE = "US/Pacific"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_BEAT_SCHEDULE = {
     "remove_lines_when_game_starts": {
