@@ -217,6 +217,6 @@ CELERY_BEAT_SCHEDULE = {
     },
     "send_slip_emails": {
         "task": "core.tasks.send_slip_emails",
-        "schedule": crontab(minute=0, hour=12),
+        "schedule": crontab(minute=0, hour=8),
     },
 }
