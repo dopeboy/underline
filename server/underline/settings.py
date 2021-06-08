@@ -215,4 +215,8 @@ CELERY_BEAT_SCHEDULE = {
         "task": "core.tasks.update_player_scores",
         "schedule": crontab(minute=0),
     },
+    "send_slip_emails": {
+        "task": "core.tasks.send_slip_emails",
+        "schedule": crontab(minute=0, hour=12),
+    },
 }

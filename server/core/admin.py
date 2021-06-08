@@ -230,21 +230,19 @@ class CurrentDateAdmin(admin.ModelAdmin):
                         "src": first_subline.line.player.headshot_url,
                         "name": str(first_subline.line.player),
                         "game": str(first_subline.line.game),
-                        "pointProjection": str(round(first_subline.nba_points_line, 1)),
+                        "projection": f'{str(round(first_subline.projected_value, 1))} {first_subline.line.category.category}',
                     },
                     {
                         "src": second_subline.line.player.headshot_url,
                         "name": str(second_subline.line.player),
                         "game": str(second_subline.line.game),
-                        "pointProjection": str(
-                            round(second_subline.nba_points_line, 1)
-                        ),
+                        "projection": f'{str(round(first_subline.projected_value, 1))} {first_subline.line.category.category}',
                     },
                     {
                         "src": third_subline.line.player.headshot_url,
                         "name": str(third_subline.line.player),
                         "game": str(third_subline.line.game),
-                        "pointProjection": str(round(third_subline.nba_points_line, 1)),
+                        "projection": f'{str(round(first_subline.projected_value, 1))} {first_subline.line.category.category}',
                     },
                 ]
 
