@@ -150,121 +150,6 @@ class CurrentDateAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
-    # Before saving, for the current date, find all slips created and send emails
-    # In each email, send outcome of the slip and if new lines exist, a preview of those
-    def save_model(self, request, obj, form, change):
-        cd = CurrentDate.objects.first()
-        d = cd.date
-
-        # Hacky - needs revisiting
-
-        # Find all the games for this date. Find all the lines that roll up those
-        # games. Find all the slips attached to those lines.
-        todays_picks = Pick.objects.filter(subline__line__game__datetime__date=d)
-
-        todays_slips = []
-        for pick in todays_picks:
-            if pick.slip not in todays_slips:
-                todays_slips.append(pick.slip)
-
-        users_with_slips_today = {}
-        for slip in todays_slips:
-            if slip.owner.id not in users_with_slips_today:
-                users_with_slips_today[slip.owner.id] = []
-            users_with_slips_today[slip.owner.id].append(slip)
-
-        for user_id in users_with_slips_today:
-            u = User.objects.get(id=user_id)
-
-            slips = users_with_slips_today[user_id]
-            slips_sg = []
-
-            for slip in slips:
-                slips_sg.append(
-                    {
-                        "numPicks": slip.pick_set.count(),
-                        "payoutAmount": f"${slip.payout_amount}",
-                        "outcome": "Won" if slip.won else "Lost",
-                    }
-                )
-
-            message = Mail(
-                from_email="support@underlinesports.com",
-                to_emails="arithmetic@gmail.com"
-                if settings.DEBUG
-                else slip.owner.email,
-            )
-
-            ftp = " Free to Play " if u.free_to_play else " "
-            today = cd.date.strftime("%B %d")
-            tomorrow = obj.date.strftime("%B %d")
-            subject = f"Underline{ftp}Results for {today}"
-            body = f"Hey {u.first_name} - Below are your{ftp}results for {today}."
-
-            # pass custom values for our HTML placeholders
-            payload = {
-                "subject": subject,
-                "body": body,
-                "tomorrow_date": tomorrow,
-                "slips": slips_sg,
-            }
-
-            # Find all the sub lines for the next system date
-            tomorrow_sublines = Subline.objects.filter(
-                line__game__datetime__date=obj.date, visible=True
-            )
-
-            if tomorrow_sublines.count():
-                first_subline = tomorrow_sublines[
-                    randint(0, tomorrow_sublines.count() - 1)
-                ]
-                second_subline = tomorrow_sublines[
-                    randint(0, tomorrow_sublines.count() - 1)
-                ]
-                third_subline = tomorrow_sublines[
-                    randint(0, tomorrow_sublines.count() - 1)
-                ]
-
-                payload["newPicks"] = [
-                    {
-                        "src": first_subline.line.player.headshot_url,
-                        "name": str(first_subline.line.player),
-                        "game": str(first_subline.line.game),
-                        "projection": f'{str(round(first_subline.projected_value, 1))} {first_subline.line.category.category}',
-                    },
-                    {
-                        "src": second_subline.line.player.headshot_url,
-                        "name": str(second_subline.line.player),
-                        "game": str(second_subline.line.game),
-                        "projection": f'{str(round(first_subline.projected_value, 1))} {first_subline.line.category.category}',
-                    },
-                    {
-                        "src": third_subline.line.player.headshot_url,
-                        "name": str(third_subline.line.player),
-                        "game": str(third_subline.line.game),
-                        "projection": f'{str(round(first_subline.projected_value, 1))} {first_subline.line.category.category}',
-                    },
-                ]
-
-            message.dynamic_template_data = payload
-            message.template_id = "d-83f3ae1c712a4e45af4744e2818489a8"
-
-            sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
-            response = sg.send(message)
-            code, body, headers = (
-                response.status_code,
-                response.body,
-                response.headers,
-            )
-            """
-            print(f"Response code: {code}")
-            print(f"Response headers: {headers}")
-            print(f"Response body: {body}")
-            print("Dynamic Messages Sent!")
-            """
-
-        super(CurrentDateAdmin, self).save_model(request, obj, form, change)
-
 
 class DepositResource(resources.ModelResource):
     class Meta:
@@ -330,6 +215,20 @@ class PickTabularInline(admin.TabularInline):
 class SlipResource(resources.ModelResource):
     class Meta:
         model = Slip
+        fields = (
+            "id",
+            "owner",
+            "owner__first_name",
+            "owner__last_name",
+            "owner__email",
+            "entry_amount",
+            "datetime_created",
+            "free_to_play",
+            "creator_code",
+            "creator_slip",
+        )
+        export_order = fields
+
 
 
 class SlipAdmin(ExportMixin, admin.ModelAdmin):

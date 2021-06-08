@@ -1,9 +1,10 @@
 from django.contrib import admin
 
+from import_export.admin import ExportMixin
 from .models import User
 
 
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(ExportMixin, admin.ModelAdmin):
     list_per_page = 500
     list_display = (
         "email",

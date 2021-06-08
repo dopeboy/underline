@@ -197,7 +197,8 @@ def send_slip_emails():
         message.template_id = "d-83f3ae1c712a4e45af4744e2818489a8"
 
         sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
-        response = sg.send(message)
+        if not settings.DEBUG:
+            response = sg.send(message)
         code, body, headers = (
             response.status_code,
             response.body,
