@@ -8,8 +8,8 @@ const FantasyPoints = (props) => {
                 <li>Point: 1pts</li>
                 <li>Rebound: 1.2pts</li>
                 <li>Assist: 1.5pts</li>
-                <li>Block: 3pts</li>
-                <li>Steal: 3pts</li>
+                <li>Block: 2pts</li>
+                <li>Steal: 2pts</li>
                 <li>Turnover: -1pts</li>
             </ul>
         </>
