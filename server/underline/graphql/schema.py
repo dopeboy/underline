@@ -28,6 +28,9 @@ from django.conf import settings
 from graphql_jwt.utils import jwt_payload
 from sendgrid.helpers.mail import Mail
 from sendgrid import SendGridAPIClient
+import pytz
+import datetime
+from django.db.models import Sum
 
 
 class TeamType(DjangoObjectType):
@@ -217,6 +220,32 @@ class CreateSlip(graphene.Mutation):
 
     @classmethod
     def mutate(cls, root, info, picks, entry_amount, creator_code):
+        # Check - $500 cap
+        # Get today's slips for this user and sum their entry amounts
+        tz = pytz.timezone("America/Los_Angeles")
+        start = datetime.datetime.now().replace(
+            tzinfo=tz, hour=7, minute=0, second=0
+        ) - datetime.timedelta(days=0)
+        end = datetime.datetime.now().replace(
+            tzinfo=tz, hour=23, minute=0, second=0
+        ) - datetime.timedelta(days=0)
+
+        total = (
+            Slip.objects.filter(
+                datetime_created__lte=end,
+                datetime_created__gte=start,
+                owner=info.context.user,
+            )
+            .aggregate(Sum("entry_amount"))
+            .get("entry_amount__sum", 0)
+        )
+
+        if total == None:
+            total = 0
+
+        if total + entry_amount > 500:
+            return CreateSlip(success=False)
+
         # Create the slip
         slip = Slip.objects.create(
             owner=info.context.user,

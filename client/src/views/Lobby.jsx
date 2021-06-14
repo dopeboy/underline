@@ -612,6 +612,15 @@ const Lobby = ({ updateMainComponent }) => {
                     response.data.createSlip.freeToPlay ? '&freetoplay' : ''
                 }`
             )
+        } else {
+            // Error
+            setErrorModalVisible({
+                open: true,
+                header: '$500 daily entry volume limit',
+                message: 'You cannot submit wagers over $500 for a single day.',
+            })
+            setChecking(false)
+            setConfirmationModalVisible(false)
         }
     }
 
