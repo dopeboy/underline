@@ -17,6 +17,11 @@ from import_export.admin import ExportMixin
 
 from import_export import resources
 
+import pytz
+import datetime
+from django.db.models import Sum
+
+
 from accounts.models import User
 from .models import (
     League,
@@ -230,7 +235,6 @@ class SlipResource(resources.ModelResource):
         export_order = fields
 
 
-
 class SlipAdmin(ExportMixin, admin.ModelAdmin):
     resource_class = SlipResource
     list_per_page = 20
@@ -246,6 +250,30 @@ class SlipAdmin(ExportMixin, admin.ModelAdmin):
         PickTabularInline,
     ]
     ordering = ("-datetime_created",)
+    change_list_template = "admin/underline/core/change_list.html"
+
+    def get_todays_slips(self):
+        tz = pytz.timezone("America/Los_Angeles")
+        start = datetime.datetime.now().replace(
+            tzinfo=tz, hour=0, minute=0, second=0
+        ) - datetime.timedelta(days=0)
+        end = datetime.datetime.now().replace(
+            tzinfo=tz, hour=23, minute=59, second=59
+        ) - datetime.timedelta(days=0)
+
+        return Slip.objects.filter(
+            datetime_created__lte=end,
+            datetime_created__gte=start,
+        )
+
+    def changelist_view(self, request, extra_context=None):
+        slips = self.get_todays_slips()
+        my_context = {
+            "count": slips.count(),
+            "entry_volume": slips.aggregate(Sum("entry_amount"))["entry_amount__sum"],
+            "payout_volume": sum(s.payout_amount for s in slips),
+        }
+        return super(SlipAdmin, self).changelist_view(request, extra_context=my_context)
 
     def status(self, obj):
         if obj.invalidated:
