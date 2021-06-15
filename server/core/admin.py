@@ -264,6 +264,7 @@ class SlipAdmin(ExportMixin, admin.ModelAdmin):
         return Slip.objects.filter(
             datetime_created__lte=end,
             datetime_created__gte=start,
+            free_to_play=False
         )
 
     def changelist_view(self, request, extra_context=None):
