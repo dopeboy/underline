@@ -616,8 +616,8 @@ const Lobby = ({ updateMainComponent }) => {
             // Error
             setErrorModalVisible({
                 open: true,
-                header: '$500 daily entry volume limit',
-                message: 'You cannot submit wagers over $500 for a single day.',
+                header: '$150 daily entry volume limit',
+                message: 'You cannot submit wagers over $150 for a single day.',
             })
             setChecking(false)
             setConfirmationModalVisible(false)
