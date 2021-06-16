@@ -477,7 +477,7 @@ const Lobby = ({ updateMainComponent }) => {
     }
 
     // (1) Check if they entered a payout amount
-    // (2) Check if entry amount is <= $30
+    // (2) Check if entry amount is <= $20
     // (3) Check that there are atleast two teams involved
     // (4) Check the location of the user
     // (5) Check if user has linked a payment method
@@ -499,12 +499,12 @@ const Lobby = ({ updateMainComponent }) => {
             return
         }
 
-        if (entryAmount > 30) {
+        if (entryAmount > 20) {
             setPayoutErrorVisible(true)
             setErrorModalVisible({
                 open: true,
-                header: 'Max $30 entry',
-                message: 'We only allow a maximum of $30 for entry',
+                header: 'Max $20 entry',
+                message: 'We only allow a maximum of $20 for entry',
             })
             setChecking(false)
             return
@@ -616,8 +616,8 @@ const Lobby = ({ updateMainComponent }) => {
             // Error
             setErrorModalVisible({
                 open: true,
-                header: '$150 daily entry volume limit',
-                message: 'You cannot submit wagers over $150 for a single day.',
+                header: '$80 daily entry volume limit',
+                message: 'You cannot submit wagers over $80 for a single day.',
             })
             setChecking(false)
             setConfirmationModalVisible(false)
