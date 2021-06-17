@@ -112,6 +112,20 @@ class Line(models.Model):
     game_date.short_description = "Game date PST"
 
 
+class Movement(models.Model):
+    date = models.DateField()
+    cap = models.IntegerField()
+    datetime_created = models.DateTimeField(auto_now_add=True)
+
+
+class SubMovement(models.Model):
+    category = models.ForeignKey(LineCategory, on_delete=models.CASCADE)
+    swing = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    minimum = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    datetime_created = models.DateTimeField(auto_now_add=True)
+    movement = models.ForeignKey(Movement, on_delete=models.CASCADE)
+
+
 class Subline(models.Model):
     line = models.ForeignKey(Line, on_delete=models.CASCADE)
     projected_value = models.DecimalField(
@@ -120,6 +134,8 @@ class Subline(models.Model):
 
     # Visible in lobby
     visible = models.BooleanField(default=True)
+
+    movement = models.ForeignKey(Movement, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f"{self.line}"

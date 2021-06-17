@@ -20,6 +20,7 @@ import Lobby from 'views/Lobby.jsx'
 import Active from 'views/Active.jsx'
 import Completed from 'views/Completed.jsx'
 import Settings from 'views/Settings.jsx'
+import Creator from 'views/Creator.jsx'
 import Main from 'components/Main'
 
 // If there isn't a valid token, don't send it. This is because we can have an expired
@@ -109,6 +110,10 @@ function App() {
                         component={Active}
                     ></PrivateRoute>
                     <PrivateRoute
+                        path="/creator"
+                        component={Creator}
+                    ></PrivateRoute>
+                    <PrivateRoute
                         path="/completed"
                         component={Completed}
                     ></PrivateRoute>
@@ -124,14 +129,6 @@ function App() {
                         path="/login"
                         component={Login}
                     ></NonLoggedInRoute>
-                    <Route
-                        path="/:username"
-                        render={(props) => (
-                            <Main>
-                                <Lobby />
-                            </Main>
-                        )}
-                    />
                     <Route
                         path="/"
                         render={(props) => (

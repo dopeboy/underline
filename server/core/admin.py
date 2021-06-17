@@ -38,6 +38,8 @@ from .models import (
     Pick,
     Deposit,
     LineCategory,
+    Movement,
+    SubMovement,
 )
 
 
@@ -331,10 +333,28 @@ class LineCategoryAdmin(admin.ModelAdmin):
         return False
 
 
+class SubMovementTabularInline(admin.TabularInline):
+    list_display = [
+        field.name for field in SubMovement._meta.fields if field.name != "id"
+    ]
+    model = SubMovement
+    extra = 0
+
+
+class MovementAdmin(admin.ModelAdmin):
+    inlines = [
+        SubMovementTabularInline,
+    ]
+
+    class Meta:
+        model = Movement
+
+
 admin.site.register(Team, TeamAdmin)
 
 # Register your models here.
 admin.site.register(League)
+admin.site.register(Movement, MovementAdmin)
 admin.site.register(Slip, SlipAdmin)
 admin.site.register(FreeToPlaySlip, FreeToPlaySlipsAdmin)
 admin.site.register(PaidSlip, PaidSlipAdmin)
