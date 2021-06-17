@@ -60,7 +60,7 @@ const GET_TODAYS_SUBLINES_AND_LINE_CATEGORIES_QUERY = gql`
                 }
             }
         }
-        lineCategories(league: "NBA") {
+        lineCategories(league: "MLB") {
             id
             category
         }
@@ -803,7 +803,7 @@ const Lobby = ({ updateMainComponent }) => {
                     Predict if they will go OVER or UNDER their projected stat
                     line.
                     <br />
-                    {tabActiveIndex == 1 && (
+                    {tabActiveIndex == 0 && (
                         <Link to="/settings/fantasypoints">
                             What are fantasy points?
                         </Link>

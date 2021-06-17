@@ -687,9 +687,339 @@
         "fields": {
             "name": "Wizards",
             "abbreviation": "WAS",
-            "location": "Washington Wizards",
+            "location": "Washington",
             "logo_url": "https://dl.airtable.com/.attachmentThumbnails/e35f7c381173c4488600c7ed3c2871b5/5737d4a4",
             "league": 2
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 160,
+        "fields": {
+            "name": "Dodgers",
+            "abbreviation": "LAD",
+            "location": "Los Angeles",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 161,
+        "fields": {
+            "name": "Reds",
+            "abbreviation": "CIN",
+            "location": "Cincinnati",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 162,
+        "fields": {
+            "name": "Blue Jays",
+            "abbreviation": "TOR",
+            "location": "Toronto",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 163,
+        "fields": {
+            "name": "Pirates",
+            "abbreviation": "PIT",
+            "location": "Pittsburgh",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 164,
+        "fields": {
+            "name": "Royals",
+            "abbreviation": "KC",
+            "location": "Kansas City",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 165,
+        "fields": {
+            "name": "Cubs",
+            "abbreviation": "CHC",
+            "location": "Chicago",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 166,
+        "fields": {
+            "name": "Indians",
+            "abbreviation": "CLE",
+            "location": "Cleveland",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 167,
+        "fields": {
+            "name": "Rays",
+            "abbreviation": "TB",
+            "location": "Tampa Bay",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 168,
+        "fields": {
+            "name": "Phillies",
+            "abbreviation": "PHI",
+            "location": "Philadelphia",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 169,
+        "fields": {
+            "name": "Mariners",
+            "abbreviation": "SEA",
+            "location": "Seattle",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 170,
+        "fields": {
+            "name": "Diamondbacks",
+            "abbreviation": "ARI",
+            "location": "Arizona",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 171,
+        "fields": {
+            "name": "Giants",
+            "abbreviation": "SF",
+            "location": "San Francisco",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 172,
+        "fields": {
+            "name": "White Sox",
+            "abbreviation": "CHW",
+            "location": "Chicago",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 173,
+        "fields": {
+            "name": "Tigers",
+            "abbreviation": "DET",
+            "location": "Detroit",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 174,
+        "fields": {
+            "name": "Mets",
+            "abbreviation": "NYM",
+            "location": "New York",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 175,
+        "fields": {
+            "name": "Orioles",
+            "abbreviation": "BAL",
+            "location": "Baltimore",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 176,
+        "fields": {
+            "name": "Twins",
+            "abbreviation": "MIN",
+            "location": "Minnesota",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 177,
+        "fields": {
+            "name": "Angels",
+            "abbreviation": "LAA",
+            "location": "Los Angeles",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 178,
+        "fields": {
+            "name": "Marlins",
+            "abbreviation": "MIA",
+            "location": "Miami",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 179,
+        "fields": {
+            "name": "Rockies",
+            "abbreviation": "COL",
+            "location": "Colorado",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 180,
+        "fields": {
+            "name": "Athletics",
+            "abbreviation": "OAK",
+            "location": "Oakland",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 181,
+        "fields": {
+            "name": "Red Sox",
+            "abbreviation": "BOS",
+            "location": "Boston",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 182,
+        "fields": {
+            "name": "Braves",
+            "abbreviation": "ATL",
+            "location": "Atlanta",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 183,
+        "fields": {
+            "name": "Rangers",
+            "abbreviation": "TEX",
+            "location": "Texas",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 184,
+        "fields": {
+            "name": "Yankees",
+            "abbreviation": "NYY",
+            "location": "New York",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 185,
+        "fields": {
+            "name": "Astros",
+            "abbreviation": "HOU",
+            "location": "Houston",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 186,
+        "fields": {
+            "name": "Cardinals",
+            "abbreviation": "STL",
+            "location": "St. Louis",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 187,
+        "fields": {
+            "name": "Brewers",
+            "abbreviation": "MIL",
+            "location": "Milwaukee",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 188,
+        "fields": {
+            "name": "Padres",
+            "abbreviation": "SD",
+            "location": "San Diego",
+            "logo_url": "nothing.jpg",
+            "league": 3
+        }
+    },
+    {
+        "model": "core.team",
+        "pk": 189,
+        "fields": {
+            "name": "Nationals",
+            "abbreviation": "WSH",
+            "location": "Washington",
+            "logo_url": "nothing.jpg",
+            "league": 3
         }
     }
 ]

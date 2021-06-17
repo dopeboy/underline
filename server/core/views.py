@@ -230,6 +230,221 @@ class RunWholeShebang(SuperuserRequiredMixin, View):
         return HttpResponseRedirect(reverse("admin:index"))
 
 
+class RunWholeShebangMLB(SuperuserRequiredMixin, View):
+    def clean_team(self, team):
+        if team == "CWS":
+            return "CHW"
+        elif team == "WAS":
+            return "WSH"
+        else:
+            return team
+
+    def sync_games_for_date(self, cd):
+        headers = {"Authorization": f"Bearer {settings.AIRTABLE_API_KEY}"}
+        mlb = League.objects.get(acronym="MLB")
+
+        offset = None
+        all_records_synced = False
+        airtable_date_filter = f'SEARCH("{cd.date.strftime("%Y-%m-%d")}",{{Date}})'
+        quoted_airtable_date_filter = urllib.parse.quote_plus(airtable_date_filter)
+
+        while all_records_synced == False:
+            r = requests.get(
+                f"https://api.airtable.com/v0/appoKXpWhhjEJ4ndZ/2021?view=Grid%20view&filterByFormula={quoted_airtable_date_filter}"
+                + (f"&offset={offset}" if offset else ""),
+                headers=headers,
+            )
+            data = r.json()
+
+            for record in data["records"]:
+                print(record)
+                home_team = Team.objects.get(
+                    abbreviation=self.clean_team(record["fields"]["Home Team"]).strip(),
+                    league=mlb,
+                )
+                away_team = Team.objects.get(
+                    abbreviation=self.clean_team(record["fields"]["Away Team"]).strip(),
+                    league=mlb,
+                )
+                gt = record["fields"]["Time"].rstrip(" EST").rstrip(" PST")
+                date_time_obj = datetime.datetime.strptime(
+                    f'{record["fields"]["Date"]} {gt}',
+                    "%Y-%m-%d %I:%M %p",
+                )
+
+                if "EST" in record["fields"]["Time"]:
+                    localtz = timezone("America/New_York")
+                    date_time_obj = localtz.localize(date_time_obj)
+                elif "PST" in record["fields"]["Time"]:
+                    localtz = timezone("America/Los_Angeles")
+                    date_time_obj = localtz.localize(date_time_obj)
+
+                game, created = Game.objects.update_or_create(
+                    league=mlb,
+                    home_team=home_team,
+                    away_team=away_team,
+                    datetime=date_time_obj,
+                )
+
+            if "offset" in data:
+                offset = data["offset"]
+            else:
+                all_records_synced = True
+
+    def create_line(self, category, value, player, todays_game):
+        line, created = Line.objects.update_or_create(
+            player=player, game=todays_game, category=category
+        )
+
+        subline, created = Subline.objects.update_or_create(
+            line=line,
+            defaults={
+                "projected_value": value,
+                "visible": True,
+            },
+        )
+
+    def sync_lines_for_date(self, cd):
+        headers = {"Authorization": f"Bearer {settings.AIRTABLE_API_KEY}"}
+        mlb = League.objects.get(acronym="MLB")
+
+        offset = None
+        all_records_synced = False
+        airtable_date_filter = f'SEARCH("{cd.date.strftime("%Y-%m-%d")}",{{Date}})'
+        quoted_airtable_date_filter = urllib.parse.quote_plus(airtable_date_filter)
+
+        while all_records_synced == False:
+            r = requests.get(
+                f"https://api.airtable.com/v0/appbAvvb1TeBH86dq/Lines?view=Grid%20view&filterByFormula={quoted_airtable_date_filter}"
+                + (f"&offset={offset}" if offset else ""),
+                headers=headers,
+            )
+            data = r.json()
+
+            todays_games = []
+            for game in Game.objects.all():
+                if game.pst_gametime.date() == cd.date:
+                    todays_games.append(game)
+
+            if not todays_games:
+                print("No games today")
+                return
+
+            # Lookup player. Check if player is playing in a game today. If not, skip.
+            for record in data["records"]:
+                print(record)
+                player = Player.objects.get(
+                    name=record["fields"]["Player name"].strip()
+                )
+
+                todays_game = None
+                for game in todays_games:
+                    if player.team == game.home_team or player.team == game.away_team:
+                        todays_game = game
+                        break
+
+                if not todays_game:
+                    raise Exception()
+
+                league = League.objects.get(acronym="MLB")
+
+                if "Projected Pitching: Total Outs" in record["fields"]:
+                    self.create_line(
+                        LineCategory.objects.get(
+                            league=league,
+                            category="Pitching: Total Outs",
+                        ),
+                        record["fields"]["Projected Pitching: Total Outs"],
+                        player,
+                        todays_game,
+                    )
+
+                if "Projected Hitting: Hits + Walks" in record["fields"]:
+                    self.create_line(
+                        LineCategory.objects.get(
+                            league=league,
+                            category="Hitting: Hits + Walks",
+                        ),
+                        record["fields"]["Projected Hitting: Hits + Walks"],
+                        player,
+                        todays_game,
+                    )
+
+                if "Projected Hitting: Total Bases" in record["fields"]:
+                    self.create_line(
+                        LineCategory.objects.get(
+                            league=league,
+                            category="Hitting: Total Bases",
+                        ),
+                        record["fields"]["Projected Hitting: Total Bases"],
+                        player,
+                        todays_game,
+                    )
+
+                if "Projected Fantasy Score" in record["fields"]:
+                    self.create_line(
+                        LineCategory.objects.get(
+                            league=league,
+                            category="Fantasy Score",
+                        ),
+                        record["fields"]["Projected Fantasy Score"],
+                        player,
+                        todays_game,
+                    )
+
+                if "Projected Hitting: Runs + RBIs" in record["fields"]:
+                    self.create_line(
+                        LineCategory.objects.get(
+                            league=league,
+                            category="Hitting: Runs + RBIs",
+                        ),
+                        record["fields"]["Projected Hitting: Runs + RBIs"],
+                        player,
+                        todays_game,
+                    )
+
+                if "Projected Pitching: Strikeouts" in record["fields"]:
+                    self.create_line(
+                        LineCategory.objects.get(
+                            league=league,
+                            category="Pitching: Strikeouts",
+                        ),
+                        record["fields"]["Projected Pitching: Strikeouts"],
+                        player,
+                        todays_game,
+                    )
+
+            if "offset" in data:
+                offset = data["offset"]
+            else:
+                all_records_synced = True
+
+    # 1) Change system date to current date
+    # 2) Sync games from airtable for current date
+    # 3) Sync lines from airtable for current date
+    def get(self, request, format=None):
+        # (1)
+        cd = CurrentDate.objects.first()
+        cd.date = datetime.datetime.now(timezone("US/Pacific")).date()
+        cd.save()
+
+        # TODO disable
+        from datetime import timedelta
+
+        cd.date = datetime.datetime.now(timezone("US/Pacific")).date() + timedelta(
+            days=1
+        )
+        cd.save()
+
+        # (2)
+        self.sync_games_for_date(cd)
+
+        # (3)
+        self.sync_lines_for_date(cd)
+
+        return HttpResponseRedirect(reverse("admin:index"))
+
+
 class SyncPlayers(SuperuserRequiredMixin, View):
     def get(self, request, format=None):
         headers = {"Authorization": f"Bearer {settings.AIRTABLE_API_KEY}"}
@@ -267,6 +482,64 @@ class SyncPlayers(SuperuserRequiredMixin, View):
                 )
 
                 player.positions.set(pos)
+
+            if "offset" in data:
+                offset = data["offset"]
+            else:
+                all_records_synced = True
+
+        return HttpResponseRedirect(reverse("admin:index"))
+
+
+class SyncMLBPlayers(SuperuserRequiredMixin, View):
+    def get(self, request, format=None):
+        headers = {"Authorization": f"Bearer {settings.AIRTABLE_API_KEY}"}
+        mlb = League.objects.get(acronym="MLB")
+
+        offset = None
+        all_records_synced = False
+        i = 0
+        while all_records_synced == False:
+            # Player Sync (> 100 records)
+            r = requests.get(
+                "https://api.airtable.com/v0/appW2D1lnIU66op2M/All?view=Grid%20view"
+                + (f"&offset={offset}" if offset else ""),
+                headers=headers,
+            )
+            data = r.json()
+            for record in data["records"]:
+                print(i)
+                if record["fields"]["Team"] == "FA":
+                    continue
+
+                x = ""
+                if record["fields"]["Team"] == "CWS":
+                    x = "CHW"
+                else:
+                    x = record["fields"]["Team"]
+
+                team = Team.objects.get(league=mlb, abbreviation=x.strip())
+
+                pos = []
+                positions = record["fields"]["Position"].split("/")
+                for p in positions:
+                    pos.append(Position.objects.get(league=mlb, acronym=p))
+
+                player, created = Player.objects.update_or_create(
+                    name=record["fields"]["Name"],
+                    defaults={
+                        "team": team,
+                        "premier": True
+                        if "Premier Player" in record["fields"]
+                        else False,
+                        "headshot_url": record["fields"]["Image"][0]["thumbnails"][
+                            "large"
+                        ]["url"],
+                    },
+                )
+
+                player.positions.set(pos)
+                i = i + 1
 
             if "offset" in data:
                 offset = data["offset"]
