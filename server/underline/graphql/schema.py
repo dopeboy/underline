@@ -18,6 +18,8 @@ from core.models import (
     Deposit,
     LineCategory,
     League,
+    Movement,
+    SubMovement,
 )
 from accounts.models import User
 from graphql_jwt.decorators import login_required
@@ -80,8 +82,20 @@ class LineType(DjangoObjectType):
         model = Line
 
 
+class SubMovementType(DjangoObjectType):
+    class Meta:
+        model = SubMovement
+
+
+class MovementType(DjangoObjectType):
+
+    class Meta:
+        model = Movement
+
+
 class SublineType(DjangoObjectType):
     line = graphene.Field(LineType)
+    movement = graphene.Field(MovementType)
 
     class Meta:
         model = Subline
@@ -126,6 +140,7 @@ class MySlipType(DjangoObjectType):
 
 class Query(graphene.ObjectType):
     todays_sublines = graphene.List(SublineType)
+    todays_movements = graphene.List(MovementType)
     line_categories = graphene.Field(
         graphene.List(LineCategoryType), league=graphene.String(required=True)
     )
@@ -167,6 +182,11 @@ class Query(graphene.ObjectType):
             q1._result_cache.append(line)
 
         return q1
+
+    # Get today's date. Find all the movements for the date
+    def resolve_todays_movements(self, info, **kwargs):
+        cd = CurrentDate.objects.first()
+        return Movement.objects.filter(date=cd.date)
 
     @login_required
     def resolve_me(self, info, **kawargs):
