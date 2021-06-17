@@ -9,6 +9,7 @@ LOGFILE=/var/log/gunicorn/access.log    # WSGI log here
 USER=app                                # the user to run as
 GROUP=app                               # the group to run as
 NUM_WORKERS=2                           # how many worker processes should spawn
+TIMEOUT=120
 
 echo "Starting $NAME as `whoami`"
 
@@ -22,6 +23,7 @@ exec gunicorn \
     --name $NAME \
     --workers $NUM_WORKERS \
     --user $USER \
+    --timeout $TIMEOUT \
     --group $GROUP \
     --log-level debug \
     --bind unix:$SOCKFILE \

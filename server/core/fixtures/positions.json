@@ -88,5 +88,95 @@
             "name": "Center",
             "acronym": "C"
         }
+    },
+    {
+        "model": "core.position",
+        "pk": 11,
+        "fields": {
+            "league": 3,
+            "name": "Pitcher",
+            "acronym": "P"
+        }
+    },
+    {
+        "model": "core.position",
+        "pk": 12,
+        "fields": {
+            "league": 3,
+            "name": "Catcher",
+            "acronym": "C"
+        }
+    },
+    {
+        "model": "core.position",
+        "pk": 13,
+        "fields": {
+            "league": 3,
+            "name": "First base",
+            "acronym": "1B"
+        }
+    },
+    {
+        "model": "core.position",
+        "pk": 14,
+        "fields": {
+            "league": 3,
+            "name": "Second base",
+            "acronym": "2B"
+        }
+    },
+    {
+        "model": "core.position",
+        "pk": 15,
+        "fields": {
+            "league": 3,
+            "name": "Third base",
+            "acronym": "3B"
+        }
+    },
+    {
+        "model": "core.position",
+        "pk": 16,
+        "fields": {
+            "league": 3,
+            "name": "Short stop",
+            "acronym": "SS"
+        }
+    },
+    {
+        "model": "core.position",
+        "pk": 17,
+        "fields": {
+            "league": 3,
+            "name": "Outfield",
+            "acronym": "OF"
+        }
+    },
+    {
+        "model": "core.position",
+        "pk": 18,
+        "fields": {
+            "league": 3,
+            "name": "Relief Pitcher",
+            "acronym": "RP"
+        }
+    },
+    {
+        "model": "core.position",
+        "pk": 19,
+        "fields": {
+            "league": 3,
+            "name": "Starting Pitcher",
+            "acronym": "SP"
+        }
+    },
+    {
+        "model": "core.position",
+        "pk": 20,
+        "fields": {
+            "league": 3,
+            "name": "Designated Hitter",
+            "acronym": "DH"
+        }
     }
 ]
