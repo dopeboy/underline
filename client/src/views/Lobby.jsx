@@ -122,7 +122,11 @@ const PlayerList = ({ picks, addOrRemovePick, setTabActiveIndex }) => {
     const panes =
         data &&
         data.lineCategories
-            .filter((lineCategory) => lineCategory.category !== 'Fantasy Score')
+            .filter(
+                (lineCategory) =>
+                    lineCategory.category !== 'Fantasy Score' &&
+                    lineCategory.category !== 'Pitching: Total Outs'
+            )
             .map((lineCategory) => {
                 return {
                     menuItem: lineCategory.category,
