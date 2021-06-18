@@ -429,12 +429,14 @@ class RunWholeShebangMLB(SuperuserRequiredMixin, View):
         cd.save()
 
         # TODO disable
+        """
         from datetime import timedelta
 
         cd.date = datetime.datetime.now(timezone("US/Pacific")).date() + timedelta(
             days=1
         )
         cd.save()
+        """
 
         # (2)
         self.sync_games_for_date(cd)
