@@ -121,123 +121,135 @@ const PlayerList = ({ picks, addOrRemovePick, setTabActiveIndex }) => {
 
     const panes =
         data &&
-        data.lineCategories.map((lineCategory) => {
-            return {
-                menuItem: lineCategory.category,
-                pane: {
-                    key: lineCategory.category,
-                    content: (
-                        <Card.Group itemsPerRow={!isTabletOrMobile && 4}>
-                            {data.todaysSublines
-                                .filter(
-                                    (subline) =>
-                                        subline.line.category.category ===
-                                        lineCategory.category
-                                )
-                                .map((subline) => {
-                                    const pick = picks.filter((e) => {
-                                        return e.id === subline.id
-                                    })[0]
-
-                                    return (
-                                        <Card
-                                            fluid={isTabletOrMobile}
-                                            key={subline.id}
-                                        >
-                                            <Image
-                                                size="tiny"
-                                                src={
-                                                    subline.line.player
-                                                        .headshotUrl
-                                                }
-                                                wrapped
-                                                ui={false}
-                                            />
-                                            <Card.Content>
-                                                <Card.Header>
-                                                    {subline.line.player.name}
-                                                </Card.Header>
-                                                <Card.Meta>
-                                                    <span className="date">
-                                                        {
-                                                            subline.line
-                                                                .category
-                                                                .category
-                                                        }
-                                                        :{' '}
-                                                        {parseFloat(
-                                                            subline.projectedValue
-                                                        ).toFixed(1)}
-                                                    </span>
-                                                </Card.Meta>
-                                                <Card.Description>
-                                                    {
-                                                        subline.line.game
-                                                            .awayTeam
-                                                            .abbreviation
-                                                    }{' '}
-                                                    @{' '}
-                                                    {
-                                                        subline.line.game
-                                                            .homeTeam
-                                                            .abbreviation
-                                                    }{' '}
-                                                    -{' '}
-                                                    {moment
-                                                        .tz(
-                                                            subline.line.game
-                                                                .datetime,
-                                                            moment.tz.guess()
-                                                        )
-                                                        .format('h:mma z')}
-                                                </Card.Description>
-                                            </Card.Content>
-                                            <Card.Content extra>
-                                                <Button.Group
-                                                    size="large"
-                                                    fluid
-                                                >
-                                                    <Button
-                                                        className="over-under-btn"
-                                                        color={
-                                                            pick && !pick.under
-                                                                ? 'black'
-                                                                : ''
-                                                        }
-                                                        content="Over"
-                                                        onClick={() =>
-                                                            addOrRemovePick(
-                                                                subline,
-                                                                false
-                                                            )
-                                                        }
-                                                    />
-                                                    <Button.Or />
-                                                    <Button
-                                                        className="over-under-btn"
-                                                        content="Under"
-                                                        color={
-                                                            pick && pick.under
-                                                                ? 'black'
-                                                                : null
-                                                        }
-                                                        onClick={() =>
-                                                            addOrRemovePick(
-                                                                subline,
-                                                                true
-                                                            )
-                                                        }
-                                                    />
-                                                </Button.Group>
-                                            </Card.Content>
-                                        </Card>
+        data.lineCategories
+            .filter(
+                (lineCategory) =>
+                    lineCategory.category !== 'Fantasy Score' &&
+                    lineCategory.category !== 'Pitching: Total Outs'
+            )
+            .map((lineCategory) => {
+                return {
+                    menuItem: lineCategory.category,
+                    pane: {
+                        key: lineCategory.category,
+                        content: (
+                            <Card.Group itemsPerRow={!isTabletOrMobile && 4}>
+                                {data.todaysSublines
+                                    .filter(
+                                        (subline) =>
+                                            subline.line.category.category ===
+                                            lineCategory.category
                                     )
-                                })}
-                        </Card.Group>
-                    ),
-                },
-            }
-        })
+                                    .map((subline) => {
+                                        const pick = picks.filter((e) => {
+                                            return e.id === subline.id
+                                        })[0]
+
+                                        return (
+                                            <Card
+                                                fluid={isTabletOrMobile}
+                                                key={subline.id}
+                                            >
+                                                <Image
+                                                    size="tiny"
+                                                    src={
+                                                        subline.line.player
+                                                            .headshotUrl
+                                                    }
+                                                    wrapped
+                                                    ui={false}
+                                                />
+                                                <Card.Content>
+                                                    <Card.Header>
+                                                        {
+                                                            subline.line.player
+                                                                .name
+                                                        }
+                                                    </Card.Header>
+                                                    <Card.Meta>
+                                                        <span className="date">
+                                                            {
+                                                                subline.line
+                                                                    .category
+                                                                    .category
+                                                            }
+                                                            :{' '}
+                                                            {parseFloat(
+                                                                subline.projectedValue
+                                                            ).toFixed(1)}
+                                                        </span>
+                                                    </Card.Meta>
+                                                    <Card.Description>
+                                                        {
+                                                            subline.line.game
+                                                                .awayTeam
+                                                                .abbreviation
+                                                        }{' '}
+                                                        @{' '}
+                                                        {
+                                                            subline.line.game
+                                                                .homeTeam
+                                                                .abbreviation
+                                                        }{' '}
+                                                        -{' '}
+                                                        {moment
+                                                            .tz(
+                                                                subline.line
+                                                                    .game
+                                                                    .datetime,
+                                                                moment.tz.guess()
+                                                            )
+                                                            .format('h:mma z')}
+                                                    </Card.Description>
+                                                </Card.Content>
+                                                <Card.Content extra>
+                                                    <Button.Group
+                                                        size="large"
+                                                        fluid
+                                                    >
+                                                        <Button
+                                                            className="over-under-btn"
+                                                            color={
+                                                                pick &&
+                                                                !pick.under
+                                                                    ? 'black'
+                                                                    : ''
+                                                            }
+                                                            content="Over"
+                                                            onClick={() =>
+                                                                addOrRemovePick(
+                                                                    subline,
+                                                                    false
+                                                                )
+                                                            }
+                                                        />
+                                                        <Button.Or />
+                                                        <Button
+                                                            className="over-under-btn"
+                                                            content="Under"
+                                                            color={
+                                                                pick &&
+                                                                pick.under
+                                                                    ? 'black'
+                                                                    : null
+                                                            }
+                                                            onClick={() =>
+                                                                addOrRemovePick(
+                                                                    subline,
+                                                                    true
+                                                                )
+                                                            }
+                                                        />
+                                                    </Button.Group>
+                                                </Card.Content>
+                                            </Card>
+                                        )
+                                    })}
+                            </Card.Group>
+                        ),
+                    },
+                }
+            })
 
     return (
         <Form loading={!data}>

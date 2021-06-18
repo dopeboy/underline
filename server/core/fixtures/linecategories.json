@@ -58,7 +58,7 @@
         "pk": 8,
         "fields": {
             "category": "Pitching: Total Outs",
-            "display_order": 3,
+            "display_order": 10,
             "league": 3
         }
     },

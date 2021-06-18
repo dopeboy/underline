@@ -510,7 +510,6 @@ class SyncMLBPlayers(SuperuserRequiredMixin, View):
             )
             data = r.json()
             for record in data["records"]:
-                print(i)
                 if record["fields"]["Team"] == "FA":
                     continue
 
