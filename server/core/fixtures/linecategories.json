@@ -34,59 +34,5 @@
             "display_order": 2,
             "league": 2
         }
-    },
-    {
-        "model": "core.linecategory",
-        "pk": 6,
-        "fields": {
-            "category": "Fantasy Score",
-            "display_order": 1,
-            "league": 3
-        }
-    },
-    {
-        "model": "core.linecategory",
-        "pk": 7,
-        "fields": {
-            "category": "Pitching: Strikeouts",
-            "display_order": 2,
-            "league": 3
-        }
-    },
-    {
-        "model": "core.linecategory",
-        "pk": 8,
-        "fields": {
-            "category": "Pitching: Total Outs",
-            "display_order": 10,
-            "league": 3
-        }
-    },
-    {
-        "model": "core.linecategory",
-        "pk": 9,
-        "fields": {
-            "category": "Hitting: Runs + RBIs",
-            "display_order": 4,
-            "league": 3
-        }
-    },
-    {
-        "model": "core.linecategory",
-        "pk": 10,
-        "fields": {
-            "category": "Hitting: Total Bases",
-            "display_order": 5,
-            "league": 3
-        }
-    },
-    {
-        "model": "core.linecategory",
-        "pk": 11,
-        "fields": {
-            "category": "Hitting: Hits + Walks",
-            "display_order": 6,
-            "league": 3
-        }
     }
 ]

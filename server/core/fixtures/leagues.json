@@ -14,13 +14,5 @@
             "acronym": "NBA",
             "long_name": "National Basketball Association"
         }
-    },
-    {
-        "model": "core.league",
-        "pk": 3,
-        "fields": {
-            "acronym": "MLB",
-            "long_name": "Major League Baseball"
-        }
     }
 ]
