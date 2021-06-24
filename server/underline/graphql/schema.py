@@ -220,7 +220,7 @@ class CreateSlip(graphene.Mutation):
 
     @classmethod
     def mutate(cls, root, info, picks, entry_amount, creator_code):
-        # Check - $80 cap
+        # Check - $150 cap
         # Get today's slips for this user and sum their entry amounts
         tz = pytz.timezone("America/Los_Angeles")
         start = datetime.datetime.now().replace(
@@ -243,7 +243,7 @@ class CreateSlip(graphene.Mutation):
         if total == None:
             total = 0
 
-        if total + entry_amount > 80:
+        if total + entry_amount > 150:
             return CreateSlip(success=False)
 
         # Create the slip
