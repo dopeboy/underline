@@ -800,7 +800,7 @@ const Creator = ({ updateMainComponent }) => {
                     </p>
                     <p>
                         <a
-                            href={`https://www.underline-demo.herokuapp.com/${
+                            href={`https://underline-demo.herokuapp.com/${
                                 data && data.me.username
                             }`}
                         >
