@@ -157,7 +157,7 @@ const GET_ME_QUERY = gql`
 `
 
 const renderProjectedValue = (subline) => {
-    if (!subline.submovment)
+    if (subline.submovement === undefined || subline.submovment === null)
         return parseFloat(subline.projectedValue).toFixed(1)
     else {
         return (
@@ -176,6 +176,7 @@ const CreatorSelectedPicks = ({ picks, addOrRemovePick, username }) => {
             username: username,
         },
     })
+
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 767px)' })
 
     return (
