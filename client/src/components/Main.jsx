@@ -29,6 +29,7 @@ const GET_ME_QUERY = gql`
             lastName
             username
             walletBalance
+            creator
         }
     }
 `
@@ -98,21 +99,16 @@ const Main = (props) => {
                                         >
                                             Complete
                                         </Dropdown.Item>
-                                        {/*
-                                        <Dropdown.Item
-                                            as={Link}
-                                            to={`/${
-                                                data && data.me.username
-                                                    ? data.me.username
-                                                    : 'lobby'
-                                            }`}
-                                        >
-                                            @
-                                            {data && data.me.username
-                                                ? data.me.username
-                                                : 'me'}
-                                        </Dropdown.Item>
-                                        */}
+                                        {isActiveJWT() &&
+                                            data &&
+                                            data.me.creator && (
+                                                <Dropdown.Item
+                                                    as={Link}
+                                                    to="/creator"
+                                                >
+                                                    Creator
+                                                </Dropdown.Item>
+                                            )}
                                         <Dropdown.Item
                                             as={Link}
                                             to="/settings/deposit"
@@ -170,24 +166,15 @@ const Main = (props) => {
                                 Completed
                             </Menu.Item>
                         )}
-                        {/* isActiveJWT() && data && (
+                        {isActiveJWT() && data && data.me.creator && (
                             <Menu.Item
-                                active={
-                                    location.pathname === `/${data.me.username}`
-                                }
+                                active={location.pathname === '/creator'}
                                 as={Link}
-                                to={`/${
-                                    data && data.me.username
-                                        ? data.me.username
-                                        : 'lobby'
-                                }`}
+                                to="/creator"
                             >
-                                @
-                                {data && data.me.username
-                                    ? data.me.username
-                                    : 'me'}
+                                Creator
                             </Menu.Item>
-                        )*/}
+                        )}
 
                         <Menu.Menu position="right">
                             {isActiveJWT() && (

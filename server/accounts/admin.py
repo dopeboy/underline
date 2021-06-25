@@ -16,6 +16,7 @@ class UserAdmin(ExportMixin, admin.ModelAdmin):
     )
     list_editable = ("wallet_balance",)
     ordering = ('-date_joined',)
+    search_fields = ['first_name', 'last_name']
 
 
 admin.site.register(User, UserAdmin)

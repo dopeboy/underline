@@ -20,6 +20,7 @@ import Lobby from 'views/Lobby.jsx'
 import Active from 'views/Active.jsx'
 import Completed from 'views/Completed.jsx'
 import Settings from 'views/Settings.jsx'
+import Creator from 'views/Creator.jsx'
 import Main from 'components/Main'
 
 // If there isn't a valid token, don't send it. This is because we can have an expired
@@ -42,6 +43,7 @@ const httpLink = createHttpLink({
             : 'http://localhost:5000/graphql/',
 })
 
+/*
 const defaultOptions = {
     watchQuery: {
         fetchPolicy: 'no-cache',
@@ -49,6 +51,14 @@ const defaultOptions = {
     },
     query: {
         fetchPolicy: 'no-cache',
+        errorPolicy: 'all',
+    },
+}
+*/
+
+const defaultOptions = {
+    query: {
+        fetchPolicy: 'cache-first',
         errorPolicy: 'all',
     },
 }
@@ -124,14 +134,10 @@ function App() {
                         path="/login"
                         component={Login}
                     ></NonLoggedInRoute>
-                    <Route
+                    <PrivateRoute
                         path="/:username"
-                        render={(props) => (
-                            <Main>
-                                <Lobby />
-                            </Main>
-                        )}
-                    />
+                        component={Creator}
+                    ></PrivateRoute>
                     <Route
                         path="/"
                         render={(props) => (

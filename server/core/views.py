@@ -212,14 +212,11 @@ class RunWholeShebang(SuperuserRequiredMixin, View):
         cd.save()
 
         # TODO disable
-        """
         from datetime import timedelta
 
-        cd.date = datetime.datetime.now(timezone("US/Pacific")).date() - timedelta(
-            days=3
-        )
+        cd.date = datetime.datetime.now(timezone("US/Pacific")).date()
+        cd.date = cd.date.replace(month=6, day=16)
         cd.save()
-        """
 
         # (2)
         self.sync_games_for_date(cd)

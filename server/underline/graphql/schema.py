@@ -18,6 +18,8 @@ from core.models import (
     Deposit,
     LineCategory,
     League,
+    Movement,
+    SubMovement,
 )
 from accounts.models import User
 from graphql_jwt.decorators import login_required
@@ -80,8 +82,19 @@ class LineType(DjangoObjectType):
         model = Line
 
 
+class SubMovementType(DjangoObjectType):
+    class Meta:
+        model = SubMovement
+
+
+class MovementType(DjangoObjectType):
+    class Meta:
+        model = Movement
+
+
 class SublineType(DjangoObjectType):
     line = graphene.Field(LineType)
+    movement = graphene.Field(MovementType)
 
     class Meta:
         model = Subline
@@ -126,6 +139,7 @@ class MySlipType(DjangoObjectType):
 
 class Query(graphene.ObjectType):
     todays_sublines = graphene.List(SublineType)
+    my_movements_for_today = graphene.List(MovementType)
     line_categories = graphene.Field(
         graphene.List(LineCategoryType), league=graphene.String(required=True)
     )
@@ -168,6 +182,11 @@ class Query(graphene.ObjectType):
 
         return q1
 
+    # Get today's date. Find all the movements for the date
+    def resolve_my_movements_for_today(self, info, **kwargs):
+        cd = CurrentDate.objects.first()
+        return Movement.objects.filter(date=cd.date, creator=info.context.user)
+
     @login_required
     def resolve_me(self, info, **kawargs):
         return info.context.user
@@ -206,6 +225,31 @@ class PickType(graphene.InputObjectType):
     # This is the subline_id
     id = graphene.ID(required=True)
     under = graphene.Boolean(required=True)
+
+
+class SuperPickType(graphene.InputObjectType):
+    # This is the subline_id
+    id = graphene.ID(required=True)
+    under = graphene.Boolean(required=True)
+    submovement_id = graphene.ID(required=False)
+
+
+class CreateCreatorSublines(graphene.Mutation):
+    class Arguments:
+        picks = graphene.List(SuperPickType, required=True)
+
+    # The class attributes define the response of the mutation
+    success = graphene.Boolean()
+
+    @classmethod
+    def mutate(cls, root, info, picks):
+        for pick in picks:
+            sl = Subline.objects.get(pk=pick['id'])
+            sl.pk = None
+            sl.creator=info.context.user
+            # if pick['
+            sl.save()
+        return CreateCreatorSublines(success=True)
 
 
 class CreateSlip(graphene.Mutation):
@@ -277,33 +321,6 @@ class CreateSlip(graphene.Mutation):
             response = sg.send(message)
 
         return CreateSlip(success=True, free_to_play=info.context.user.free_to_play)
-
-
-class CreateCreatorSlip(graphene.Mutation):
-    class Arguments:
-        picks = graphene.List(PickType, required=True)
-
-    # The class attributes define the response of the mutation
-    success = graphene.Boolean()
-
-    @classmethod
-    def mutate(cls, root, info, picks):
-        # Create the slip
-        slip = Slip.objects.create(
-            owner=info.context.user,
-            entry_amount=0,
-            creator_slip=True,
-        )
-
-        u = info.context.user
-        u.current_creator_slip = slip
-        u.save()
-
-        for p in picks:
-            subline = Subline.objects.get(id=int(p["id"]))
-            Pick.objects.create(subline=subline, slip=slip, under=p["under"])
-
-        return CreateCreatorSlip(success=True)
 
 
 class CreateUser(graphene.Mutation):
@@ -406,6 +423,6 @@ class RecordDeposit(graphene.Mutation):
 
 class Mutation(graphene.ObjectType):
     create_slip = CreateSlip.Field()
-    create_creator_slip = CreateCreatorSlip.Field()
+    create_creator_sublines = CreateCreatorSublines.Field()
     create_user = CreateUser.Field()
     record_deposit = RecordDeposit.Field()

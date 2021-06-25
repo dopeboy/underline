@@ -38,6 +38,8 @@ from .models import (
     Pick,
     Deposit,
     LineCategory,
+    Movement,
+    SubMovement,
 )
 
 
@@ -262,9 +264,7 @@ class SlipAdmin(ExportMixin, admin.ModelAdmin):
         ) - datetime.timedelta(days=0)
 
         return Slip.objects.filter(
-            datetime_created__lte=end,
-            datetime_created__gte=start,
-            free_to_play=False
+            datetime_created__lte=end, datetime_created__gte=start, free_to_play=False
         )
 
     def changelist_view(self, request, extra_context=None):
@@ -331,10 +331,32 @@ class LineCategoryAdmin(admin.ModelAdmin):
         return False
 
 
+class SubMovementTabularInline(admin.TabularInline):
+    list_display = [
+        field.name for field in SubMovement._meta.fields if field.name != "id"
+    ]
+    model = SubMovement
+    extra = 0
+
+
+class MovementAdmin(admin.ModelAdmin):
+    inlines = [
+        SubMovementTabularInline,
+    ]
+
+    class Meta:
+        model = Movement
+
+    autocomplete_fields = [
+        "creator",
+    ]
+
+
 admin.site.register(Team, TeamAdmin)
 
 # Register your models here.
 admin.site.register(League)
+admin.site.register(Movement, MovementAdmin)
 admin.site.register(Slip, SlipAdmin)
 admin.site.register(FreeToPlaySlip, FreeToPlaySlipsAdmin)
 admin.site.register(PaidSlip, PaidSlipAdmin)
