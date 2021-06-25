@@ -138,8 +138,6 @@ class Subline(models.Model):
 
     movement = models.ForeignKey(Movement, on_delete=models.CASCADE, null=True)
 
-    creator = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-
     def __str__(self):
         return f"{self.line}"
 
