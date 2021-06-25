@@ -157,7 +157,11 @@ const GET_ME_QUERY = gql`
 `
 
 const renderProjectedValue = (subline) => {
-    if (subline.submovement === undefined || subline.submovment === null)
+    if (
+        !subline.hasOwnProperty('submovement') ||
+        subline.submovement === undefined ||
+        subline.submovement === null
+    )
         return parseFloat(subline.projectedValue).toFixed(1)
     else {
         return (
