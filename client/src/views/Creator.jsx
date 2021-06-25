@@ -349,8 +349,8 @@ const PicksList = ({ picks, addOrRemovePick, sublineSubmovements, isSelf }) => {
             <Header as="h2">Slip</Header>
             {picks.length === 0 && (
                 <p>
-                    Unlock up to four exclusive line adjustments for your community
-                    by clicking on the green button on a player.
+                    Unlock up to four exclusive line adjustments for your
+                    community by clicking on the green button on a player.
                 </p>
             )}
             {picks.map((pick) => (
@@ -719,7 +719,9 @@ const Creator = ({ updateMainComponent }) => {
     }
 
     const getSubmovement = (sublineId) => {
-        const sublineSubmovement = sublineSubmovements.find((e) => e.subline.id === sublineId) 
+        const sublineSubmovement = sublineSubmovements.find(
+            (e) => e.subline.id === sublineId
+        )
         return sublineSubmovement ? sublineSubmovement.submovement.id : null
     }
 
@@ -789,7 +791,7 @@ const Creator = ({ updateMainComponent }) => {
             >
                 <Header>
                     <Icon name="exclamation circle" />
-                    You created your own slip!
+                    You created your own picks
                 </Header>
                 <Modal.Content>
                     <p>
@@ -798,9 +800,13 @@ const Creator = ({ updateMainComponent }) => {
                     </p>
                     <p>
                         <a
-                            href={`https://www.underlinefantasy.com/${username}`}
+                            href={`https://www.underline-demo.herokuapp.com/${
+                                data && data.me.username
+                            }`}
                         >
-                            {`https://www.underlinefantasy.com/${username}`}
+                            {`https://www.underline-demo.herokuapp.com/${
+                                data && data.me.username
+                            }`}
                         </a>
                     </p>
                 </Modal.Content>
