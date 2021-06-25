@@ -188,7 +188,13 @@ class Query(graphene.ObjectType):
 
     def resolve_my_picks_for_today(self, info, **kwargs):
         u = User.objects.get(username=kwargs.get("username"))
-        return Slip.objects.filter(owner=u).latest("datetime_created").pick_set.all()
+        if Slip.objects.filter(owner=u, creator_slip=True).count() == 0:
+            return []
+        return (
+            Slip.objects.filter(owner=u, creator_slip=True)
+            .latest("datetime_created")
+            .pick_set.all()
+        )
 
     # Get today's date. Find all the movements for the date
     def resolve_my_movements_for_today(self, info, **kwargs):
@@ -260,6 +266,7 @@ class CreateCreatorSlip(graphene.Mutation):
             owner=info.context.user,
             entry_amount=0,
             free_to_play=True,
+            creator_slip=True,
         )
 
         for p in picks:
