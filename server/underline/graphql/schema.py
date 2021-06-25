@@ -139,6 +139,9 @@ class MySlipType(DjangoObjectType):
 
 class Query(graphene.ObjectType):
     todays_sublines = graphene.List(SublineType)
+    my_picks_for_today = graphene.Field(
+        graphene.List(MyPickType), username=graphene.String(required=True)
+    )
     my_movements_for_today = graphene.List(MovementType)
     line_categories = graphene.Field(
         graphene.List(LineCategoryType), league=graphene.String(required=True)
@@ -147,6 +150,7 @@ class Query(graphene.ObjectType):
     active_slips = graphene.List(MySlipType)
     complete_slips = graphene.List(MySlipType)
     current_date = graphene.Date()
+    user = graphene.Field(UserType, username=graphene.String(required=True))
 
     # Get today's date. Find all the games that lie on today's
     # date. Get all the lines that roll up to these dates. Get all the sublines
@@ -182,6 +186,10 @@ class Query(graphene.ObjectType):
 
         return q1
 
+    def resolve_my_picks_for_today(self, info, **kwargs):
+        u = User.objects.get(username=kwargs.get("username"))
+        return Slip.objects.filter(owner=u).latest("datetime_created").pick_set.all()
+
     # Get today's date. Find all the movements for the date
     def resolve_my_movements_for_today(self, info, **kwargs):
         cd = CurrentDate.objects.first()
@@ -190,6 +198,9 @@ class Query(graphene.ObjectType):
     @login_required
     def resolve_me(self, info, **kawargs):
         return info.context.user
+
+    def resolve_user(self, info, **kawargs):
+        return User.objects.get(username=kwargs.get("username"))
 
     def resolve_line_categories(self, info, **kwargs):
         name = kwargs.get("league")
@@ -234,7 +245,7 @@ class SuperPickType(graphene.InputObjectType):
     submovement_id = graphene.ID(required=False)
 
 
-class CreateCreatorSublines(graphene.Mutation):
+class CreateCreatorSlip(graphene.Mutation):
     class Arguments:
         picks = graphene.List(SuperPickType, required=True)
 
@@ -243,13 +254,28 @@ class CreateCreatorSublines(graphene.Mutation):
 
     @classmethod
     def mutate(cls, root, info, picks):
-        for pick in picks:
-            sl = Subline.objects.get(pk=pick['id'])
-            sl.pk = None
-            sl.creator=info.context.user
-            # if pick['
-            sl.save()
-        return CreateCreatorSublines(success=True)
+        print(picks)
+        # Create the creator slip
+        slip = Slip.objects.create(
+            owner=info.context.user,
+            entry_amount=0,
+            free_to_play=True,
+        )
+
+        for p in picks:
+            subline = Subline.objects.get(id=int(p["id"]))
+
+            # if there is a movement on the subline, clone the subline
+            # and attach movement
+            subline.pk = None
+            subline.visible = False
+
+            if p["submovement_id"]:
+                subline.submovement = SubMovement.objects.get(id=p["submovement_id"])
+            subline.save()
+
+            Pick.objects.create(subline=subline, slip=slip, under=p["under"])
+        return CreateCreatorSlip(success=True)
 
 
 class CreateSlip(graphene.Mutation):
@@ -423,6 +449,6 @@ class RecordDeposit(graphene.Mutation):
 
 class Mutation(graphene.ObjectType):
     create_slip = CreateSlip.Field()
-    create_creator_sublines = CreateCreatorSublines.Field()
+    create_creator_slip = CreateCreatorSlip.Field()
     create_user = CreateUser.Field()
     record_deposit = RecordDeposit.Field()

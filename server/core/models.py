@@ -136,7 +136,7 @@ class Subline(models.Model):
     # Visible in lobby
     visible = models.BooleanField(default=True)
 
-    movement = models.ForeignKey(Movement, on_delete=models.CASCADE, null=True)
+    submovement = models.ForeignKey(SubMovement, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f"{self.line}"

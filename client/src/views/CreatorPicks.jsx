@@ -64,21 +64,45 @@ const GET_TODAYS_SUBLINES_AND_LINE_CATEGORIES_QUERY = gql`
             id
             category
         }
-        myMovementsForToday {
+    }
+`
+
+const GET_CREATOR_PICKS = gql`
+    query myPicksForToday($username: String!) {
+        myPicksForToday(username: $username) {
             id
-            cap
-            submovementSet {
+            under
+            subline {
                 id
-                swing
-                minimum
-                category {
+                line {
                     id
-                    category
+                    category {
+                        id
+                        category
+                    }
+                    player {
+                        id
+                        name
+                        headshotUrl
+                        team {
+                            id
+                        }
+                    }
+                    game {
+                        datetime
+                        homeTeam {
+                            abbreviation
+                        }
+                        awayTeam {
+                            abbreviation
+                        }
+                    }
                 }
-            }
-            creator {
-                id
-                firstName
+                projectedValue
+                submovement {
+                    id
+                    swing
+                }
             }
         }
     }
@@ -100,7 +124,7 @@ const CREATE_SLIP_MUTATION = gql`
     mutation CreateSlip(
         $picks: [PickType]!
         $entryAmount: Int!
-        $creatorCode: String
+        $creatorCode: String!
     ) {
         createSlip(
             picks: $picks
@@ -114,7 +138,7 @@ const CREATE_SLIP_MUTATION = gql`
 `
 
 const CREATE_CREATOR_SLIP_MUTATION = gql`
-    mutation CreateCreatorSlip($picks: [SuperPickType]!) {
+    mutation CreateCreatorSlip($picks: [PickType]!) {
         createCreatorSlip(picks: $picks) {
             success
         }
@@ -132,44 +156,131 @@ const GET_ME_QUERY = gql`
     }
 `
 
-const renderProjectedValue = (subline, sublineSubmovements) => {
-    const matchedSublineSubmovement = sublineSubmovements.find(
-        (e) => e.subline.id === subline.id
-    )
-
-    if (matchedSublineSubmovement === undefined)
+const renderProjectedValue = (subline) => {
+    if (!subline.submovment)
         return parseFloat(subline.projectedValue).toFixed(1)
     else {
         return (
             <span>
                 <s>{parseFloat(subline.projectedValue).toFixed(1)}</s>{' '}
                 {parseFloat(subline.projectedValue) +
-                    parseFloat(matchedSublineSubmovement.submovement.swing)}
+                    parseFloat(subline.submovement.swing)}
             </span>
         )
     }
 }
 
-const PlayerList = ({
-    picks,
-    addOrRemovePick,
-    addOrRemoveSublineSubmovement,
-    sublineSubmovements,
-    setTabActiveIndex,
-}) => {
+const CreatorSelectedPicks = ({ picks, addOrRemovePick, username }) => {
+    const { data } = useQuery(GET_CREATOR_PICKS, {
+        variables: {
+            username: username,
+        },
+    })
+    const isTabletOrMobile = useMediaQuery({ query: '(max-width: 767px)' })
+
+    return (
+        <Form loading={!data}>
+            {data && data.myPicksForToday.length === 0 ? (
+                <p>This creator hasn't made any picks yet.</p>
+            ) : (
+                <Card.Group itemsPerRow={!isTabletOrMobile && 4}>
+                    {data &&
+                        data.myPicksForToday.map((myPick) => {
+                            const subline = myPick.subline
+                            const pick = picks.filter((e) => {
+                                return e.id === subline.id
+                            })[0]
+
+                            return (
+                                <Card fluid={isTabletOrMobile} key={subline.id}>
+                                    <Image
+                                        size="tiny"
+                                        src={subline.line.player.headshotUrl}
+                                        wrapped
+                                        ui={false}
+                                    />
+                                    <Card.Content>
+                                        <Card.Header>
+                                            {subline.line.player.name}
+                                        </Card.Header>
+                                        <Card.Meta>
+                                            <span className="date">
+                                                {subline.line.category.category}
+                                                :{' '}
+                                                {renderProjectedValue(subline)}
+                                            </span>
+                                        </Card.Meta>
+                                        <Card.Description>
+                                            {
+                                                subline.line.game.awayTeam
+                                                    .abbreviation
+                                            }{' '}
+                                            @{' '}
+                                            {
+                                                subline.line.game.homeTeam
+                                                    .abbreviation
+                                            }{' '}
+                                            -{' '}
+                                            {moment
+                                                .tz(
+                                                    subline.line.game.datetime,
+                                                    moment.tz.guess()
+                                                )
+                                                .format('h:mma z')}
+                                        </Card.Description>
+                                    </Card.Content>
+                                    <Card.Content extra>
+                                        <Button.Group size="large" fluid>
+                                            <Button
+                                                className="over-under-btn"
+                                                color={
+                                                    !myPick.under ? 'black' : ''
+                                                }
+                                                content="Over"
+                                            />
+                                            <Button.Or />
+                                            <Button
+                                                className="over-under-btn"
+                                                content="Under"
+                                                color={
+                                                    myPick.under
+                                                        ? 'black'
+                                                        : null
+                                                }
+                                            />
+                                        </Button.Group>
+                                        <Button
+                                            className="activate-btn"
+                                            content="Add"
+                                            color="green"
+                                            icon="add"
+                                            size="large"
+                                            labelPosition="left"
+                                            fluid
+                                            onClick={() =>
+                                                addOrRemovePick(
+                                                    myPick.subline,
+                                                    myPick.under
+                                                )
+                                            }
+                                        />
+                                    </Card.Content>
+                                </Card>
+                            )
+                        })}
+                </Card.Group>
+            )}
+        </Form>
+    )
+}
+
+const PlayerList = ({ picks, addOrRemovePick, setTabActiveIndex }) => {
     const { data } = useQuery(GET_TODAYS_SUBLINES_AND_LINE_CATEGORIES_QUERY)
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 767px)' })
 
     const panes =
         data &&
         data.lineCategories.map((lineCategory) => {
-            const submovement = data.myMovementsForToday
-                ? data.myMovementsForToday[0].submovementSet.find(
-                      (submovement) =>
-                          submovement.category.id === lineCategory.id
-                  )
-                : null
-
             return {
                 menuItem: lineCategory.category,
                 pane: {
@@ -214,8 +325,7 @@ const PlayerList = ({
                                                         }
                                                         :{' '}
                                                         {renderProjectedValue(
-                                                            subline,
-                                                            sublineSubmovements
+                                                            subline
                                                         )}
                                                     </span>
                                                 </Card.Meta>
@@ -278,43 +388,6 @@ const PlayerList = ({
                                                         }
                                                     />
                                                 </Button.Group>
-                                                {submovement && (
-                                                    <Button
-                                                        className="activate-btn"
-                                                        content={
-                                                            submovement.swing >
-                                                            0
-                                                                ? `+${parseInt(
-                                                                      submovement.swing
-                                                                  )} ${submovement.category.category.toLowerCase()} 
-                                                                  `
-                                                                : `${parseInt(
-                                                                      submovement.swing
-                                                                  )} ${submovement.category.category.toLowerCase()} 
-                                                                  `
-                                                        }
-                                                        color={
-                                                            sublineSubmovements.find(
-                                                                (e) =>
-                                                                    e.subline
-                                                                        .id ===
-                                                                    subline.id
-                                                            )
-                                                                ? 'red'
-                                                                : ''
-                                                        }
-                                                        icon="unlock"
-                                                        size="large"
-                                                        labelPosition="left"
-                                                        fluid
-                                                        onClick={() =>
-                                                            addOrRemoveSublineSubmovement(
-                                                                subline,
-                                                                submovement
-                                                            )
-                                                        }
-                                                    />
-                                                )}
                                             </Card.Content>
                                         </Card>
                                     )
@@ -342,16 +415,12 @@ const PlayerList = ({
     )
 }
 
-const PicksList = ({ picks, addOrRemovePick, sublineSubmovements, isSelf }) => {
-    console.log(picks)
+const PicksList = ({ picks, addOrRemovePick }) => {
     return (
         <>
             <Header as="h2">Slip</Header>
             {picks.length === 0 && (
-                <p>
-                    Unlock up to four exclusive line adjustments for your
-                    community by clicking on the green button on a player.
-                </p>
+                <p>Select a featured player from at least two teams.</p>
             )}
             {picks.map((pick) => (
                 <Card fluid className="slip-card">
@@ -370,10 +439,7 @@ const PicksList = ({ picks, addOrRemovePick, sublineSubmovements, isSelf }) => {
                                             <List.Icon name="hashtag" />
                                             <List.Content>
                                                 {pick.line.category.category}:{' '}
-                                                {renderProjectedValue(
-                                                    pick,
-                                                    sublineSubmovements
-                                                )}
+                                                {renderProjectedValue(pick)}
                                             </List.Content>
                                         </List.Item>
                                         <List.Item>
@@ -425,22 +491,33 @@ const PicksList = ({ picks, addOrRemovePick, sublineSubmovements, isSelf }) => {
     )
 }
 
-const LobbyHeader = () => {
+const LobbyHeader = ({ username }) => {
     const { data } = useQuery(GET_CURRENT_DATE_QUERY)
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 767px)' })
 
     return (
         <Header as={isTabletOrMobile ? 'h3' : 'h2'}>
-            Featured Players:{' '}
+            @{username}'s Picks for{' '}
             {data && moment(data.currentDate).format('MMMM Do YYYY')}
         </Header>
     )
 }
 
-const Creator = ({ updateMainComponent }) => {
+const AllHeader = () => {
+    const { data } = useQuery(GET_CURRENT_DATE_QUERY)
+    const isTabletOrMobile = useMediaQuery({ query: '(max-width: 767px)' })
+
+    return (
+        <Header as={isTabletOrMobile ? 'h3' : 'h2'}>
+            Featured players:{' '}
+            {data && moment(data.currentDate).format('MMMM Do YYYY')}
+        </Header>
+    )
+}
+
+const CreatorPicks = ({ updateMainComponent }) => {
     const [tab, setTab] = useState('lobby')
     const [picks, setPicks] = useState([])
-    const [sublineSubmovements, setSublineSubmovements] = useState([])
     const [percent, setPercent] = useState(0)
     const [multiplier, setMultiplier] = useState('1x')
     const [payout, setPayout] = useState('')
@@ -476,44 +553,6 @@ const Creator = ({ updateMainComponent }) => {
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 767px)' })
 
     const { data } = useQuery(GET_ME_QUERY)
-    const isSelf = data && data.me && data.me.username === username
-
-    const addOrRemoveSublineSubmovement = (subline, submovement) => {
-        const sublineSubmovementsIndex = sublineSubmovements.findIndex(
-            (e) => e.subline.id === subline.id
-        )
-        let newSublineSubmovements = []
-
-        // remove
-        if (sublineSubmovementsIndex != -1) {
-            var array = [...sublineSubmovements] // deep copy
-            array.splice(sublineSubmovementsIndex, 1)
-            newSublineSubmovements = array
-            setSublineSubmovements(array)
-        } else {
-            // add
-            if (sublineSubmovements.length === 4) {
-                setErrorModalVisible({
-                    open: true,
-                    header: "You've hit the cap!",
-                    message:
-                        'You can only unlock line movements on four players.',
-                })
-                return
-            }
-            newSublineSubmovements = [
-                ...sublineSubmovements,
-                Object.assign({}, { subline }, { submovement }),
-            ]
-            setSublineSubmovements(newSublineSubmovements)
-        }
-
-        if (newSublineSubmovements.length == 0) setPercent(0)
-        else if (newSublineSubmovements.length == 1) setPercent(25)
-        else if (newSublineSubmovements.length == 2) setPercent(50)
-        else if (newSublineSubmovements.length == 3) setPercent(75)
-        else if (newSublineSubmovements.length == 4) setPercent(100)
-    }
 
     const addOrRemovePick = (subline, under) => {
         const pickIndex = picks.findIndex((e) => e.id === subline.id)
@@ -551,6 +590,41 @@ const Creator = ({ updateMainComponent }) => {
                 newPicks = [...picks, Object.assign({}, subline, { under })]
                 setPicks(newPicks)
             }
+        }
+
+        // Update multiplier
+        if (newPicks.length == 0) {
+            setPercent(0)
+            setMultiplier(`${getMultiplier(newPicks.length)}x`)
+            setPayout(entryAmount ? entryAmount : '')
+        } else if (newPicks.length === 1) {
+            setPercent(10)
+            setMultiplier(`${getMultiplier(newPicks.length)}x`)
+            setPayout(entryAmount ? entryAmount : '')
+        } else if (newPicks.length === 2) {
+            setPercent(25)
+            setMultiplier(`${getMultiplier(newPicks.length)}x`)
+            setPayout(
+                entryAmount ? entryAmount * getMultiplier(newPicks.length) : ''
+            )
+        } else if (newPicks.length === 3) {
+            setPercent(50)
+            setMultiplier(`${getMultiplier(newPicks.length)}x`)
+            setPayout(
+                entryAmount ? entryAmount * getMultiplier(newPicks.length) : ''
+            )
+        } else if (newPicks.length === 4) {
+            setPercent(75)
+            setMultiplier(`${getMultiplier(newPicks.length)}x`)
+            setPayout(
+                entryAmount ? entryAmount * getMultiplier(newPicks.length) : ''
+            )
+        } else if (newPicks.length === 5) {
+            setPercent(100)
+            setMultiplier(`${getMultiplier(newPicks.length)}x`)
+            setPayout(
+                entryAmount ? entryAmount * getMultiplier(newPicks.length) : ''
+            )
         }
     }
 
@@ -693,8 +767,8 @@ const Creator = ({ updateMainComponent }) => {
                         under: e.under,
                     }
                 }),
-                creatorCode: creatorCode,
                 entryAmount: entryAmount,
+                creatorCode: username,
             },
         })
 
@@ -718,13 +792,6 @@ const Creator = ({ updateMainComponent }) => {
         }
     }
 
-    const getSubmovement = (sublineId) => {
-        const sublineSubmovement = sublineSubmovements.find(
-            (e) => e.subline.id === sublineId
-        )
-        return sublineSubmovement ? sublineSubmovement.submovement.id : null
-    }
-
     const createCreatorSlip = async () => {
         setProcessing(true)
 
@@ -733,9 +800,8 @@ const Creator = ({ updateMainComponent }) => {
             variables: {
                 picks: picks.map((e) => {
                     return {
-                        id: e.id, // subline id
+                        id: e.id,
                         under: e.under,
-                        submovementId: getSubmovement(e.id),
                     }
                 }),
             },
@@ -781,7 +847,7 @@ const Creator = ({ updateMainComponent }) => {
                 </Button>
             )}
             <Helmet>
-                <title>Creator</title>
+                <title>Lobby</title>
             </Helmet>
             <Modal
                 closeOnEscape={false}
@@ -791,7 +857,7 @@ const Creator = ({ updateMainComponent }) => {
             >
                 <Header>
                     <Icon name="exclamation circle" />
-                    You created your own picks
+                    You created your own slip!
                 </Header>
                 <Modal.Content>
                     <p>
@@ -800,13 +866,9 @@ const Creator = ({ updateMainComponent }) => {
                     </p>
                     <p>
                         <a
-                            href={`https://www.underline-demo.herokuapp.com/${
-                                data && data.me.username
-                            }`}
+                            href={`https://www.underlinefantasy.com/${username}`}
                         >
-                            {`https://www.underlinefantasy.com/${
-                                data && data.me.username
-                            }`}
+                            {`https://www.underlinefantasy.com/${username}`}
                         </a>
                     </p>
                 </Modal.Content>
@@ -903,71 +965,100 @@ const Creator = ({ updateMainComponent }) => {
                 textAlign="center"
                 className="over-under-header"
             >
-                Creator mode
+                Over/Under
                 <Header.Subheader>
-                    Choose your predictions for games today and share with your
-                    community
+                    Pick 2, 3, 4, or 5 players from at least two teams. <br />
+                    Predict if they will go OVER or UNDER their projected stat
+                    line.
+                    <br />
+                    {tabActiveIndex == 1 && (
+                        <Link to="/settings/fantasypoints">
+                            What are fantasy points?
+                        </Link>
+                    )}
                 </Header.Subheader>
             </Header>
             <Grid stackable>
                 <Grid.Row>
                     <Grid.Column width={12}>
-                        <LobbyHeader />
+                        <LobbyHeader username={username} />
+                        <CreatorSelectedPicks
+                            picks={picks}
+                            username={username}
+                            addOrRemovePick={addOrRemovePick}
+                        />
+                        <br />
+                        <AllHeader />
                         <PlayerList
                             picks={picks}
                             addOrRemovePick={addOrRemovePick}
-                            addOrRemoveSublineSubmovement={
-                                addOrRemoveSublineSubmovement
-                            }
-                            sublineSubmovements={sublineSubmovements}
                             setTabActiveIndex={setTabActiveIndex}
                         />
-                        {isTabletOrMobile && (
-                            <>
-                                <Progress percent={percent} color="red">
-                                    Player cap (4)
-                                </Progress>
-                                <PicksList
-                                    isSelf={isSelf}
-                                    picks={picks}
-                                    sublineSubmovements={sublineSubmovements}
-                                    addOrRemovePick={addOrRemovePick}
-                                />
-                                <Button
-                                    disabled={picks.length < 2 || processing}
-                                    onClick={createCreatorSlip}
-                                    fluid
-                                    loading={processing}
-                                    color="green"
-                                    size="huge"
-                                >
-                                    Submit
-                                </Button>
-                            </>
-                        )}
                     </Grid.Column>
                     <Grid.Column width={4}>
-                        {!isTabletOrMobile && (
-                            <>
-                                <Progress percent={percent} color="red">
-                                    Player cap (4)
-                                </Progress>
-                                <PicksList
-                                    picks={picks}
-                                    isSelf={isSelf}
-                                    sublineSubmovements={sublineSubmovements}
-                                    addOrRemovePick={addOrRemovePick}
-                                />
-                                <Button
-                                    disabled={picks.length < 2 || processing}
-                                    onClick={createCreatorSlip}
+                        <>
+                            <Header as="h2">Review picks</Header>
+                            <Progress percent={percent} color="green">
+                                {multiplier}
+                            </Progress>
+                            <Form loading={checking}>
+                                <Form.Group widths="equal">
+                                    <Form.Input
+                                        fluid
+                                        icon="dollar"
+                                        iconPosition="left"
+                                        label="Entry amount"
+                                        placeholder="0"
+                                        type="text"
+                                        error={payoutErrorVisible}
+                                        size="huge"
+                                        value={entryAmount}
+                                        onChange={(e) => {
+                                            setPayoutErrorVisible(false)
+                                            const re = /^[0-9\b]+$/
+                                            if (
+                                                re.test(e.target.value) ||
+                                                e.target.value === ''
+                                            ) {
+                                                setEntryAmount(e.target.value)
+                                                setPayout(
+                                                    (e.target.value *
+                                                        getMultiplier(
+                                                            picks.length
+                                                        ): '')
+                                                )
+                                            }
+                                        }}
+                                    />
+                                    <Form.Input
+                                        fluid
+                                        icon="dollar"
+                                        iconPosition="left"
+                                        className="payout-box"
+                                        label="Payout"
+                                        placeholder="0"
+                                        value={payout}
+                                        size="huge"
+                                    />
+                                </Form.Group>
+                                <Form.Button
+                                    disabled={picks.length < 2}
+                                    onClick={checkPicks}
                                     fluid
-                                    loading={processing}
                                     color="green"
                                     size="huge"
                                 >
                                     Submit
-                                </Button>
+                                </Form.Button>
+                                <div ref={slipButtonRef} />
+                            </Form>
+                        </>
+                        {!isTabletOrMobile && (
+                            <>
+                                <PicksList
+                                    picks={picks}
+                                    addOrRemovePick={addOrRemovePick}
+                                />
                             </>
                         )}
                     </Grid.Column>
@@ -977,4 +1068,4 @@ const Creator = ({ updateMainComponent }) => {
     )
 }
 
-export default Creator
+export default CreatorPicks

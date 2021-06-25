@@ -21,6 +21,7 @@ import Active from 'views/Active.jsx'
 import Completed from 'views/Completed.jsx'
 import Settings from 'views/Settings.jsx'
 import Creator from 'views/Creator.jsx'
+import CreatorPicks from 'views/CreatorPicks.jsx'
 import Main from 'components/Main'
 
 // If there isn't a valid token, don't send it. This is because we can have an expired
@@ -135,17 +136,30 @@ function App() {
                         component={Login}
                     ></NonLoggedInRoute>
                     <PrivateRoute
-                        path="/:username"
+                        path="/creator"
                         component={Creator}
                     ></PrivateRoute>
                     <Route
-                        path="/"
+                        path="/lobby"
                         render={(props) => (
                             <Main>
                                 <Lobby />
                             </Main>
                         )}
                     />
+                    <Route
+                        path="/"
+                        exact
+                        render={(props) => (
+                            <Main>
+                                <Lobby />
+                            </Main>
+                        )}
+                    />
+                    <PrivateRoute
+                        path="/:username"
+                        component={CreatorPicks}
+                    ></PrivateRoute>
                 </Switch>
             </Router>
         </ApolloProvider>
