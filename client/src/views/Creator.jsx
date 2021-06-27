@@ -132,19 +132,22 @@ const GET_ME_QUERY = gql`
     }
 `
 
-const renderProjectedValue = (subline, sublineSubmovements) => {
+const renderProjectedValue = (subline, sublineSubmovements, under) => {
     const matchedSublineSubmovement = sublineSubmovements.find(
         (e) => e.subline.id === subline.id
     )
 
-    if (matchedSublineSubmovement === undefined)
+    if (under === null || matchedSublineSubmovement === undefined)
         return parseFloat(subline.projectedValue).toFixed(1)
     else {
         return (
             <span>
                 <s>{parseFloat(subline.projectedValue).toFixed(1)}</s>{' '}
-                {parseFloat(subline.projectedValue) +
-                    parseFloat(matchedSublineSubmovement.submovement.swing)}
+                {under
+                    ? parseFloat(subline.projectedValue) +
+                      parseFloat(matchedSublineSubmovement.submovement.swing)
+                    : parseFloat(subline.projectedValue) -
+                      parseFloat(matchedSublineSubmovement.submovement.swing)}
             </span>
         )
     }
@@ -215,7 +218,10 @@ const PlayerList = ({
                                                         :{' '}
                                                         {renderProjectedValue(
                                                             subline,
-                                                            sublineSubmovements
+                                                            sublineSubmovements,
+                                                            pick
+                                                                ? pick.under
+                                                                : null
                                                         )}
                                                     </span>
                                                 </Card.Meta>
@@ -284,7 +290,7 @@ const PlayerList = ({
                                                         content={
                                                             submovement.swing >
                                                             0
-                                                                ? `+${parseInt(
+                                                                ? `${parseInt(
                                                                       submovement.swing
                                                                   )} ${submovement.category.category.toLowerCase()} 
                                                                   `
@@ -372,7 +378,8 @@ const PicksList = ({ picks, addOrRemovePick, sublineSubmovements, isSelf }) => {
                                                 {pick.line.category.category}:{' '}
                                                 {renderProjectedValue(
                                                     pick,
-                                                    sublineSubmovements
+                                                    sublineSubmovements,
+                                                    pick.under
                                                 )}
                                             </List.Content>
                                         </List.Item>

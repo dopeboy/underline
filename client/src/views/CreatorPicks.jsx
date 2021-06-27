@@ -167,8 +167,11 @@ const renderProjectedValue = (subline) => {
         return (
             <span>
                 <s>{parseFloat(subline.projectedValue).toFixed(1)}</s>{' '}
-                {parseFloat(subline.projectedValue) +
-                    parseFloat(subline.submovement.swing)}
+                {subline.under
+                    ? parseFloat(subline.projectedValue) +
+                      parseFloat(subline.submovement.swing)
+                    : parseFloat(subline.projectedValue) -
+                      parseFloat(subline.submovement.swing)}
             </span>
         )
     }
