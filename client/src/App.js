@@ -156,10 +156,14 @@ function App() {
                             </Main>
                         )}
                     />
-                    <PrivateRoute
+                    <Route
                         path="/:username"
-                        component={CreatorPicks}
-                    ></PrivateRoute>
+                        render={(props) => (
+                            <Main>
+                                <CreatorPicks />
+                            </Main>
+                        )}
+                    />
                 </Switch>
             </Router>
         </ApolloProvider>
