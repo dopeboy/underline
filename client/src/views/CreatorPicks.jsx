@@ -177,6 +177,19 @@ const renderProjectedValue = (subline) => {
     }
 }
 
+const renderProjectedValueNew = (under, subline) => {
+    return (
+        <span>
+            <s>{parseFloat(subline.projectedValue).toFixed(1)}</s>{' '}
+            {under
+                ? parseFloat(subline.projectedValue) +
+                  parseFloat(subline.submovement.swing)
+                : parseFloat(subline.projectedValue) -
+                  parseFloat(subline.submovement.swing)}
+        </span>
+    )
+}
+
 const CreatorSelectedPicks = ({ picks, addOrRemovePick, username }) => {
     const { data } = useQuery(GET_CREATOR_PICKS, {
         variables: {
@@ -215,7 +228,10 @@ const CreatorSelectedPicks = ({ picks, addOrRemovePick, username }) => {
                                             <span className="date">
                                                 {subline.line.category.category}
                                                 :{' '}
-                                                {renderProjectedValue(subline)}
+                                                {renderProjectedValueNew(
+                                                    myPick.under,
+                                                    subline
+                                                )}
                                             </span>
                                         </Card.Meta>
                                         <Card.Description>
